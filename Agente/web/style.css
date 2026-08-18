@@ -1,0 +1,222 @@
+/* [IMPROVED] Fontes profissionais para interface e mensagens. */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500&display=swap');
+
+:root {
+  color-scheme: dark;
+  --bg: #081914;
+  --panel: rgba(2, 28, 23, 0.68);
+  --panel-2: rgba(5, 46, 37, 0.58);
+  --border: rgba(37, 211, 102, 0.2);
+  --text: #f4fff9;
+  --muted: #a9e6c2;
+  --accent: #25d366;
+  --accent-2: #128c7e;
+  --danger: #ff7a7a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(37, 211, 102, 0.16), transparent 32%),
+    linear-gradient(135deg, #061510 0%, #08231d 48%, #0a2d25 100%);
+  color: var(--text);
+  font-family: "DM Sans", "Outfit", system-ui, sans-serif; /* [IMPROVED] Fonte de interface. */
+  font-weight: 400; /* [IMPROVED] Peso normal mais natural. */
+  letter-spacing: -0.01em; /* [IMPROVED] Texto mais coeso visualmente. */
+}
+
+.app {
+  width: min(1180px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 24px 0;
+}
+
+.topbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600; /* [IMPROVED] Peso reservado para titulo principal. */
+}
+
+p {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, .24), inset 0 1px 0 rgba(255, 255, 255, .06);
+  backdrop-filter: blur(10px) saturate(145%); /* [IMPROVED] Transparencia com blur de card. */
+  -webkit-backdrop-filter: blur(10px) saturate(145%);
+  transition: box-shadow .2s ease, opacity .2s ease, border-color .3s ease; /* [IMPROVED] Hover mais suave. */
+}
+
+.panel:hover {
+  opacity: 1; /* [IMPROVED] Leve ganho de presenca no hover. */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
+}
+
+.panel span,
+.outputHead span {
+  font-weight: 500; /* [IMPROVED] Nome/label sem cara pesada. */
+}
+
+textarea {
+  width: 100%;
+  min-height: 210px;
+  resize: vertical;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel-2);
+  color: var(--text);
+  padding: 12px;
+  font: 400 14.5px/1.5 "Plus Jakarta Sans", "DM Sans", system-ui, sans-serif; /* [IMPROVED] Fonte de mensagem. */
+  letter-spacing: -0.01em; /* [IMPROVED] Melhor leitura em widget pequeno. */
+  backdrop-filter: blur(12px); /* [IMPROVED] Input com transparencia sutil. */
+  -webkit-backdrop-filter: blur(12px);
+  transition: border-color .3s ease, opacity .3s ease, box-shadow .2s ease; /* [IMPROVED] Focus suave. */
+}
+
+textarea::placeholder {
+  opacity: .5; /* [IMPROVED] Placeholder animado. */
+  transition: opacity .3s ease;
+}
+
+textarea:focus {
+  border-color: rgba(37, 211, 102, .5); /* [IMPROVED] Borda de foco com accent atual. */
+  outline: none;
+}
+
+textarea:focus::placeholder {
+  opacity: 1; /* [IMPROVED] Placeholder ganha legibilidade no focus. */
+}
+
+.output textarea {
+  min-height: 240px;
+}
+
+.learn {
+  margin-top: 14px;
+}
+
+.learn textarea {
+  min-height: 110px;
+}
+
+button,
+select {
+  min-height: 38px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel-2);
+  color: var(--text);
+  padding: 0 14px;
+  font: 500 14px "DM Sans", "Outfit", system-ui, sans-serif; /* [IMPROVED] Fonte de interface. */
+  letter-spacing: -0.01em; /* [IMPROVED] Mais coeso visualmente. */
+  transition: transform .3s ease, opacity .3s ease, border-color .3s ease, background .3s ease; /* [IMPROVED] Estados suaves. */
+}
+
+button {
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: var(--accent);
+  transform: scale(1.02); /* [IMPROVED] Microinteracao. */
+}
+
+button:active {
+  transform: scale(.95); /* [IMPROVED] Feedback no click. */
+}
+
+.primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: rgba(37, 211, 102, 0.48);
+  box-shadow: 0 8px 20px rgba(18, 140, 126, .24);
+}
+
+/* [IMPROVED] Scrollbar compacta no padrao de widget. */
+textarea::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 4px;
+}
+
+textarea::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, .15);
+  border-radius: 999px;
+}
+
+textarea::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, .3);
+}
+
+html {
+  scroll-behavior: smooth; /* [IMPROVED] Scroll suave. */
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.actions.compact {
+  margin: 0;
+}
+
+.actions.compact span {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+#status {
+  color: var(--muted);
+}
+
+#status.error {
+  color: var(--danger);
+}
+
+.outputHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+@media (max-width: 760px) {
+  .topbar,
+  .grid,
+  .actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

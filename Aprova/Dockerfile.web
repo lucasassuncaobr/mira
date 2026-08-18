@@ -1,0 +1,14 @@
+FROM node:24-alpine AS build
+WORKDIR /app
+COPY package.json package-lock.json ./
+COPY apps/web/package.json apps/web/package.json
+RUN npm ci
+COPY apps/web/src apps/web/src
+COPY apps/web/tsconfig.json apps/web/tsconfig.json
+COPY apps/web/index.html apps/web/
+COPY apps/web/vite.config.ts apps/web/
+RUN npm run build -w apps/web
+
+FROM nginx:alpine
+COPY --from=build /app/apps/web/dist /usr/share/nginx/html
+EXPOSE 80

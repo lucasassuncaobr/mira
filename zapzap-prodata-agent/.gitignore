@@ -1,0 +1,8 @@
+.mimo_api_key
+.deepseek_api_key
+.qwen_api_key
+.env
+__pycache__/
+*.pyc
+moondream-latest.mf
+.venv-moondream/

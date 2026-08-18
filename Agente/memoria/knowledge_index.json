@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "categorias": {
+    "chamado": {
+      "count": 1,
+      "ultima_atualizacao": "2026-07-14 10:34:26",
+      "exemplos": [
+        {
+          "pergunta": "ele fica responsável por criar eventos",
+          "resposta": "consegue abrir chamado por gentileza",
+          "confianca": 0.68,
+          "usos": 1
+        }
+      ]
+    },
+    "erro_sistema": {
+      "count": 1,
+      "ultima_atualizacao": "2026-07-14 10:36:27",
+      "exemplos": [
+        {
+          "pergunta": "qual é este erro?",
+          "resposta": "Bom dia Aurea, tudo jóia",
+          "confianca": 0.68,
+          "usos": 1
+        }
+      ]
+    }
+  },
+  "entries": [
+    {
+      "assinatura": "ele fica responsável por criar eventos -> consegue abrir chamado por gentileza",
+      "data": "2026-07-14 10:34:26",
+      "ultima_atualizacao": "2026-07-14 10:34:26",
+      "pergunta": "ele fica responsável por criar eventos",
+      "resposta": "consegue abrir chamado por gentileza",
+      "categoria": "chamado",
+      "confianca": 0.68,
+      "usos": 1,
+      "aprovado": true
+    },
+    {
+      "assinatura": "qual é este erro? -> bom dia aurea, tudo jóia",
+      "data": "2026-07-14 10:36:27",
+      "ultima_atualizacao": "2026-07-14 10:36:27",
+      "pergunta": "qual é este erro?",
+      "resposta": "Bom dia Aurea, tudo jóia",
+      "categoria": "erro_sistema",
+      "confianca": 0.68,
+      "usos": 1,
+      "aprovado": true
+    }
+  ],
+  "metricas": {
+    "total_aprendizados": 1,
+    "aprendizados_validos": 2,
+    "rejeitados": 0,
+    "taxa_qualidade": 2.0,
+    "ultima_atualizacao": "2026-07-14 10:36:27"
+  }
+}

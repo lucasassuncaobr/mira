@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Agente Prodata</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div>
+          <h1>Agente Prodata</h1>
+          <p>Copiloto local para melhorar respostas antes de enviar no ZapZap.</p>
+        </div>
+        <select id="modo" aria-label="Modo da resposta">
+          <option value="profissional">Profissional</option>
+          <option value="curta">Curta</option>
+          <option value="mais simpática">Mais simpática</option>
+          <option value="mais firme">Mais firme</option>
+          <option value="passo a passo">Passo a passo</option>
+        </select>
+      </header>
+
+      <section class="grid">
+        <label class="panel">
+          <span>Mensagem do cliente</span>
+          <textarea id="cliente" placeholder="Cole aqui a mensagem recebida no ZapZap"></textarea>
+          <button id="colarCliente" type="button">Colar clipboard</button>
+        </label>
+
+        <label class="panel">
+          <span>Seu rascunho</span>
+          <textarea id="rascunho" placeholder="Escreva como responderia, mesmo com erros ou abreviado"></textarea>
+          <button id="colarRascunho" type="button">Colar clipboard</button>
+        </label>
+      </section>
+
+      <div class="actions">
+        <button id="melhorar" class="primary" type="button">Melhorar resposta</button>
+        <button id="limpar" type="button">Limpar</button>
+        <span id="status"></span>
+      </div>
+
+      <section class="panel output">
+        <div class="outputHead">
+          <span>Resposta sugerida</span>
+          <button id="copiar" type="button">Copiar resposta</button>
+        </div>
+        <textarea id="resposta" placeholder="A resposta melhorada aparece aqui"></textarea>
+      </section>
+
+      <section class="panel learn">
+        <span>Aprendizado local</span>
+        <textarea id="aprendizado" placeholder="Opcional: registre uma regra nova. Ex: quando for erro X, pedir primeiro o print da tela Y."></textarea>
+        <div class="actions compact">
+          <button id="salvarAprendizado" type="button">Salvar aprendizado</button>
+          <span>Salva a resposta aprovada e a regra nos arquivos locais.</span>
+        </div>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>

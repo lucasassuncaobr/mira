@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>Agente Prodata</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="page">
+      <div class="floating-controls" aria-label="Controles flutuantes">
+        <button class="agent-button" id="agentButton" type="button" aria-label="Abrir agente">
+          <span class="agent-button__ring" aria-hidden="true"></span>
+          <span class="agent-button__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="img" focusable="false" aria-hidden="true">
+              <path d="M12 2.5c5.1 0 9.25 3.67 9.25 8.2 0 4.53-4.15 8.2-9.25 8.2-1.06 0-2.08-.15-3.02-.44L4.3 20.2l1.18-3.52C4.24 15.19 2.75 13.05 2.75 10.7 2.75 6.17 6.9 2.5 12 2.5Zm-3.1 7.7c-.55 0-1 .45-1 1s.45 1 1 1 .99-.45.99-1-.44-1-1-1Zm3.1 0c-.55 0-1 .45-1 1s.45 1 .99 1 1-.45 1-1-.44-1-.99-1Zm3.1 0c-.55 0-1 .45-1 1s.45 1 1 1 .99-.45.99-1-.44-1-.99-1Z" />
+            </svg>
+          </span>
+        </button>
+
+        <button class="scroll-button" id="scrollToBottom" type="button" aria-label="Ir para o fim da conversa" hidden>
+          <span aria-hidden="true">⌄</span>
+        </button>
+      </div>
+
+      <section class="chat-window" id="chatWindow" aria-hidden="true">
+        <header class="chat-header">
+          <div class="chat-ident">
+            <span class="chat-avatar" aria-hidden="true">P</span>
+            <div>
+              <strong>Prodata Assist</strong>
+              <span id="chatStatus">Pronto para responder</span>
+            </div>
+          </div>
+          <button class="chat-close" id="closeChat" type="button" aria-label="Fechar conversa">←</button>
+        </header>
+
+        <div class="chat-body">
+          <div class="messages" id="messages" aria-live="polite" aria-relevant="additions"></div>
+
+          <div class="typing" id="typing" hidden aria-label="Digitando">
+            <span class="typing__dot"></span>
+            <span class="typing__dot"></span>
+            <span class="typing__dot"></span>
+          </div>
+        </div>
+
+        <form class="composer" id="composer">
+          <label class="composer-label" for="cliente">Mensagem do cliente</label>
+          <textarea
+            id="cliente"
+            rows="3"
+            placeholder="Digite a mensagem do cliente ou cole o texto do ZapZap"
+          ></textarea>
+
+          <div class="composer-row">
+            <button class="secondary" id="pasteCliente" type="button">Colar clipboard</button>
+            <select id="modo" aria-label="Modo da resposta">
+              <option value="profissional">Profissional</option>
+              <option value="curta">Curta</option>
+              <option value="mais simpática">Mais simpática</option>
+              <option value="mais firme">Mais firme</option>
+              <option value="passo a passo">Passo a passo</option>
+            </select>
+            <button class="primary" id="sendMessage" type="submit">Enviar</button>
+          </div>
+        </form>
+
+        <details class="advanced">
+          <summary>Detalhes opcionais</summary>
+          <div class="advanced-grid">
+            <label class="field">
+              <span>Seu rascunho</span>
+              <textarea
+                id="rascunho"
+                rows="4"
+                placeholder="Se quiser, cole seu rascunho para o agente melhorar"
+              ></textarea>
+            </label>
+
+            <label class="field">
+              <span>Aprendizado local</span>
+              <textarea
+                id="aprendizado"
+                rows="4"
+                placeholder="Opcional: registre uma regra nova ou observacao do atendimento"
+              ></textarea>
+            </label>
+          </div>
+
+          <div class="advanced-actions">
+            <button class="secondary" id="pasteRascunho" type="button">Colar rascunho</button>
+            <button class="secondary" id="copiarResposta" type="button">Copiar resposta</button>
+            <button class="secondary" id="limpar" type="button">Limpar</button>
+            <button class="secondary" id="salvarAprendizado" type="button">Salvar aprendizado</button>
+          </div>
+        </details>
+      </section>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>

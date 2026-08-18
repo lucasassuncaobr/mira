@@ -1,0 +1,449 @@
+================================================================================
+EXAM CARD - BACKUP COMPLETO (TRANSIÇÃO PARA OUTRO PROJETO)
+================================================================================
+Data: 27/07/2026
+Arquivos:
+  - TecconkursosPanel.tsx (componente ExamCard, linhas 113-208)
+  - styles.css (CSS do card, linhas 1215-1481)
+  - theme.css (variáveis CSS globais)
+================================================================================
+
+================================================================================
+1. TYPE Exam (adicione ao seu projeto)
+================================================================================
+
+type Exam = {
+  id: number;
+  title: string;
+  filename: string;
+  board?: string | null;
+  status: string;
+  created_at?: string;
+  question_count?: number;
+  answered_count?: number;
+  correct_count?: number;
+  wrong_count?: number;
+  study_seconds?: number;
+  logo?: string | null;
+};
+
+================================================================================
+2. IMPORTS NECESSÁRIOS (lucide-react)
+================================================================================
+
+import { useState } from "react";
+import { ChevronRight, Trash2, FileText, Check, X, ClipboardCheck, Pencil } from "lucide-react";
+
+================================================================================
+3. COMPONENTE ExamCard (TecconkursosPanel.tsx:113-208)
+================================================================================
+
+function ExamCard({ item, onOpen, onRemove }: { item: Exam; onOpen: (id: number) => void; onRemove: (id: number) => void }) {
+  const answered = Number(item.answered_count ?? 0);
+  const correct = Number(item.correct_count ?? 0);
+  const wrong = Number(item.wrong_count ?? 0);
+  const total = Number(item.question_count ?? 0);
+  const progress = total ? Math.min(100, Math.round((answered / total) * 100)) : 0;
+  const [expanded, setExpanded] = useState(false);
+
+  function handleClick(e: React.MouseEvent) {
+    if ((e.target as HTMLElement).closest('.exam-card-actions')) return;
+    setExpanded(!expanded);
+  }
+
+  return (
+    <article className={`exam-card ${expanded ? 'exam-card-expanded' : ''}`} onClick={handleClick}>
+      <div className="exam-card-visual">
+        {item.logo ? (
+          <img src={item.logo} alt={item.title} className="exam-card-logo" />
+        ) : (
+          <div className="exam-card-icon teal"><FileText size={24} strokeWidth={1.5} /></div>
+        )}
+      </div>
+
+      <div className="exam-card-content">
+        <div className="exam-card-content-inner">
+          <div className="exam-card-header">
+            <div className="exam-card-header-text">
+              <h3>{item.title}</h3>
+              {item.board && <span className="exam-card-board">{item.board}</span>}
+            </div>
+            <div className={`exam-card-chevron ${expanded ? 'expanded' : ''}`}>
+              <ChevronRight size={16} />
+            </div>
+          </div>
+
+          <div className="exam-card-progress-area">
+            <div className="exam-card-progress-top">
+              <span className="exam-card-progress-text">
+                <strong>{answered}</strong> de <span className="progress-total">{total}</span>
+                <small>resolvidas</small>
+              </span>
+              <span className="exam-card-status">
+                {answered ? "Concluído" : "Aguardando respostas"}
+              </span>
+            </div>
+            <div className="exam-card-progress-bar">
+              <i style={{ width: `${progress}%` }} />
+            </div>
+          </div>
+
+          <div className="exam-card-stats">
+            <div className="exam-card-stat">
+              <div className="exam-card-stat-icon teal"><ClipboardCheck size={16} strokeWidth={2} /></div>
+              <div className="exam-card-stat-info">
+                <strong>{answered}</strong>
+                <span>Resolvidas</span>
+              </div>
+            </div>
+            <div className="exam-card-stat">
+              <div className="exam-card-stat-icon green"><Check size={16} strokeWidth={2} /></div>
+              <div className="exam-card-stat-info">
+                <strong>{correct}</strong>
+                <span>Acertos</span>
+              </div>
+            </div>
+            <div className="exam-card-stat">
+              <div className="exam-card-stat-icon red"><X size={16} strokeWidth={2} /></div>
+              <div className="exam-card-stat-info">
+                <strong>{wrong}</strong>
+                <span>Erros</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {expanded && (
+          <div className="exam-card-details">
+            {item.board && <div className="exam-card-detail"><strong>Banca:</strong> {item.board}</div>}
+            {item.created_at && <div className="exam-card-detail"><strong>Prova:</strong> {new Date(item.created_at).toLocaleDateString('pt-BR')}</div>}
+          </div>
+        )}
+      </div>
+
+      <footer className="exam-card-footer">
+        <div className="exam-card-actions">
+          <button className="exam-card-edit" aria-label="Editar" onClick={(e) => { e.stopPropagation(); }}>
+            <Pencil size={14} />
+          </button>
+          <button className="exam-card-remove" aria-label="Remover" onClick={(e) => { e.stopPropagation(); onRemove(item.id); }}>
+            <Trash2 size={14} />
+          </button>
+        </div>
+      </footer>
+    </article>
+  );
+}
+
+================================================================================
+4. CSS VARIABLES NECESSÁRIAS (adicione no :root do seu projeto)
+================================================================================
+
+--green: #0d6b3e;
+--deep: #0a4f2e;
+--blue: #00A8DC;
+--blue-deep: #00AEEF;
+--blue-light: #00A8DC;
+--blue-bright: #00AEEF;
+--red: #c41e3a;
+--red-soft: #fde8ec;
+--slate-50: #f8fafc;
+--slate-100: #f1f5f9;
+--slate-200: #e2e8f0;
+--slate-300: #cbd5e1;
+--slate-400: #94a3b8;
+--slate-500: #64748b;
+--slate-600: #475569;
+--slate-700: #334155;
+--slate-800: #1e293b;
+--slate-900: #0f172a;
+
+================================================================================
+5. CSS COMPLETO DO CARD (styles.css)
+================================================================================
+
+/* ── Exam Cards ── */
+.exam-card {
+  position: relative;
+  background: #fff;
+  border: none;
+  border-radius: 0;
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 500ms cubic-bezier(.175,.885,.32,1.275);
+}
+.exam-card:hover { box-shadow: 0 20px 40px rgba(0,168,220,.12); }
+.exam-card-expanded { box-shadow: 0 20px 40px rgba(0,168,220,.12); }
+
+/* Visual Area (Icon/Logo) */
+.exam-card-visual {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  background: var(--slate-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: height 500ms cubic-bezier(.175,.885,.32,1.275);
+  z-index: 1;
+  overflow: hidden;
+}
+.exam-card:hover .exam-card-visual { height: 150px; }
+.exam-card-expanded .exam-card-visual { height: 80px; }
+.exam-card-expanded:hover .exam-card-visual { height: 100px; }
+
+.exam-card-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--blue) 0%, var(--blue-deep) 100%);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(0,168,220,.3);
+  transition: all 500ms cubic-bezier(.175,.885,.32,1.275);
+}
+.exam-card:hover .exam-card-icon { box-shadow: 0 12px 32px rgba(0,168,220,.4); }
+.exam-card-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 0;
+  object-fit: contain;
+}
+
+/* Content Area */
+.exam-card-content {
+  position: relative;
+  z-index: 2;
+  background: #fff;
+}
+
+.exam-card-content-inner {
+  padding: 0;
+}
+
+/* Header */
+.exam-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px 8px;
+}
+.exam-card-header-text { flex: 1; min-width: 0; }
+.exam-card-header-text h3 {
+  font: 700 16px "Inter", sans-serif;
+  color: var(--slate-900);
+  margin: 0;
+  line-height: 1.3;
+  transition: all 400ms ease;
+}
+.exam-card:hover .exam-card-header-text h3 { color: var(--blue); letter-spacing: -0.3px; }
+.exam-card-board {
+  font-size: 12px;
+  color: var(--slate-400);
+  margin-top: 2px;
+  display: block;
+  transition: color 300ms ease;
+}
+.exam-card:hover .exam-card-board { color: var(--slate-500); }
+.exam-card-chevron {
+  flex-shrink: 0;
+  color: var(--slate-400);
+  transition: all 400ms cubic-bezier(.175,.885,.32,1.275);
+  transform: rotate(0deg);
+}
+.exam-card-chevron.expanded {
+  transform: rotate(90deg) scale(1.3);
+  color: var(--blue);
+}
+
+/* Progress Area */
+.exam-card-progress-area {
+  margin: 0 14px;
+  padding: 10px 0;
+  border-top: 1px solid var(--slate-100);
+}
+.exam-card-progress-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.exam-card-progress-text {
+  font-size: 12px;
+  color: var(--slate-500);
+  line-height: 1.3;
+}
+.exam-card-progress-text strong {
+  font-weight: 700;
+  color: var(--slate-900);
+}
+.exam-card-progress-text .progress-total {
+  color: var(--blue);
+  font-weight: 700;
+}
+.exam-card-progress-text small {
+  display: block;
+  font-size: 10px;
+  color: var(--slate-400);
+  margin-top: 2px;
+}
+.exam-card-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--slate-400);
+  white-space: nowrap;
+  font-weight: 500;
+}
+.exam-card-progress-bar {
+  height: 4px;
+  background: var(--slate-200);
+  border-radius: 0;
+  overflow: hidden;
+}
+.exam-card-progress-bar i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue), var(--blue-bright));
+  border-radius: 0;
+  transition: width 500ms cubic-bezier(.4,0,.2,1);
+}
+
+/* Stats */
+.exam-card-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0;
+  margin: 0 14px;
+  padding: 10px 0;
+  background: var(--slate-50);
+  border-radius: 0;
+  transition: all 400ms ease;
+}
+.exam-card:hover .exam-card-stats { background: #eef7fb; }
+.exam-card-expanded .exam-card-stats { background: #eef7fb; }
+.exam-card-stat {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.exam-card-stat:not(:last-child) {
+  border-right: 1px solid var(--slate-200);
+}
+.exam-card-stat-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.exam-card-stat-icon.teal { color: var(--blue); }
+.exam-card-stat-icon.green { color: var(--green); }
+.exam-card-stat-icon.red { color: var(--red); }
+.exam-card-stat-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.exam-card-stat-info strong {
+  font: 700 14px "Inter", sans-serif;
+  color: var(--slate-900);
+  line-height: 1.2;
+}
+.exam-card-stat-info span {
+  font-size: 9px;
+  color: var(--slate-400);
+  font-weight: 500;
+}
+
+/* Expanded Details */
+.exam-card-details {
+  margin: 0 14px;
+  padding: 12px 0;
+  border-top: 1px solid var(--slate-100);
+  overflow: hidden;
+  animation: expandDetails 400ms cubic-bezier(.175,.885,.32,1.275);
+}
+.exam-card-detail {
+  font-size: 12px;
+  color: var(--slate-500);
+  padding: 5px 0;
+  display: flex;
+  gap: 6px;
+}
+.exam-card-detail strong {
+  font-weight: 600;
+  color: var(--slate-700);
+}
+@keyframes expandDetails {
+  from { opacity: 0; max-height: 0; padding: 0; }
+  to { opacity: 1; max-height: 100px; padding: 12px 0; }
+}
+
+/* Footer */
+.exam-card-footer {
+  position: relative;
+  z-index: 2;
+  padding: 8px 14px;
+  display: flex;
+  justify-content: flex-end;
+  background: #fff;
+}
+
+.exam-card-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  border: 1px solid var(--slate-200);
+  border-radius: 0;
+  overflow: hidden;
+}
+.exam-card-actions button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 0;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  color: var(--slate-400);
+  cursor: pointer;
+  transition: all 200ms ease;
+  margin: 0;
+  padding: 0;
+}
+.exam-card-actions button + button {
+  border-left: 1px solid var(--slate-200);
+}
+.exam-card-actions button:hover { color: var(--blue); background: var(--slate-50); }
+.exam-card-edit { color: var(--slate-400) !important; background: transparent !important; }
+.exam-card-edit:hover { color: var(--blue) !important; background: var(--slate-50) !important; }
+.exam-card-remove { color: var(--slate-400) !important; background: transparent !important; }
+.exam-card-remove:hover { color: var(--red) !important; background: var(--red-soft) !important; }
+
+================================================================================
+6. NOTAS DE DESIGN
+================================================================================
+
+- border-radius: 0 em TODOS os elementos (card, icones, botoes, barras)
+- Sem borda no card (`border: none`)
+- Sem efeito na logo (estatica)
+- Sem efeito hover no logo
+- Hover no card: sombra azul suave (box-shadow)
+- Hover no titulo: cor muda para --blue
+- Hover nas stats: fundo muda para #eef7fb
+- Hover no chevron: rotaciona 90deg + scale(1.3) + cor --blue
+- Visual area: height muda 140px→150px (hover) / 80px (expandido)
+- Progress bar: gradiente horizontal azul
+- Icone: gradiente azul com sombra
+- Sem overlay borrado no card
+- Sem transform/translate no card inteiro
+- Footer: botoes editar/lado a lado sem borda-top
+- Botoes acao: edit azul no hover, remove vermelho no hover
+================================================================================

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Agente Prodata
+Comment=Copiloto local para atendimento Prodata no ZapZap
+Exec=/home/lucasassuncao/Projetos/zapzap-prodata-agent/iniciar_desktop.sh
+TryExec=/home/lucasassuncao/Projetos/zapzap-prodata-agent/iniciar_desktop.sh
+Icon=/home/lucasassuncao/Imagens/prodata.png
+StartupWMClass=local.prodata.agent
+Terminal=false
+Categories=Utility;Chat;Network;InstantMessaging;
+Keywords=Prodata;ZapZap;WhatsApp;Chat;Suporte;

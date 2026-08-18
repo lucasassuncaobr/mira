@@ -1,0 +1,101 @@
+:root {
+  --mira-bg: #f5f0eb;
+  --mira-text: #2c2c2c;
+  --mira-border: #e0ddd8;
+  --mira-pdf-bg: #fff;
+  --mira-pdf-content-bg: #fff;
+  --mira-muted-text: #666;
+  --mira-pdf-shadow: rgba(0,0,0,0.15);
+}
+
+.mira-solve {
+  display: flex;
+  height: calc(100vh - 64px);
+  background: var(--mira-bg);
+}
+
+.mira-pdf-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--mira-pdf-bg);
+  min-width: 0;
+}
+
+.view-solve .mira-pdf-panel {
+  position: sticky;
+  top: 64px;
+  height: calc(100vh - 64px);
+  max-height: none;
+  overflow: auto;
+  padding: 20px 24px;
+  background: var(--mira-pdf-bg);
+  border: 0;
+  border-right: 1px solid var(--mira-border);
+  border-radius: 0;
+}
+
+.mira-pdf-panel .page-reference {
+  margin-top: 0;
+  background: #fff;
+  border-radius: 0;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.mira-pdf-panel .image-viewport {
+  height: calc(100vh - 235px);
+  min-height: 480px;
+}
+
+.mira-pdf-panel .pdf-empty {
+  height: 400px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  color: var(--mira-muted-text);
+}
+
+.mira-pdf-header {
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mira-pdf-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--mira-muted-text);
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.mira-pdf-title {
+  font-size: 13px;
+  color: var(--mira-muted-text);
+}
+
+.mira-pdf-viewer {
+  flex: 1;
+  overflow: auto;
+  padding: 0 20px 20px 20px;
+}
+
+.mira-pdf-content {
+  background-color: var(--mira-pdf-content-bg);
+  box-shadow: 0 2px 20px var(--mira-pdf-shadow);
+  padding: 40px 50px;
+  max-width: 100%;
+  min-height: calc(100vh - 120px);
+}
+
+.mira-pdf-page {
+  line-height: 1.7;
+  font-size: 14px;
+  color: var(--mira-text);
+}
+
+.mira-pdf-page p {
+  margin-bottom: 10px;
+}

@@ -1,0 +1,21 @@
+// Ignorar dependências — cada máquina instala as suas
+node_modules/
+
+// Ignorar build
+dist/
+apps/web/dist/
+apps/api/dist/
+
+// Ignorar metadados do sistema
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+// Ignorar logs
+*.log
+
+// Ignorar pastas do Syncthing (evita loop)
+.stversions/
+.stfolder/

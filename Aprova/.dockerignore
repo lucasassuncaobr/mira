@@ -1,0 +1,7 @@
+node_modules
+.git
+.stfolder
+dist
+data
+*.md
+*.tar.gz

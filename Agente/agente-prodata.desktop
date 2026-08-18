@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Agente Prodata
+Comment=Copiloto local para atendimento Prodata no ZapZap
+Exec=/home/lucasassuncao/Projetos/zapzap-prodata-agent/iniciar_desktop.sh
+Terminal=false
+Categories=Utility;

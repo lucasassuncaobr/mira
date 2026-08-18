@@ -1,0 +1,7 @@
+.stfolder/
+LucasShell/
+NuvioWeb/
+node_modules/
+dist/
+*.sync-conflict-*
+.server.log

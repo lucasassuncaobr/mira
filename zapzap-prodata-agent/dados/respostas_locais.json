@@ -1,0 +1,503 @@
+{
+  "entries": [
+    {
+      "id": "session_end",
+      "priority": 100,
+      "category": "closing",
+      "triggers": [
+        "encerrar sessao",
+        "encerrar sessão",
+        "finalizar sessao",
+        "finalizar sessão",
+        "fechar atendimento",
+        "sair do sistema",
+        "tchau",
+        "ate mais",
+        "até mais"
+      ],
+      "responses": [
+        "Sessão encerrada com segurança. Se quiser retomar depois, me diga o módulo do SIG Prodata e eu continuo do ponto certo."
+      ]
+    },
+    {
+      "id": "greeting",
+      "priority": 99,
+      "category": "relationship",
+      "triggers": [
+        "oi",
+        "ola",
+        "olá",
+        "bom dia",
+        "boa tarde",
+        "boa noite"
+      ],
+      "responses": [
+        "Oi! Me diga o módulo do SIG Prodata que você está usando e eu te guio.",
+        "Olá! Posso ajudar com Compras, Contratos, Almoxarifado, COLARE ou SICAP.",
+        "Bom dia! Se quiser, descreva a etapa do processo e eu já monto o passo a passo."
+      ]
+    },
+    {
+      "id": "thanks",
+      "priority": 98,
+      "category": "relationship",
+      "triggers": [
+        "obrigado",
+        "obrigada",
+        "valeu",
+        "grato",
+        "agradeco",
+        "agradeço"
+      ],
+      "responses": [
+        "De nada. Se precisar de mais alguma etapa do SIG Prodata, é só chamar.",
+        "Por nada. Se quiser, eu também posso revisar o próximo passo com você.",
+        "Tranquilo. Quando surgir outra dúvida, me manda o contexto do processo."
+      ]
+    },
+    {
+      "id": "switch_topic",
+      "priority": 97,
+      "category": "context_switch",
+      "triggers": [
+        "agora",
+        "mudando de assunto",
+        "mudei de assunto",
+        "troquei de assunto",
+        "outra demanda",
+        "outro assunto",
+        "além disso",
+        "tambem preciso",
+        "também preciso"
+      ],
+      "context_triggers": [
+        "requisicao",
+        "requisicao de compra",
+        "contrato",
+        "empenho",
+        "sicap",
+        "protocolo",
+        "almoxarifado",
+        "pncp"
+      ],
+      "responses": [
+        "Perfeito, vamos para a nova demanda. Me diga exatamente o módulo ou a tela atual do SIG Prodata para eu seguir do ponto certo.",
+        "Certo, mudei o foco junto com você. Me fala a nova etapa e eu respondo só sobre ela.",
+        "Sem problema, vamos tratar o novo assunto. Se quiser, eu também posso manter o anterior em segundo plano."
+      ],
+      "context_triggers": [
+        "requisicao de compra",
+        "processo de compra",
+        "empenho",
+        "contrato",
+        "sicap",
+        "glpi",
+        "protocolo",
+        "almoxarifado"
+      ]
+    },
+    {
+      "id": "retomar_contexto",
+      "priority": 96,
+      "category": "context_switch",
+      "triggers": [
+        "retomar",
+        "voltar ao assunto",
+        "continuar de onde parou",
+        "lembrar contexto",
+        "voltar no assunto",
+        "seguir do ponto anterior"
+      ],
+      "context_triggers": [
+        "requisicao",
+        "empenho",
+        "contrato",
+        "sicap",
+        "almoxarifado",
+        "protocolo"
+      ],
+      "responses": [
+        "Claro, eu retomo do ponto anterior. Me diga só qual tela ou etapa vale agora e eu sigo a partir dali.",
+        "Perfeito, continuo do contexto anterior. Se a demanda mudou, me confirme o módulo atual para eu ajustar a orientação.",
+        "Sem problema, vou reaproveitar o contexto anterior e focar no ponto novo."
+      ]
+    },
+    {
+      "id": "sig_prodata_requisicao",
+      "priority": 95,
+      "category": "sig_prodata",
+      "triggers": [
+        "requisicao de compra",
+        "requisição de compra",
+        "liberar requisicao",
+        "liberar requisição",
+        "origem do recurso",
+        "origem do valor de referencia",
+        "origem do valor de referência"
+      ],
+      "responses": [
+        "No SIG Prodata, abra Compras e Licitações > Requisição de Compra, preencha origem do recurso, origem do valor de referência e os itens. Depois salve e siga para a liberação do perfil D."
+      ],
+      "context_triggers": [
+        "compras e licitações",
+        "perfil d",
+        "valor de referência",
+        "liberação",
+        "processo de compra"
+      ]
+    },
+    {
+      "id": "sig_prodata_requisicao_detalhe",
+      "priority": 94,
+      "category": "sig_prodata",
+      "triggers": [
+        "quantidade do item",
+        "liberar requisição",
+        "vincular ao processo",
+        "perfil d",
+        "perfil de compra",
+        "origem do recurso municipal",
+        "origem do recurso federal"
+      ],
+      "responses": [
+        "Na requisição, valide quantidade, origem do recurso e valor de referência antes de liberar. Depois, use o perfil D para aprovar e só então vincule ao processo.",
+        "Se a requisição não avança, normalmente falta quantidade, origem do recurso ou a liberação do perfil D. Vale revisar esses pontos primeiro."
+      ],
+      "context_triggers": [
+        "perfil d",
+        "quantidade",
+        "origem do recurso",
+        "vincular ao processo",
+        "liberar requisição"
+      ]
+    },
+    {
+      "id": "sig_prodata_processo",
+      "priority": 94,
+      "category": "sig_prodata",
+      "triggers": [
+        "processo de compra",
+        "vincular requisicao",
+        "vincular requisição",
+        "modalidade de licitacao",
+        "modalidade de licitação",
+        "natureza do objeto",
+        "colare",
+        "colar"
+      ],
+      "responses": [
+        "No Processo de Compra, vincule as requisições liberadas, informe número, ano, modalidade, objeto e fundamentação legal. Se for o caso, confira também a Natureza do Objeto COLARE."
+      ],
+      "context_triggers": [
+        "requisição liberada",
+        "julgamento",
+        "modalidade",
+        "natureza do objeto",
+        "colare"
+      ]
+    },
+    {
+      "id": "sig_prodata_processo_busca",
+      "priority": 93,
+      "category": "sig_prodata",
+      "triggers": [
+        "adicionar requisicao",
+        "adicionar requisição",
+        "cancelar item",
+        "atualizar valor de referencia",
+        "atualizar valor de referência",
+        "item sigiloso"
+      ],
+      "responses": [
+        "No processo, confira se a requisição já está liberada antes de adicionar. Se precisar ajustar item ou valor de referência, faça isso antes de seguir para julgamento.",
+        "Quando houver item sigiloso, trate o valor com cuidado para não expor informação indevida no processo."
+      ],
+      "context_triggers": [
+        "julgamento",
+        "requisicao liberada",
+        "valor de referência",
+        "item sigiloso"
+      ]
+    },
+    {
+      "id": "sig_prodata_empenho",
+      "priority": 93,
+      "category": "sig_prodata",
+      "triggers": [
+        "empenho",
+        "dados orcamentarios",
+        "dados orçamentários",
+        "ficha orcamentaria",
+        "ficha orçamentária",
+        "elemento da despesa",
+        "detalhamento da fonte"
+      ],
+      "responses": [
+        "Antes de gerar o empenho, confira ficha, elemento da despesa, fonte e detalhamento da fonte. Se um desses campos faltar, o SIG Prodata costuma bloquear a geração."
+      ],
+      "context_triggers": [
+        "ficha",
+        "fonte",
+        "detalhamento",
+        "orçamento",
+        "orcamento"
+      ]
+    },
+    {
+      "id": "sig_prodata_empenho_orcamento",
+      "priority": 92,
+      "category": "sig_prodata",
+      "triggers": [
+        "autorizacao de compra",
+        "autorização de compra",
+        "nota de empenho",
+        "gerar empenho",
+        "dados orçamentários",
+        "dados orcamentarios"
+      ],
+      "responses": [
+        "Para fechar o empenho, valide autorização, ficha, elemento, fonte e detalhamento. Se faltar um campo, o sistema costuma barrar a emissão.",
+        "Se o empenho não fecha, eu revisaria primeiro o orçamento e depois o vínculo com o fornecedor homologado."
+      ],
+      "context_triggers": [
+        "ficha",
+        "elemento",
+        "fonte",
+        "detalhamento",
+        "fornecedor"
+      ]
+    },
+    {
+      "id": "sig_prodata_ems",
+      "priority": 92,
+      "category": "sig_prodata",
+      "triggers": [
+        "ems",
+        "entrada de mercadoria",
+        "entrada de servico",
+        "entrada de serviço",
+        "almoxarifado",
+        "baixa no estoque"
+      ],
+      "responses": [
+        "Na EMS, selecione a transação correta, confirme a entrada no almoxarifado e finalize para gerar a baixa automática."
+      ]
+    },
+    {
+      "id": "sig_prodata_almoxarifado",
+      "priority": 91,
+      "category": "sig_prodata",
+      "triggers": [
+        "kardex",
+        "inventario",
+        "inventário",
+        "estoque",
+        "saída",
+        "saida",
+        "transferencia",
+        "transferência"
+      ],
+      "responses": [
+        "No almoxarifado, confira cadastro, entrada, saída e inventário. O Kardex ajuda a rastrear movimentações e custo médio.",
+        "Se houver divergência de estoque, eu começaria pelo inventário e pelas últimas movimentações no Kardex."
+      ]
+    },
+    {
+      "id": "sig_prodata_contratos",
+      "priority": 91,
+      "category": "sig_prodata",
+      "triggers": [
+        "contrato",
+        "aditivo",
+        "apostilamento",
+        "rescisao",
+        "rescisão",
+        "vigencia",
+        "vigência",
+        "saldo e empenho"
+      ],
+      "responses": [
+        "Em Contratos, revise vigência, objeto, contratado, valor e fonte de recurso. Para mudanças, use aditivo ou apostilamento conforme a natureza da alteração."
+      ]
+    },
+    {
+      "id": "sig_prodata_contrato_detalhe",
+      "priority": 90,
+      "category": "sig_prodata",
+      "triggers": [
+        "rescisao",
+        "rescisão",
+        "paralisacao",
+        "paralisação",
+        "aditivo de prazo",
+        "aditivo de valor",
+        "apostilamento"
+      ],
+      "responses": [
+        "Para alteração contratual, confira se é aditivo de prazo, de valor ou apostilamento antes de concluir. Também vale validar o saldo e a vigência.",
+        "Em rescisão ou paralisação, revise o impacto no saldo e no empenho antes de salvar."
+      ]
+    },
+    {
+      "id": "sig_prodata_transparencia",
+      "priority": 90,
+      "category": "sig_prodata",
+      "triggers": [
+        "pncp",
+        "publicacao",
+        "publicação",
+        "sicap",
+        "xml",
+        "item sigiloso",
+        "assinatura digital",
+        "certificado a1"
+      ],
+      "responses": [
+        "Antes de publicar no PNCP ou enviar ao COLARE, valide os anexos, campos obrigatórios e o status do processo. Se houver item sigiloso, o valor unitário precisa ser tratado com cuidado."
+      ]
+    },
+    {
+      "id": "sig_prodata_sicap",
+      "priority": 89,
+      "category": "sig_prodata",
+      "triggers": [
+        "sicap",
+        "xml",
+        "remessa",
+        "folha de pagamento",
+        "atos de pessoal",
+        "tabela",
+        "layout"
+      ],
+      "responses": [
+        "No SICAP, revise o layout, o XML e os campos obrigatórios antes de enviar a remessa. Se houver erro, me envie a tela ou a mensagem exata para eu te orientar melhor.",
+        "Quando a remessa não fecha, normalmente falta validar algum campo do layout ou um dado de pessoal/folha."
+      ],
+      "context_triggers": [
+        "layout",
+        "xml",
+        "remessa",
+        "folha de pagamento",
+        "atos de pessoal"
+      ]
+    },
+    {
+      "id": "access_help",
+      "priority": 88,
+      "category": "support",
+      "triggers": [
+        "nao abre",
+        "não abre",
+        "erro",
+        "falha",
+        "travou",
+        "acesso",
+        "login",
+        "senha",
+        "usuario",
+        "usuário"
+      ],
+      "responses": [
+        "Se for erro de acesso, eu checaria sessão expirada, navegador compatível e permissões do usuário. Se você me passar a tela ou a mensagem exata, eu consigo ser mais preciso.",
+        "Quando o SIG trava, o caminho mais seguro é validar login, perfil e se o certificado A1 está disponível.",
+        "Se o problema começou depois de mudar de tela ou de usuário, eu revisaria sessão, permissões e cache antes de concluir."
+      ],
+      "context_triggers": [
+        "login",
+        "senha",
+        "usuario",
+        "usuário",
+        "perfil",
+        "sessão"
+      ]
+    },
+    {
+      "id": "cache_refresh",
+      "priority": 87,
+      "category": "support",
+      "triggers": [
+        "cache",
+        "versao em cache",
+        "versão em cache",
+        "atualizar pagina",
+        "atualizar página",
+        "ctrl f5",
+        "ctrl shift r",
+        "pagina desatualizada",
+        "página desatualizada"
+      ],
+      "responses": [
+        "Provavelmente você está visualizando uma versão em cache. Tente uma atualização forçada da página com Ctrl + F5 ou Ctrl + Shift + R.",
+        "Se preferir, posso fazer esse procedimento para você. Basta me informar o acesso do AnyDesk."
+      ]
+    },
+    {
+      "id": "update_notice",
+      "priority": 86,
+      "category": "support",
+      "triggers": [
+        "atualizacao",
+        "atualização",
+        "manutencao",
+        "manutenção",
+        "sistema indisponivel",
+        "sistema indisponível",
+        "janela de manutencao",
+        "janela de manutenção"
+      ],
+      "responses": [
+        "Bom dia, informamos que o sistema ficará indisponível durante a manutenção programada. Assim que o serviço normalizar, eu te aviso.",
+        "A atualização do sistema está em andamento. Se a tela continuar exibindo aviso, me envie um print para eu conferir."
+      ]
+    },
+    {
+      "id": "glpi_help",
+      "priority": 85,
+      "category": "support",
+      "triggers": [
+        "glpi",
+        "chamado",
+        "ticket",
+        "protocolo",
+        "suporte",
+        "abrir chamado"
+      ],
+      "responses": [
+        "Se o caso precisar de acompanhamento, abra um chamado com a mensagem exata e um print da tela. Assim fica mais rápido para validar o que aconteceu.",
+        "Se você já tiver o número do chamado, me manda que eu sigo em cima dele."
+      ],
+      "context_triggers": [
+        "mensagem exata",
+        "print da tela",
+        "acompanhar",
+        "protocolo"
+      ]
+    },
+    {
+      "id": "fallback_support",
+      "priority": 80,
+      "category": "support",
+      "triggers": [
+        "erro",
+        "falha",
+        "travou",
+        "nao abre",
+        "não abre",
+        "acesso",
+        "login",
+        "sessao",
+        "sessão"
+      ],
+      "responses": [
+        "Se for erro de acesso, eu checaria sessão expirada, navegador compatível e permissões do usuário. Se você me passar a tela ou a mensagem exata, eu consigo ser mais preciso."
+      ],
+      "context_triggers": [
+        "erro",
+        "falha",
+        "acesso",
+        "login",
+        "sessão"
+      ]
+    }
+  ]
+}

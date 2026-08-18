@@ -1,0 +1,21 @@
+FROM node:24-alpine AS build
+RUN apk add --no-cache poppler-utils
+WORKDIR /app
+COPY package.json package-lock.json ./
+COPY apps/api/package.json apps/api/package.json
+COPY apps/web/package.json apps/web/package.json
+RUN npm ci
+COPY apps/api/src apps/api/src
+COPY apps/api/tsconfig.json apps/api/tsconfig.json
+RUN npm run build -w apps/api
+
+FROM node:24-alpine
+RUN apk add --no-cache poppler-utils
+WORKDIR /app
+COPY --from=build /app/apps/api/dist apps/api/dist
+COPY --from=build /app/node_modules node_modules
+COPY apps/api/package.json apps/api/
+EXPOSE 3333
+VOLUME /app/data
+WORKDIR /app/apps/api
+CMD ["node", "dist/server.js"]
