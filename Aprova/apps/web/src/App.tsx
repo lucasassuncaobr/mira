@@ -108,7 +108,7 @@ export function App() {
       {view === "performance" && <Performance exams={exams} onOpen={(id) => openExam(id, "solve")}/>} 
       {view === "import" && <Import loading={loading} setLoading={setLoading} onDone={async (id) => { await refresh(); await openExam(id, "review"); }} onError={setError}/>} 
       {view === "review" && exam?.questions && <Review exam={exam} onChange={setExam} onSolve={() => setView("solve")}/>} 
-      {view === "solve" && (exam ? <Solve key={exam.id} exam={exam}/> : <div className="panel" style={{padding: 40, textAlign: "center", color: "#666"}}>Carregando prova...</div>)} 
+      {view === "solve" && (exam ? <Solve key={exam.id} exam={exam}/> : <div className="panel" style={{padding: 40, textAlign: "center", color: "#6C7480"}}>Carregando prova...</div>)} 
     </main>
   </div>;
 }
@@ -428,7 +428,7 @@ function Solve({ exam }: { exam: Exam & { questions?: Question[] } }) {
     }
   }
 
-  if (!question) return <div className="panel" style={{ padding: 40, textAlign: "center", color: "#666" }}>Nenhuma questão encontrada.</div>;
+  if (!question) return <div className="panel" style={{ padding: 40, textAlign: "center", color: "#6C7480" }}>Nenhuma questão encontrada.</div>;
 
   const selected = answers[question.id] ?? null;
 

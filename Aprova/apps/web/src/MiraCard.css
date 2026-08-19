@@ -1,11 +1,11 @@
 :root {
-  --mira-bg: #f5f0eb;
-  --mira-text: #2c2c2c;
-  --mira-border: #e0ddd8;
+  --mira-bg: #F7F5F0;
+  --mira-text: #2E333D;
+  --mira-border: #E8E8E8;
   --mira-pdf-bg: #fff;
   --mira-pdf-content-bg: #fff;
-  --mira-muted-text: #666;
-  --mira-pdf-shadow: rgba(0,0,0,0.15);
+  --mira-muted-text: #6C7480;
+  --mira-pdf-shadow: rgba(0,0,0,0.08);
 }
 
 .mira-solve {
