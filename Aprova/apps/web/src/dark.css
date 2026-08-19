@@ -1,24 +1,36 @@
-/* Dark Mode — Mishu Theme Pro palette */
-.dark-mode{--paper:#1a1b26;--paper-deep:#16161e;--ink:#c0caf5;--ink-soft:#a9b1d6;--navy:#7aa2f7;--navy-deep:#3d59a1;--terracotta:#7dcfff;--rule:#414868;--green:#9ece6a;--deep:#24283b;--mint:#24283b;--line:#414868;--accent:#7aa2f7;--accent-soft:#24283b;--success:#9ece6a;--error:#f7768e;--n-50:#1a1b26;--n-100:#1e2030;--n-200:#292e42;--n-300:#414868;--n-400:#565f89;--n-500:#737aa2;--n-600:#a9b1d6;--n-700:#c0caf5;--n-800:#c0caf5;--n-900:#c0caf5;color:var(--ink);background:var(--paper-deep)}
+/* Dark Mode — Paleta Noturna */
+.dark-mode{
+  --paper:#22262A;--paper-deep:#181A1B;
+  --ink:#E8EAEF;--ink-soft:#9A9FA8;
+  --navy:#008080;--navy-deep:#006666;
+  --terracotta:#D6A12A;
+  --rule:#2E333D;--green:#008080;--deep:#1E2B27;--mint:#1E2B27;
+  --line:#2E333D;--accent:#008080;--accent-soft:#1E2B27;
+  --success:#008080;--error:#8B0000;
+  --n-50:#181A1B;--n-100:#22262A;--n-200:#2E333D;--n-300:#3A3F47;
+  --n-400:#5A6070;--n-500:#9A9FA8;--n-600:#B0B5BE;--n-700:#E8EAEF;
+  --n-800:#E8EAEF;--n-900:#F0F2F5;
+  color:var(--ink);background:var(--paper-deep)
+}
 
-/* Global reset — kill every white surface */
+/* Global reset */
 .dark-mode body,.dark-mode .app-shell{background:var(--paper-deep);color:var(--ink)}
 .dark-mode *{border-color:var(--rule)}
 .dark-mode main{background:var(--paper-deep)}
 
-/* Topbar */
-.dark-mode .topbar{background:rgba(26,27,38,.97);border-color:var(--rule)!important}
+/* Topbar — verde floresta escuro */
+.dark-mode .topbar{background:rgba(30,43,39,.97);border-color:var(--rule)!important}
 .dark-mode .brand{color:var(--ink)}.dark-mode .brand-mark{border-color:var(--ink)}
 .dark-mode .nav{color:var(--n-500)}.dark-mode .nav:hover{color:var(--ink);background:var(--n-200)}.dark-mode .nav.active{color:var(--accent);background:var(--n-200);box-shadow:inset 0 -2px var(--accent)}
-.dark-mode .top-import{background:var(--accent);color:#1a1b26}.dark-mode .top-import:hover{background:var(--navy-deep)}
-.dark-mode .profile{border-color:var(--rule)!important}.dark-mode .profile .avatar{background:var(--accent);color:#1a1b26}
+.dark-mode .top-import{background:var(--accent);color:#181A1B}.dark-mode .top-import:hover{background:var(--navy-deep)}
+.dark-mode .profile{border-color:var(--rule)!important}.dark-mode .profile .avatar{background:var(--accent);color:#181A1B}
 
 /* Header */
 .dark-mode header{border-bottom-color:var(--rule)!important}
 .dark-mode header h1,.dark-mode .section-head h3,.dark-mode .library-head h2,.dark-mode .center-title h2,.dark-mode .editor-head h2{color:var(--ink)}
 .dark-mode .eyebrow{color:var(--n-400)}
 
-/* All card surfaces — the big fix */
+/* All card surfaces */
 .dark-mode .panel,.dark-mode .stat,.dark-mode .exam-card,.dark-mode .empty,.dark-mode .study-notebooks,.dark-mode .side-card,.dark-mode .performance-panel,.dark-mode .performance-summary,.dark-mode .performance-controls,.dark-mode .notebook-analytics,.dark-mode .question-list,.dark-mode .exam-card-v2,.dark-mode .study-create,.dark-mode .dashboard-study-create,.dark-mode .portal-performance,.dark-mode .glance-performance,.dark-mode .consistency,.dark-mode .donut-card,.dark-mode .mastery,.dark-mode .exam-ranking{background:var(--n-100)!important;border-color:var(--rule)!important;box-shadow:none!important;color:var(--ink)}
 
 /* Stat cards */
@@ -28,9 +40,9 @@
 .dark-mode .stat span{color:var(--n-500)!important}
 
 /* Buttons */
-.dark-mode .primary{background:var(--accent)!important;color:#1a1b26!important}.dark-mode .primary:hover{background:var(--navy-deep)!important;color:#fff!important}
+.dark-mode .primary{background:var(--accent)!important;color:#181A1B!important}.dark-mode .primary:hover{background:var(--navy-deep)!important;color:#fff!important}
 .dark-mode .secondary{background:transparent!important;border-color:var(--n-300)!important;color:var(--ink)!important}
-.dark-mode .alert{background:#2d1b2e!important;color:#f7768e!important}
+.dark-mode .alert{background:#2A1A1A!important;color:#FF6B6B!important}
 
 /* Import */
 .dark-mode .dropzone{background:var(--n-100)!important;border-color:var(--n-300)!important}.dark-mode .dropzone.selected{border-color:var(--accent)!important;background:var(--n-200)!important}
@@ -41,7 +53,7 @@
 .dark-mode .exam-emblem{background:var(--n-200)!important;border-color:var(--n-300)!important;color:var(--accent)!important}
 .dark-mode .exam-identity h3{color:var(--ink)!important}
 .dark-mode .exam-card-board{color:var(--n-500)!important}
-.dark-mode .status{background:#1a2b2a!important;color:var(--success)!important}
+.dark-mode .status{background:#1A2E2A!important;color:var(--success)!important}
 .dark-mode .exam-card-progress-bar{background:var(--n-300)!important}.dark-mode .exam-card-progress-bar i{background:var(--accent)!important}
 .dark-mode .exam-card-stat{color:var(--ink)!important}.dark-mode .exam-card-stat-info strong{color:var(--ink)!important}.dark-mode .exam-card-stat-info span{color:var(--n-500)!important}
 
@@ -51,11 +63,11 @@
 
 /* Number grid */
 .dark-mode .number-grid button{background:var(--n-100)!important;border-color:var(--n-300)!important;color:var(--n-500)!important}
-.dark-mode .number-grid button.active{background:var(--accent)!important;border-color:var(--accent)!important;color:#1a1b26!important}
+.dark-mode .number-grid button.active{background:var(--accent)!important;border-color:var(--accent)!important;color:#181A1B!important}
 
 /* Review editor */
 .dark-mode .alternative-edit .letter{background:var(--n-100)!important;border-color:var(--n-300)!important;color:var(--n-500)!important}
-.dark-mode .alternative-edit .letter.correct{background:var(--success)!important;border-color:var(--success)!important;color:#1a1b26!important}
+.dark-mode .alternative-edit .letter.correct{background:var(--success)!important;border-color:var(--success)!important;color:#181A1B!important}
 .dark-mode .alternative-edit textarea{background:var(--n-100)!important;border-color:var(--n-300)!important;color:var(--ink)!important}
 .dark-mode .editor{border-top-color:var(--accent)!important}
 
@@ -73,9 +85,9 @@
 
 /* Heatmap */
 .dark-mode .modern-heatmap .consistency-grid i,.dark-mode .heatmap-footer i{background:var(--n-200)!important;border-color:var(--n-300)!important}
-.dark-mode .modern-heatmap i.level-1{background:#1a3a4a!important;border-color:#1a3a4a!important}
-.dark-mode .modern-heatmap i.level-2{background:#1e4d5e!important;border-color:#1e4d5e!important}
-.dark-mode .modern-heatmap i.level-3{background:#247a8e!important;border-color:#247a8e!important}
+.dark-mode .modern-heatmap i.level-1{background:#1A3A35!important;border-color:#1A3A35!important}
+.dark-mode .modern-heatmap i.level-2{background:#1E5550!important;border-color:#1E5550!important}
+.dark-mode .modern-heatmap i.level-3{background:#008080!important;border-color:#008080!important}
 .dark-mode .modern-heatmap i.level-4{background:var(--accent)!important;border-color:var(--accent)!important}
 .dark-mode .activity-total{color:var(--n-500)!important}
 
@@ -105,13 +117,13 @@
 .dark-mode .field span{color:var(--n-500)!important}
 
 /* Dark solve view */
-.dark-mode .view-solve{--n-50:#1a1b26;--n-100:#1e2030;--n-200:#292e42;--n-300:#414868;--n-400:#565f89;--n-500:#737aa2;--n-600:#a9b1d6;--n-700:#c0caf5;--n-800:#c0caf5;--n-900:#c0caf5;--accent:#7aa2f7;--accent-soft:#24283b}
-.dark-mode .view-solve .topbar{background:var(--paper)!important;border-color:var(--rule)!important}
+.dark-mode .view-solve{--n-50:#181A1B;--n-100:#22262A;--n-200:#2E333D;--n-300:#3A3F47;--n-400:#5A6070;--n-500:#9A9FA8;--n-600:#B0B5BE;--n-700:#E8EAEF;--n-800:#E8EAEF;--n-900:#F0F2F5;--accent:#008080;--accent-soft:#1E2B27}
+.dark-mode .view-solve .topbar{background:#1E2B27!important;border-color:var(--rule)!important}
 .dark-mode .view-solve .pdf-column{background:var(--n-100)!important;border-right-color:var(--rule)!important}
 .dark-mode .view-solve .question-panel{background:var(--paper)!important;border-left-color:var(--rule)!important}
 .dark-mode .view-solve .question-header{border-bottom-color:var(--accent)!important}
 .dark-mode .view-solve .question-number{color:var(--ink)!important}
-.dark-mode .view-solve .clock-container{background:var(--n-100)!important;border-color:var(--n-300)!important}
+.dark-mode .view-solve .clock-container{background:var(--n-200)!important;border-color:var(--n-300)!important}
 .dark-mode .view-solve .clock-label{color:var(--n-500)!important}
 .dark-mode .view-solve .clock-time{color:var(--accent)!important}
 .dark-mode .view-solve .index-header{background:var(--paper)!important}
@@ -119,34 +131,34 @@
 .dark-mode .view-solve .index-count{color:var(--n-500)!important}
 .dark-mode .view-solve .index-btn{background:var(--n-100)!important;border-color:var(--n-300)!important;color:var(--n-500)!important}
 .dark-mode .view-solve .index-btn:hover{background:var(--n-200)!important;border-color:var(--n-400)!important;color:var(--ink)!important}
-.dark-mode .view-solve .index-btn.active{background:var(--accent)!important;border-color:var(--accent)!important;color:#1a1b26!important}
+.dark-mode .view-solve .index-btn.active{background:var(--accent)!important;border-color:var(--accent)!important;color:#181A1B!important}
 .dark-mode .view-solve .answer-title{color:var(--n-500)!important}
 .dark-mode .view-solve .option{background:var(--n-100)!important;border-color:var(--n-300)!important;color:var(--ink)!important}
 .dark-mode .view-solve .option:hover{border-color:var(--accent)!important;background:var(--n-200)!important}
-.dark-mode .view-solve .option.selected{border-color:var(--accent)!important;background:var(--n-200)!important;box-shadow:0 1px 3px rgba(122,162,247,.15)!important}
+.dark-mode .view-solve .option.selected{border-color:var(--accent)!important;background:var(--n-200)!important;box-shadow:0 1px 3px rgba(0,128,128,.15)!important}
 .dark-mode .view-solve .option-letter{background:var(--n-200)!important;border-color:var(--n-300)!important;color:var(--n-500)!important}
-.dark-mode .view-solve .option.selected .option-letter{background:var(--accent)!important;color:#1a1b26!important}
-.dark-mode .view-solve .option.correct-highlight{border-color:var(--success)!important;background:#1a2b1a!important}
-.dark-mode .view-solve .option.correct-highlight .option-letter{background:var(--success)!important;color:#1a1b26!important}
-.dark-mode .view-solve .option.wrong-highlight{border-color:var(--error)!important;background:#2d1b1e!important;opacity:.7}
+.dark-mode .view-solve .option.selected .option-letter{background:var(--accent)!important;color:#181A1B!important}
+.dark-mode .view-solve .option.correct-highlight{border-color:var(--success)!important;background:#1A2E2A!important}
+.dark-mode .view-solve .option.correct-highlight .option-letter{background:var(--success)!important;color:#181A1B!important}
+.dark-mode .view-solve .option.wrong-highlight{border-color:var(--error)!important;background:#2A1A1A!important;opacity:.7}
 .dark-mode .view-solve .option-text{color:var(--ink)!important}
-.dark-mode .view-solve .feedback.correct{background:#1a2b1a!important;border-color:var(--success)!important}
+.dark-mode .view-solve .feedback.correct{background:#1A2E2A!important;border-color:var(--success)!important}
 .dark-mode .view-solve .feedback.correct .feedback-text{color:var(--success)!important}
-.dark-mode .view-solve .feedback.incorrect{background:#2d1b1e!important;border-color:var(--error)!important}
+.dark-mode .view-solve .feedback.incorrect{background:#2A1A1A!important;border-color:var(--error)!important}
 .dark-mode .view-solve .feedback.incorrect .feedback-text{color:var(--error)!important}
 .dark-mode .view-solve .bottom-nav{background:var(--paper)!important;border-top-color:var(--rule)!important}
 .dark-mode .view-solve .nav-arrow{background:var(--n-100)!important;border-color:var(--n-300)!important;color:var(--n-500)!important}
 .dark-mode .view-solve .nav-arrow:hover:not(:disabled){border-color:var(--accent)!important;color:var(--accent)!important;background:var(--n-200)!important}
 .dark-mode .view-solve .btn-respond{background:var(--n-400)!important;color:var(--ink)!important}
-.dark-mode .view-solve .btn-respond:hover:not(:disabled){background:var(--accent)!important;color:#1a1b26!important}
-.dark-mode .view-solve .bottom-nav.feedback-active .btn-respond{background:var(--accent)!important;color:#1a1b26!important}
+.dark-mode .view-solve .btn-respond:hover:not(:disabled){background:var(--accent)!important;color:#181A1B!important}
+.dark-mode .view-solve .bottom-nav.feedback-active .btn-respond{background:var(--accent)!important;color:#181A1B!important}
 
 /* Dark image toolbar */
 .dark-mode .view-solve .image-toolbar{background:var(--n-100)!important;border-color:var(--n-300)!important}
 .dark-mode .view-solve .image-toolbar button{background:var(--n-200)!important;color:var(--n-600)!important}
-.dark-mode .view-solve .image-toolbar button:hover{background:var(--accent)!important;color:#1a1b26!important}
+.dark-mode .view-solve .image-toolbar button:hover{background:var(--accent)!important;color:#181A1B!important}
 .dark-mode .view-solve .image-title{color:var(--n-500)!important}
-.dark-mode .view-solve .drag-hint{background:rgba(26,27,38,.9)!important}
+.dark-mode .view-solve .drag-hint{background:rgba(24,26,27,.9)!important}
 .dark-mode .view-solve .image-viewport{background:var(--n-200)!important;border-color:var(--n-300)!important}
 
 /* Dark question context */
@@ -166,3 +178,159 @@
 .dark-toggle svg{width:18px;height:18px}
 .dark-mode .dark-toggle{background:var(--n-200);border-color:var(--n-300);color:var(--accent)}
 .dark-mode .dark-toggle:hover{background:var(--n-300);color:var(--terracotta)}
+
+/* Dark compact specific */
+.dark-mode .app-shell .topbar{background:#1E2B27!important;border-top:3px solid var(--accent)!important}
+.dark-mode .app-shell .brand-name{color:#E8EAEF!important}
+.dark-mode .app-shell .brand-lockup small{color:#9A9FA8!important}
+.dark-mode .app-shell .nav{color:#9A9FA8!important}
+.dark-mode .app-shell .nav:hover{background:rgba(255,255,255,.08)!important;color:#E8EAEF!important}
+.dark-mode .app-shell .nav.active{background:rgba(255,255,255,.1)!important;color:#E8EAEF!important;box-shadow:inset 0 -3px var(--accent)!important}
+.dark-mode .app-shell .profile{color:#E8EAEF!important;border-color:rgba(255,255,255,.2)!important}
+.dark-mode .app-shell .profile strong{color:#E8EAEF!important}
+.dark-mode .app-shell .profile svg{color:#9A9FA8!important}
+.dark-mode .app-shell .profile .avatar{background:var(--accent)!important;color:#181A1B!important}
+
+/* Dark dashboard portal */
+.dark-mode .view-dashboard .topbar{background:#1E2B27!important;border-top-color:var(--accent)!important}
+.dark-mode .view-dashboard .brand{background:#1E2B27!important}
+.dark-mode .view-dashboard .brand-name{color:#E8EAEF!important}
+.dark-mode .view-dashboard .brand-lockup small{color:#9A9FA8!important}
+.dark-mode .view-dashboard .nav{color:#9A9FA8!important}
+.dark-mode .view-dashboard .nav:hover{background:rgba(255,255,255,.08)!important;color:#E8EAEF!important}
+.dark-mode .view-dashboard .nav.active{background:rgba(255,255,255,.1)!important;color:#E8EAEF!important;box-shadow:inset 0 -3px var(--accent)!important}
+.dark-mode .view-dashboard .profile{color:#E8EAEF!important}
+.dark-mode .view-dashboard .profile strong{color:#E8EAEF!important}
+.dark-mode .view-dashboard .profile svg{color:#9A9FA8!important}
+.dark-mode .view-dashboard .profile .avatar{background:var(--accent)!important;color:#181A1B!important}
+.dark-mode .view-dashboard main{background:var(--paper-deep)!important}
+.dark-mode .view-dashboard .stats .stat{background:var(--n-100)!important;border-top-color:var(--accent)!important}
+.dark-mode .view-dashboard .stat-icon{background:var(--n-200)!important;color:var(--accent)!important}
+.dark-mode .view-dashboard .study-notebooks{background:var(--n-100)!important}
+.dark-mode .view-dashboard .exam-card{background:var(--n-100)!important}
+.dark-mode .view-dashboard .exam-performance{background:var(--n-200)!important}
+.dark-mode .view-dashboard .card-actions .access{color:var(--accent)!important}
+
+/* Dark exam ranking / summary cards */
+.dark-mode .exam-card-v2{background:var(--n-100)!important}
+.dark-mode .exam-card-v2:hover{box-shadow:0 4px 16px rgba(0,0,0,.2)!important}
+.dark-mode .exam-card-content{background:var(--n-100)!important}
+.dark-mode .exam-card-footer{background:var(--n-100)!important}
+.dark-mode .exam-card-stats:hover{background:var(--n-200)!important}
+.dark-mode .exam-edit-modal{background:var(--n-100)!important}
+.dark-mode .exam-edit-field input:focus{background:var(--n-200)!important}
+.dark-mode .exam-edit-upload{background:var(--n-200)!important}
+.dark-mode .exam-edit-cancel{background:var(--n-100)!important}
+.dark-mode .exam-menu summary{border-color:var(--rule)!important;color:var(--ink)!important}
+.dark-mode .exam-menu summary:hover{border-color:var(--accent)!important;color:var(--accent)!important}
+.dark-mode .exam-menu>div{border-color:var(--rule)!important}
+.dark-mode .exam-menu button{color:var(--ink)!important}
+.dark-mode .exam-menu button:hover{background:var(--n-200)!important}
+.dark-mode .exam-menu button.danger{color:var(--error)!important}
+.dark-mode .exam-menu button.danger:hover{background:#2A1A1A!important}
+.dark-mode .status.inline.pending{background:var(--n-200)!important;color:var(--n-500)!important}
+.dark-mode .status.inline.progress{background:var(--n-200)!important;color:var(--accent)!important}
+.dark-mode .status.inline.finished{background:#1A2E2A!important;color:var(--success)!important}
+.dark-mode .access{color:var(--accent)!important}
+.dark-mode .access:hover{background:var(--n-200)!important}
+.dark-mode .remove{background:#2A1A1A!important;color:var(--error)!important}
+.dark-mode .remove:hover{background:var(--error)!important;color:#fff!important}
+
+/* Dark exam card v2 icon */
+.dark-mode .exam-card-icon{background:var(--n-200)!important;color:var(--accent)!important}
+
+/* Dark summary/result views */
+.dark-mode .modern-result h2{color:var(--ink)!important}
+.dark-mode .modern-result p{color:var(--n-500)!important}
+.dark-mode .feature-card{background:var(--n-100)!important;border-color:var(--rule)!important}
+.dark-mode .feature-card>div{background:var(--n-200)!important}
+.dark-mode .feature-card span{color:var(--n-500)!important}
+.dark-mode .feature-card strong{color:var(--ink)!important}
+.dark-mode .feature-correct{background:var(--n-200)!important}
+.dark-mode .feature-correct i{background:var(--accent)!important}
+.dark-mode .summary-grid article{background:var(--n-100)!important;border-color:var(--rule)!important}
+.dark-mode .summary-grid article span{color:var(--n-500)!important}
+.dark-mode .summary-grid article strong{color:var(--ink)!important}
+.dark-mode .summary-compact-grid article{background:var(--n-100)!important;border-color:var(--rule)!important}
+.dark-mode .summary-compact-grid span{color:var(--n-500)!important}
+.dark-mode .summary-compact-grid strong{color:var(--ink)!important}
+.dark-mode .summary-lower-grid article{background:var(--n-100)!important;border-color:var(--rule)!important}
+.dark-mode .summary-lower-grid article strong{color:var(--ink)!important}
+.dark-mode .summary-lower-grid p{color:var(--n-500)!important}
+.dark-mode .summary-hero{border-color:var(--rule)!important}
+.dark-mode .summary-hero p{color:var(--n-500)!important}
+.dark-mode .summary-mood{color:var(--accent)!important}
+.dark-mode .summary-note{border-color:var(--rule)!important;color:var(--n-500)!important}
+.dark-mode .metric-correct{background:var(--n-200)!important}.dark-mode .metric-correct strong{color:var(--accent)!important}
+.dark-mode .metric-wrong{background:#2A1A1A!important}.dark-mode .metric-wrong strong{color:var(--error)!important}
+.dark-mode .metric-blank{background:var(--n-100)!important}.dark-mode .metric-blank strong{color:var(--n-500)!important}
+.dark-mode .metric-score{background:var(--n-100)!important}
+.dark-mode .metric-cutoff{background:var(--n-200)!important}.dark-mode .metric-cutoff strong{color:var(--accent)!important}
+.dark-mode .metric-time{background:var(--n-100)!important}
+.dark-mode .metric-average em{color:var(--n-500)!important}
+.dark-mode .critical-panel{background:#2A1A1A!important;border-color:var(--error)!important}
+.dark-mode .time-panel{background:var(--n-100)!important;border-color:var(--rule)!important}
+.dark-mode .critical-empty{color:var(--error)!important}
+.dark-mode .critical-summary{background:#2A1A1A!important}.dark-mode .critical-summary strong{color:var(--error)!important}.dark-mode .critical-summary span{color:var(--error)!important}
+.dark-mode .panel-title strong{color:var(--error)!important}
+.dark-mode .wrong-area{background:var(--n-100)!important;border-color:var(--rule)!important}
+.dark-mode .wrong-area strong{color:var(--ink)!important}
+.dark-mode .wrong-area span{color:var(--error)!important}
+
+/* Dark summary warning */
+.dark-mode .summary-warning{background:#2A2210!important;border-color:var(--terracotta)!important}
+.dark-mode .summary-warning p{color:var(--ink)!important}
+.dark-mode .summary-warning strong{color:var(--terracotta)!important}
+.dark-mode .summary-warning button{background:var(--accent)!important;color:#181A1B!important}
+.dark-mode .summary-warning button:hover{background:var(--navy-deep)!important}
+
+/* Dark next steps */
+.dark-mode .next-steps{border-color:var(--rule)!important;background:var(--n-100)!important}
+.dark-mode .next-steps button{background:var(--n-100)!important;border-color:var(--n-300)!important;color:var(--ink)!important}
+.dark-mode .next-steps button:hover{border-color:var(--accent)!important}
+.dark-mode .primary-step{background:var(--accent)!important;border-color:var(--accent)!important;color:#181A1B!important}
+
+/* Dark approval orbit */
+.dark-mode .orbit-track{stroke:var(--n-300)!important}
+.dark-mode .orbit-cutoff{stroke:var(--n-400)!important}
+.dark-mode .approval-orbit span{color:var(--n-500)!important}
+
+/* Dark solve summary */
+.dark-mode .solve-summary.approved{--summary-bg:#1A2E2A;--summary-color:var(--accent);--summary-track:var(--n-300)}
+.dark-mode .solve-summary.reproved{--summary-bg:#2A1A1A;--summary-color:var(--error);--summary-track:var(--n-300)}
+.dark-mode .solve-summary .summary-note{background:var(--n-100)!important;color:var(--n-500)!important}
+.dark-mode .solve-summary.approved .summary-note{background:#1A2E2A!important;color:var(--accent)!important}
+.dark-mode .solve-summary.reproved .summary-note{background:#2A1A1A!important;color:var(--error)!important}
+
+/* Dark study-create / portal */
+.dark-mode .study-create{background:var(--n-100)!important}
+.dark-mode .study-create h2{color:var(--ink)!important}
+.dark-mode .study-create p{color:var(--n-500)!important}
+.dark-mode .portal-notice{background:var(--n-100)!important;border-top-color:var(--error)!important}
+.dark-mode .portal-notice>span{color:var(--error)!important}
+.dark-mode .portal-notice strong{color:var(--ink)!important}
+.dark-mode .portal-notice p{color:var(--n-500)!important}
+.dark-mode .portal-performance{background:var(--n-100)!important}
+.dark-mode .portal-performance h3{color:var(--ink)!important}
+.dark-mode .portal-performance>strong{color:var(--accent)!important}
+.dark-mode .portal-performance>span{color:var(--n-500)!important}
+
+/* Dark view-exams */
+.dark-mode .view-exams main{background:var(--paper-deep)!important}
+.dark-mode .view-exams .stats .stat{background:var(--n-100)!important;border-top-color:var(--accent)!important}
+.dark-mode .exam-row{border-left-color:var(--accent)!important}
+
+/* Dark performance view */
+.dark-mode .view-performance .performance-controls button.active{background:var(--n-200)!important;color:var(--accent)!important}
+.dark-mode .view-performance .donut-legend .green{background:var(--accent)!important}
+.dark-mode .view-performance .donut-legend .red{background:var(--error)!important}
+.dark-mode .view-performance .correct-row{color:var(--accent)!important}
+.dark-mode .view-performance .wrong-row{color:var(--error)!important}
+.dark-mode .view-performance .mastery>div{background:linear-gradient(90deg,var(--n-200),var(--accent))!important}
+.dark-mode .view-performance .exam-ranking button:hover strong,.dark-mode .view-performance .rank-rate b{color:var(--accent)!important}
+
+/* Dark exam row actions */
+.dark-mode .provas-empty{background:var(--n-100)!important;border-color:var(--rule)!important}
+.dark-mode .provas-empty .primary{background:var(--accent)!important;color:#181A1B!important;border-color:var(--accent)!important}
+.dark-mode .provas-empty .primary:hover{background:var(--navy-deep)!important}
+.dark-mode .featured-heatmap{background:var(--n-100)!important;border-color:var(--rule)!important}
