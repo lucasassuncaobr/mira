@@ -370,8 +370,157 @@ function FormattedText({ children }: { children: string }) { return <span classN
 
 function Solve({ exam }: { exam: Exam & { questions?: Question[] } }) {
   const questions = exam.questions ?? [];
-  const question = questions[0];
-  return <div className="solve notranslate" translate="no"><div className="solve-workspace"><aside className="pdf-column">{question?.page_number ? <PageReference examId={exam.id} page={question.page_number} questionNumber={question.number}/> : <div className="pdf-empty"><FileText/><span>Página original indisponível</span></div>}</aside></div></div>;
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [elapsed, setElapsed] = useState(0);
+  const [feedback, setFeedback] = useState<{ correct: boolean; correctAnswer: string } | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const question = questions[currentIdx];
+  const total = questions.length;
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setElapsed((s) => s + 1), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  function formatClock(sec: number) {
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = sec % 60;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  }
+
+  async function submitAnswer() {
+    if (!question || !answers[question.id] || submitting) return;
+    setSubmitting(true);
+    setFeedback(null);
+    try {
+      const res = await fetch(`${API}/questions/${question.id}/answer`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answer: answers[question.id], elapsedSeconds: 0 }),
+      });
+      const data = await res.json();
+      setFeedback({ correct: data.isCorrect === true, correctAnswer: data.correctAnswer ?? "?" });
+    } catch {
+      setFeedback({ correct: false, correctAnswer: "?" });
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  function goNext() {
+    if (currentIdx < total - 1) {
+      setFeedback(null);
+      setCurrentIdx(currentIdx + 1);
+    }
+  }
+
+  function goPrev() {
+    if (currentIdx > 0) {
+      setFeedback(null);
+      setCurrentIdx(currentIdx - 1);
+    }
+  }
+
+  if (!question) return <div className="panel" style={{ padding: 40, textAlign: "center", color: "#666" }}>Nenhuma questão encontrada.</div>;
+
+  const selected = answers[question.id] ?? null;
+
+  return (
+    <div className="solve notranslate" translate="no">
+      <div className="solve-workspace">
+        <aside className="pdf-column">
+          {question.page_number ? (
+            <PageReference examId={exam.id} page={question.page_number} questionNumber={question.number} />
+          ) : (
+            <div className="pdf-empty"><FileText/><span>Página original indisponível</span></div>
+          )}
+        </aside>
+        <section className="question-panel">
+          <div className="question-header">
+            <h2 className="question-number">Questão {question.number}</h2>
+            <div className="clock-container">
+              <div className="clock-inner">
+                <svg className="clock-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span className="clock-label">TEMPO DE PROVA</span>
+                <span className="clock-time">{formatClock(elapsed)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="question-index">
+            <div className="index-header">
+              <span className="index-title">ÍNDICE DE QUESTÕES</span>
+              <span className="index-count">{currentIdx + 1}/{total}</span>
+            </div>
+            <div className="index-grid">
+              {questions.map((q, i) => (
+                <button
+                  key={q.id}
+                  className={`index-btn${i === currentIdx ? " active" : ""}${answers[q.id] ? " answered" : ""}`}
+                  onClick={() => { setFeedback(null); setCurrentIdx(i); }}
+                >
+                  {q.number}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="answer-section">
+            <h3 className="answer-title">ESCOLHA UMA RESPOSTA</h3>
+            {question.alternatives.map((alt) => {
+              const isSelected = selected === alt.label;
+              const isCorrectAnswer = feedback && feedback.correctAnswer === alt.label;
+              const isWrongSelected = feedback && isSelected && !feedback.correct;
+              let optionClass = "option";
+              if (isSelected && !feedback) optionClass += " selected";
+              if (feedback && isCorrectAnswer) optionClass += " correct-highlight";
+              if (isWrongSelected) optionClass += " wrong-highlight";
+              if (feedback) optionClass += " disabled";
+              return (
+                <div
+                  key={alt.label}
+                  className={optionClass}
+                  onClick={() => { if (!feedback) setAnswers({ ...answers, [question.id]: alt.label }); }}
+                >
+                  <div className="option-letter">{alt.label}</div>
+                  <div className="option-text">{alt.text}</div>
+                </div>
+              );
+            })}
+          </div>
+
+          {feedback && (
+            <div className={`feedback ${feedback.correct ? "correct" : "incorrect"}`} id="feedback">
+              <div className="feedback-label">{feedback.correct ? "ACERTOU!" : "ERROU"}</div>
+              <div className="feedback-text">{feedback.correct ? "Resposta correta!" : `Gabarito: ${feedback.correctAnswer}`}</div>
+            </div>
+          )}
+
+          <div className={`bottom-nav${feedback ? " feedback-active" : ""}`}>
+            <div className="nav-arrows">
+              <button className="nav-arrow" id="prev-btn" onClick={goPrev} disabled={currentIdx === 0}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <button className="nav-arrow" id="next-btn" onClick={goNext} disabled={currentIdx === total - 1}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+            {feedback ? (
+              <button className="btn-respond" id="respond-btn" onClick={goNext} disabled={currentIdx === total - 1}>
+                {currentIdx === total - 1 ? "Finalizar" : "Próxima"}
+              </button>
+            ) : (
+              <button className="btn-respond" id="respond-btn" onClick={submitAnswer} disabled={!selected || submitting}>
+                {submitting ? "Enviando..." : "Responder"}
+              </button>
+            )}
+          </div>
+        </section>
+      </div>
+    </div>
+  );
 }
 
 function formatTimer(seconds: number) { const hours = Math.floor(seconds / 3600); const minutes = Math.floor((seconds % 3600) / 60); const rest = seconds % 60; return [hours, minutes, rest].map((value) => String(value).padStart(2, "0")).join(":"); }
