@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { BarChart3, BookOpen, Check, ChevronLeft, ChevronRight, Clock3, ClipboardCheck, FileText, Maximize2, Menu, Moon, Move, Pencil, RotateCcw, Sparkles, Sun, Trash2, UploadCloud, X, ZoomIn, ZoomOut } from "lucide-react";
+import { BarChart3, BookOpen, Check, ChevronLeft, ChevronRight, Clock3, ClipboardCheck, FileText, Maximize2, Menu, Move, Pencil, RotateCcw, Sparkles, Trash2, UploadCloud, X, ZoomIn, ZoomOut } from "lucide-react";
 
 const API = "http://localhost:3333/api";
 type Alternative = { label: string; text: string };
@@ -13,7 +13,6 @@ export function App() {
   const [exam, setExam] = useState<Exam | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [dark, setDark] = useState(() => localStorage.getItem("aprova-dark") === "true");
   const historyReady = useRef(false);
   const historyView = useRef<View | null>(null);
 
@@ -86,11 +85,8 @@ export function App() {
     if (!response.ok) return setError("Não foi possível remover a prova.");
     await refresh();
   }
-  function toggleDark() {
-    setDark((v) => { localStorage.setItem("aprova-dark", String(!v)); return !v; });
-  }
 
-  return <div className={`app-shell view-${view}${dark ? " dark-mode" : ""}`}>
+  return <div className={`app-shell view-${view}`}>
     <div className="topbar"><div className="topbar-inner">
       <div className="brand"><div className="brand-lockup"><span className="brand-name">Mira</span><small>estudos</small></div></div>
       <nav>
@@ -98,7 +94,6 @@ export function App() {
         <Nav active={view === "performance"} icon={<BarChart3/>} label="Desempenho" onClick={() => setView("performance")}/>
       </nav>
       <button className="primary compact top-import" onClick={() => setView("import")}><UploadCloud size={18}/> Importar prova</button>
-      <button className="dark-toggle" onClick={toggleDark} title={dark ? "Modo claro" : "Modo escuro"}>{dark ? <Sun size={18}/> : <Moon size={18}/>}</button>
       <div className="profile"><div className="avatar">LA</div><div><strong>Lucas</strong></div><Menu size={18}/></div>
     </div></div>
     <main>
