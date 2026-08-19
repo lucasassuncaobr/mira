@@ -11,5 +11,6 @@ import "./styles.css";
 import "./theme.css";
 import "./theme-polish.css";
 import "./compact.css";
+import "./dark.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(<React.StrictMode><App /></React.StrictMode>);
