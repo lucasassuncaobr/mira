@@ -8,7 +8,7 @@ header h1,.section-head h3,.library-head h2,.center-title h2,.editor-head h2,.st
 .dropzone,.smart-note,.alternative-edit .letter,.alternative-edit textarea{border-radius:8px}.upload-icon{border-radius:12px}.number-grid button{border-radius:6px}.performance-controls button.active{border-radius:6px}.modern-heatmap .consistency-grid i,.heatmap-footer i{border-radius:3px}.view-solve .brand-mark{background:var(--navy);border:0;border-radius:11px}@media(max-width:600px){.brand>small{display:none}.brand{font-size:21px}.brand-mark{width:34px;height:34px}}
 
 /* Feedback positioning */
-.view-solve .feedback{position:static;right:auto;bottom:auto;width:auto;margin:2px 0 12px;padding:12px 14px;box-shadow:none;border-width:1px;border-left-width:3px;flex:0 0 auto}
+.view-solve .feedback{position:static;right:auto;bottom:auto;width:auto;margin:2px 0 12px;padding:16px 18px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.06);flex:0 0 auto;display:flex;align-items:center;gap:14px}
 
 /* Assessment color language: defined but deferred to compact.css */
 .view-solve{--exam-blue:#008080;--exam-blue-deep:#006666;--exam-teal:#D6A12A;--exam-charcoal:#2E333D;--exam-error:#8B0000;--exam-line:#E8E8E8}

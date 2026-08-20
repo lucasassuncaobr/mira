@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { BarChart3, BookOpen, Check, ChevronLeft, ChevronRight, Clock3, ClipboardCheck, FileText, Maximize2, Menu, Move, Pencil, RotateCcw, Sparkles, Trash2, UploadCloud, X, ZoomIn, ZoomOut } from "lucide-react";
+import { BarChart3, BookOpen, Check, ChevronLeft, ChevronRight, Clock3, ClipboardCheck, FileText, GraduationCap, Maximize2, Menu, Move, Pencil, RotateCcw, Sparkles, Trash2, UploadCloud, X, ZoomIn, ZoomOut } from "lucide-react";
 
 const API = "http://localhost:3333/api";
 type Alternative = { label: string; text: string };
@@ -88,13 +88,16 @@ export function App() {
 
   return <div className={`app-shell view-${view}`}>
     <div className="topbar"><div className="topbar-inner">
-      <div className="brand"><div className="brand-lockup"><span className="brand-name">Mira</span><small>estudos</small></div></div>
-      <nav>
-        <Nav active={view === "exams"} icon={<BookOpen/>} label="Provas" onClick={() => setView("exams")}/>
-        <Nav active={view === "performance"} icon={<BarChart3/>} label="Desempenho" onClick={() => setView("performance")}/>
+      <a className="brand" href="#exams" aria-label="Mira estudos — página inicial" onClick={(e) => { e.preventDefault(); setView("exams"); }}>
+        <span className="brand-mark" aria-hidden="true"><GraduationCap size={20} strokeWidth={1.8}/></span>
+        <span className="brand-lockup"><span className="brand-name">Mira</span><small>estudos</small></span>
+      </a>
+      <nav aria-label="Navegação principal">
+        <Nav active={view === "exams"} icon={<BookOpen size={17}/>} label="Provas" ariaLabel="Ver minhas provas" onClick={() => setView("exams")}/>
+        <Nav active={view === "performance"} icon={<BarChart3 size={17}/>} label="Desempenho" ariaLabel="Ver meu desempenho" onClick={() => setView("performance")}/>
       </nav>
-      <button className="primary compact top-import" onClick={() => setView("import")}><UploadCloud size={18}/> Importar prova</button>
-      <div className="profile"><div className="avatar">LA</div><div><strong>Lucas</strong></div><Menu size={18}/></div>
+      <button className="primary compact top-import" aria-label="Importar nova prova" onClick={() => setView("import")}><UploadCloud size={17}/> <span>Importar prova</span></button>
+      <div className="profile"><div className="avatar" aria-hidden="true">LA</div><div className="profile-meta"><strong>Lucas</strong></div><button className="profile-menu" type="button" aria-label="Abrir menu da conta"><Menu size={18}/></button></div>
     </div></div>
     <main>
       <header><div><span className="eyebrow">PLATAFORMA DE ESTUDOS</span><h1>{titles[view]}</h1></div></header>
@@ -109,7 +112,7 @@ export function App() {
 }
 
 const titles: Record<View, string> = { dashboard: "Sua preparação, em um só lugar", exams: "Suas provas", performance: "Seu desempenho", import: "Importar nova prova", review: "Revisar questões", solve: "Resolver prova" };
-function Nav({ icon, label, active, onClick }: { icon: React.ReactNode; label: string; active?: boolean; onClick?: () => void }) { return <button className={active ? "nav active" : "nav"} onClick={onClick}>{icon}<span>{label}</span></button>; }
+function Nav({ icon, label, active, ariaLabel, onClick }: { icon: React.ReactNode; label: string; active?: boolean; ariaLabel?: string; onClick?: () => void }) { return <button type="button" className={active ? "nav active" : "nav"} aria-label={ariaLabel ?? label} aria-current={active ? "page" : undefined} onClick={onClick}>{icon}<span>{label}</span></button>; }
 
 function Dashboard({ exams, onImport, onOpen, onReview, onRemove, onRefresh }: { exams: Exam[]; onImport: () => void; onOpen: (id: number) => void; onReview: (id: number) => void; onRemove: (id: number) => void; onRefresh: () => void }) {
   const answered = exams.reduce((sum, item) => sum + Number(item.answered_count ?? 0), 0);
@@ -369,9 +372,12 @@ function PageReference({ examId, page, questionNumber }: { examId: number; page:
 function FormattedText({ children }: { children: string }) { return <span className="exam-text">{children}</span>; }
 
 function Solve({ exam }: { exam: Exam & { questions?: Question[] } }) {
-  const questions = exam.questions ?? [];
+  const questions = (exam.questions ?? []).filter(
+    (q, i, arr) => arr.findIndex((x) => x.number === q.number) === i
+  );
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [results, setResults] = useState<Record<number, "correct" | "wrong">>({});
   const [elapsed, setElapsed] = useState(0);
   const [feedback, setFeedback] = useState<{ correct: boolean; correctAnswer: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -401,9 +407,12 @@ function Solve({ exam }: { exam: Exam & { questions?: Question[] } }) {
         body: JSON.stringify({ answer: answers[question.id], elapsedSeconds: 0 }),
       });
       const data = await res.json();
-      setFeedback({ correct: data.isCorrect === true, correctAnswer: data.correctAnswer ?? "?" });
+      const isCorrect = data.isCorrect === true;
+      setFeedback({ correct: isCorrect, correctAnswer: data.correctAnswer ?? "?" });
+      setResults(prev => ({ ...prev, [question.id]: isCorrect ? "correct" : "wrong" }));
     } catch {
       setFeedback({ correct: false, correctAnswer: "?" });
+      setResults(prev => ({ ...prev, [question.id]: "wrong" }));
     } finally {
       setSubmitting(false);
     }
@@ -455,15 +464,19 @@ function Solve({ exam }: { exam: Exam & { questions?: Question[] } }) {
               <span className="index-count">{currentIdx + 1}/{total}</span>
             </div>
             <div className="index-grid">
-              {questions.map((q, i) => (
-                <button
-                  key={q.id}
-                  className={`index-btn${i === currentIdx ? " active" : ""}${answers[q.id] ? " answered" : ""}`}
-                  onClick={() => { setFeedback(null); setCurrentIdx(i); }}
-                >
-                  {q.number}
-                </button>
-              ))}
+              {questions.map((q, i) => {
+                const result = results[q.id];
+                const statusClass = result === "correct" ? " correct-answer" : result === "wrong" ? " wrong-answer" : "";
+                return (
+                  <button
+                    key={q.id}
+                    className={`index-btn${i === currentIdx ? " active" : ""}${statusClass}`}
+                    onClick={() => { setFeedback(null); setCurrentIdx(i); }}
+                  >
+                    {String(i + 1).padStart(2, "0")}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -493,8 +506,11 @@ function Solve({ exam }: { exam: Exam & { questions?: Question[] } }) {
 
           {feedback && (
             <div className={`feedback ${feedback.correct ? "correct" : "incorrect"}`} id="feedback">
-              <div className="feedback-label">{feedback.correct ? "ACERTOU!" : "ERROU"}</div>
-              <div className="feedback-text">{feedback.correct ? "Resposta correta!" : `Gabarito: ${feedback.correctAnswer}`}</div>
+              <div className="feedback-icon">{feedback.correct ? <Check size={18}/> : <X size={18}/>}</div>
+              <div className="feedback-content">
+                <div className="feedback-label">{feedback.correct ? "ACERTOU!" : "ERROU"}</div>
+                <div className="feedback-text">{feedback.correct ? "Resposta correta!" : `Gabarito: ${feedback.correctAnswer}`}</div>
+              </div>
             </div>
           )}
 
