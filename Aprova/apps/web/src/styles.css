@@ -39,11 +39,11 @@ button,input,textarea,select{font-family:inherit}button:focus-visible,input:focu
 .clock-label{font-size:10px;font-weight:600;color:#6C7480;letter-spacing:.5px}
 .clock-time{font-size:16px;font-weight:700;color:#008080;font-family:'Rawline','Courier New',monospace;font-variant-numeric:tabular-nums;min-width:70px;text-align:right}
 
-.question-index{display:flex;flex-direction:column;flex-shrink:0}
-.index-header{display:flex;justify-content:space-between;align-items:center;padding:10px 12px 6px;flex-shrink:0;background-color:#fff}
+.question-index{display:flex;flex-direction:column;flex-shrink:0;padding:0 20px}
+.index-header{display:flex;justify-content:space-between;align-items:center;padding:10px 0 6px;flex-shrink:0;background-color:#fff}
 .index-title{font-size:10px;font-weight:600;color:#6C7480;letter-spacing:.5px}
 .index-count{font-size:11px;color:#6C7480}
-.index-grid{display:grid;grid-template-columns:repeat(15,1fr);gap:3px;padding:0 12px 8px;max-height:112px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#B8D8D4 #F1F2F4;justify-items:center}
+.index-grid{display:grid;grid-template-columns:repeat(15,1fr);gap:3px;padding:0 0 8px;max-height:112px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#B8D8D4 #F1F2F4;justify-items:center}
 .index-grid::-webkit-scrollbar{width:5px}
 .index-grid::-webkit-scrollbar-track{background:#F1F2F4;border-radius:3px}
 .index-grid::-webkit-scrollbar-thumb{background:#B8D8D4;border-radius:3px}
