@@ -97,6 +97,8 @@ button,input,textarea,select{font-family:inherit}button:focus-visible,input:focu
 .btn-respond{padding:14px 40px;background-color:#6C7480;color:white;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s ease;letter-spacing:.3px}
 .btn-respond:hover:not(:disabled){background-color:#008080}
 .btn-respond:disabled{opacity:.5;cursor:not-allowed}
+.btn-finish{background-color:#008080!important;font-size:13px;padding:14px 24px!important}
+.btn-finish:hover:not(:disabled){background-color:#006666!important}
 
 .view-solve .question-panel{border-left:0}
 @media(max-width:1050px){.question-panel{width:100%;border-left:0;border-top:1px solid #E8E8E8}}

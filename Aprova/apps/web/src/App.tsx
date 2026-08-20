@@ -103,7 +103,7 @@ export function App() {
       {view === "performance" && <Performance exams={exams} onOpen={(id) => openExam(id, "solve")}/>} 
       {view === "import" && <Import loading={loading} setLoading={setLoading} onDone={async (id) => { await refresh(); await openExam(id, "review"); }} onError={setError}/>} 
       {view === "review" && exam?.questions && <Review exam={exam} onChange={setExam} onSolve={() => setView("solve")}/>} 
-      {view === "solve" && (exam ? <Solve key={exam.id} exam={exam}/> : <div className="panel" style={{padding: 40, textAlign: "center", color: "#6C7480"}}>Carregando prova...</div>)} 
+      {view === "solve" && (exam ? <Solve key={exam.id} exam={exam} onFinish={() => setView("performance")}/> : <div className="panel" style={{padding: 40, textAlign: "center", color: "#6C7480"}}>Carregando prova...</div>)} 
     </main>
   </div>;
 }
@@ -368,7 +368,7 @@ function PageReference({ examId, page, questionNumber }: { examId: number; page:
 
 function FormattedText({ children }: { children: string }) { return <span className="exam-text">{children}</span>; }
 
-function Solve({ exam }: { exam: Exam & { questions?: Question[] } }) {
+function Solve({ exam, onFinish }: { exam: Exam & { questions?: Question[] }; onFinish: () => void }) {
   const questions = (exam.questions ?? []).filter(
     (q, i, arr) => arr.findIndex((x) => x.number === q.number) === i
   );
@@ -427,6 +427,14 @@ function Solve({ exam }: { exam: Exam & { questions?: Question[] } }) {
       setFeedback(null);
       setCurrentIdx(currentIdx - 1);
     }
+  }
+
+  const allAnswered = questions.every(q => answers[q.id]);
+  const answeredCount = questions.filter(q => answers[q.id]).length;
+
+  function finishExam() {
+    if (!allAnswered) return;
+    onFinish();
   }
 
   if (!question) return <div className="panel" style={{ padding: 40, textAlign: "center", color: "#6C7480" }}>Nenhuma questão encontrada.</div>;
@@ -521,9 +529,15 @@ function Solve({ exam }: { exam: Exam & { questions?: Question[] } }) {
               </button>
             </div>
             {feedback ? (
-              <button className="btn-respond" id="respond-btn" onClick={goNext} disabled={currentIdx === total - 1}>
-                {currentIdx === total - 1 ? "Finalizar" : "Próxima"}
-              </button>
+              currentIdx === total - 1 ? (
+                <button className="btn-respond btn-finish" id="finish-btn" onClick={finishExam} disabled={!allAnswered}>
+                  {allAnswered ? "Finalizar prova" : `Faltam ${total - answeredCount} questões`}
+                </button>
+              ) : (
+                <button className="btn-respond" id="respond-btn" onClick={goNext}>
+                  Próxima
+                </button>
+              )
             ) : (
               <button className="btn-respond" id="respond-btn" onClick={submitAnswer} disabled={!selected || submitting}>
                 {submitting ? "Enviando..." : "Responder"}
