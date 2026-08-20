@@ -39,15 +39,12 @@ button,input,textarea,select{font-family:inherit}button:focus-visible,input:focu
 .clock-label{font-size:10px;font-weight:600;color:#6C7480;letter-spacing:.5px}
 .clock-time{font-size:16px;font-weight:700;color:#008080;font-family:'Rawline','Courier New',monospace;font-variant-numeric:tabular-nums;min-width:70px;text-align:right}
 
-.question-index{display:flex;flex-direction:column;flex-shrink:0;padding:0 20px}
+.question-index{display:flex;flex-direction:column;flex-shrink:0;padding:0 20px;overflow:hidden}
 .index-header{display:flex;justify-content:space-between;align-items:center;padding:10px 0 6px;flex-shrink:0;background-color:#fff}
 .index-title{font-size:10px;font-weight:600;color:#6C7480;letter-spacing:.5px}
 .index-count{font-size:11px;color:#6C7480}
-.index-grid{display:grid;grid-template-columns:repeat(15,1fr);gap:3px;padding:0 0 8px;max-height:112px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#B8D8D4 #F1F2F4;justify-items:center}
-.index-grid::-webkit-scrollbar{width:5px}
-.index-grid::-webkit-scrollbar-track{background:#F1F2F4;border-radius:3px}
-.index-grid::-webkit-scrollbar-thumb{background:#B8D8D4;border-radius:3px}
-.index-grid::-webkit-scrollbar-thumb:hover{background:#008080}
+.index-grid{display:grid;grid-template-columns:repeat(15,1fr);gap:3px;padding:0 0 4px;max-height:80px;overflow-y:auto;scrollbar-width:none;justify-items:center}
+.index-grid::-webkit-scrollbar{display:none}
 .index-btn{width:100%;aspect-ratio:1;border:1px solid #E8E8E8;background-color:#F7F5F0;font-size:11px;font-weight:600;color:#6C7480;cursor:pointer;transition:all .15s ease;padding:0;min-height:22px;min-width:22px;border-radius:2px;font-variant-numeric:tabular-nums;justify-self:center}
 .index-btn:hover{border-color:#008080;background-color:#E8F4F4;color:#2E333D;transform:scale(1.05)}
 .index-btn.null{background-color:#F1F2F4;border-color:#E8E8E8;color:#6C7480}
@@ -59,7 +56,8 @@ button,input,textarea,select{font-family:inherit}button:focus-visible,input:focu
 .context-label{font-size:10px;font-weight:700;color:#008080;letter-spacing:1px;display:block;margin-bottom:4px}
 .question-context p{margin:0;font-size:13px;color:#6C7480;line-height:1.5}
 
-.answer-section{padding:16px 20px;flex:1;overflow-y:auto}
+.answer-section{padding:16px 20px;flex:1;overflow-y:auto;scrollbar-width:none}
+.answer-section::-webkit-scrollbar{display:none}
 .question-statement{margin-bottom:14px}
 .question-statement .exam-text{font:400 14px/1.5 'Rawline',sans-serif;color:#2E333D}
 .answer-title{font-size:11px;font-weight:600;color:#6C7480;letter-spacing:.5px;margin:0 0 14px}

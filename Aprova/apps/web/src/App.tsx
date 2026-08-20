@@ -380,6 +380,14 @@ function Solve({ exam, onFinish }: { exam: Exam & { questions?: Question[] }; on
   const [submitting, setSubmitting] = useState(false);
   const question = questions[currentIdx];
   const total = questions.length;
+  const indexGridRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const grid = indexGridRef.current;
+    if (!grid) return;
+    const active = grid.querySelector(".index-btn.active");
+    if (active) active.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }, [currentIdx]);
 
   useEffect(() => {
     const timer = window.setInterval(() => setElapsed((s) => s + 1), 1000);
@@ -468,7 +476,7 @@ function Solve({ exam, onFinish }: { exam: Exam & { questions?: Question[] }; on
               <span className="index-title">ÍNDICE DE QUESTÕES</span>
               <span className="index-count">{currentIdx + 1}/{total}</span>
             </div>
-            <div className="index-grid">
+            <div className="index-grid" ref={indexGridRef}>
               {questions.map((q, i) => {
                 const result = results[q.id];
                 const statusClass = result === "correct" ? " correct-answer" : result === "wrong" ? " wrong-answer" : "";
