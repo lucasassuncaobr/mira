@@ -1,5 +1,5 @@
 /* Compact, modern Mira shell */
-.topbar{height:60px}.topbar-inner{padding:0 24px;gap:22px}.brand{min-width:108px;line-height:1}.brand-lockup{display:grid;align-content:center}.brand-name{font:800 23px/21px Rawline;letter-spacing:-.055em;color:var(--ink)}.brand-lockup small{font:700 7px/10px Rawline;text-transform:uppercase;letter-spacing:.24em;color:#6C7480;margin:2px 0 0 2px}.brand-i{position:relative;display:inline-block}.brand-crosshair{position:absolute;width:13px;height:13px;left:-1px;top:-7px;border:1.7px solid var(--ink);border-radius:50%;background:#fff;z-index:2}.brand-crosshair:before,.brand-crosshair:after{content:"";position:absolute;background:var(--terracotta);z-index:3}.brand-crosshair:before{width:2px;height:19px;left:3.8px;top:-4.7px}.brand-crosshair:after{width:19px;height:2px;left:-4.7px;top:3.8px}.brand-crosshair i{position:absolute;width:7px;height:7px;left:1.3px;top:1.3px;border:1.4px solid var(--terracotta);border-radius:50%;z-index:4}.brand-crosshair b{position:absolute;width:2px;height:2px;left:4px;top:4px;background:#fff;border-radius:50%;z-index:5}.nav{height:38px;padding:8px 10px}.nav svg{width:17px}.top-import{height:40px;padding:0 14px}.profile .avatar{width:32px;height:32px}
+.topbar{height:60px}.topbar-inner{padding:0 24px;gap:22px}.brand{min-width:108px;line-height:1}.brand-lockup{display:grid;align-content:center}.brand-name{font:800 23px/21px var(--font-primary);letter-spacing:-.055em;color:var(--ink)}.brand-lockup small{font:700 7px/10px var(--font-primary);text-transform:uppercase;letter-spacing:.24em;color:#6C7480;margin:2px 0 0 2px}.brand-i{position:relative;display:inline-block}.brand-crosshair{position:absolute;width:13px;height:13px;left:-1px;top:-7px;border:1.7px solid var(--ink);border-radius:50%;background:#fff;z-index:2}.brand-crosshair:before,.brand-crosshair:after{content:"";position:absolute;background:var(--terracotta);z-index:3}.brand-crosshair:before{width:2px;height:19px;left:3.8px;top:-4.7px}.brand-crosshair:after{width:19px;height:2px;left:-4.7px;top:3.8px}.brand-crosshair i{position:absolute;width:7px;height:7px;left:1.3px;top:1.3px;border:1.4px solid var(--terracotta);border-radius:50%;z-index:4}.brand-crosshair b{position:absolute;width:2px;height:2px;left:4px;top:4px;background:#fff;border-radius:50%;z-index:5}.nav{height:38px;padding:8px 10px}.nav svg{width:17px}.top-import{height:40px;padding:0 14px}.profile .avatar{width:32px;height:32px}
 main{padding:0 26px 44px}header{height:78px;margin-bottom:18px}header h1{font-size:23px;margin-top:4px}.stats{gap:10px;margin-bottom:22px}.stat{min-height:72px;padding:13px 15px}.stat-icon{width:36px;height:36px}.stat strong{font-size:20px}.stat span{font-size:11px}.dashboard-study-grid{grid-template-columns:minmax(0,1fr) 310px;gap:12px}.dashboard-side{gap:10px}.study-notebooks{min-height:116px;padding:20px 24px}.study-notebooks h3{font-size:18px;margin:4px 0}.study-notebooks p{font-size:12px;line-height:1.45}.notebook-actions{gap:8px}.notebook-actions button{height:42px;padding:0 16px}.side-card{padding:17px}.side-card h3{font-size:16px}.section-head h3{font-size:19px;margin-bottom:10px}.exam-grid{gap:10px}.exam-card.organized{padding:16px}.exam-identity{display:block}.exam-emblem{display:none}.exam-identity h3{margin-top:6px}.exam-card.organized .exam-performance{margin-top:13px}.card-actions{margin-top:13px;padding-top:11px}.modern-heatmap .consistency-grid{grid-template-rows:repeat(7,10px);grid-auto-columns:10px;gap:3px}.modern-heatmap .consistency-grid i,.heatmap-footer i{width:10px;height:10px}.heatmap-scroll{padding:12px 0 5px}
 .view-solve .topbar{height:60px}.view-solve main{height:calc(100vh - 60px)}.view-solve .solve-workspace{min-height:calc(100vh - 60px)}.view-solve .pdf-column{height:calc(100vh - 60px)}@media(max-width:900px){.topbar{height:auto}.topbar-inner{padding:8px 14px}.brand{min-width:90px}.topbar nav{margin-top:2px}.dashboard-study-grid{grid-template-columns:1fr}}@media(max-width:600px){}
 
@@ -17,12 +17,12 @@ main{padding:0 26px 44px}header{height:78px;margin-bottom:18px}header h1{font-si
 .exam-card.organized,.exam-card.organized:hover,.view-dashboard .exam-card,.view-dashboard .exam-card:hover{transform:none;transition:none;box-shadow:none;border-color:var(--rule)}.view-dashboard .exam-card{border-top-color:var(--rule)}.exam-card.organized:hover .exam-identity h3{color:var(--navy)}@media(max-width:600px){}
 
 /* Final shell cleanup and study portal */
-.app-shell .topbar{border-top:0}.portal-library{margin-top:-6px}.library-portal-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}.library-main{display:grid;gap:16px}.study-create,.content-library,.portal-notice,.portal-performance{background:#fff;border:1px solid var(--rule)}.study-create{min-height:150px;padding:24px;display:flex;align-items:center;justify-content:space-between;gap:24px}.study-create h2{font:700 21px Rawline;margin:6px 0}.study-create p{margin:0;color:var(--ink-soft);font-size:13px}.study-create .primary{height:42px;white-space:nowrap}.content-library{padding:0 20px 20px}.content-title{min-height:68px;margin:0 -20px 14px;padding:15px 20px;border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between}.content-title h3{font:700 17px Rawline;margin:0}.content-title p{font-size:12px;color:var(--ink-soft);margin:4px 0 0}.content-title>span{font-size:11px;color:var(--ink-soft)}.portal-library .library-tools{padding:10px;margin-bottom:14px;border-radius:2px}.portal-library .library-tools input,.portal-library .library-tools select{height:34px}.portal-exams{grid-template-columns:repeat(3,minmax(0,1fr))}.portal-exams .exam-card{min-width:0}.library-aside{display:grid;gap:12px}.portal-notice{padding:20px;border-top:4px solid #8B0000}.portal-notice>span{font-size:9px;font-weight:800;letter-spacing:.14em;color:#8B0000}.portal-notice strong,.portal-notice p{display:block}.portal-notice strong{font:700 17px Rawline;margin-top:8px}.portal-notice p{font-size:12px;line-height:1.55;color:var(--ink-soft);margin-bottom:0}.portal-performance{padding:20px}.portal-performance h3{font:700 17px Rawline;margin:6px 0 18px}.portal-performance>strong,.portal-performance>span{display:block}.portal-performance>strong{font:700 34px Rawline;color:#008080}.portal-performance>span{font-size:11px;color:var(--ink-soft)}.portal-performance>div:last-child{height:5px;background:#E8E8E8;margin-top:14px}.portal-performance>div:last-child i{display:block;height:100%;background:#D6A12A}.view-exams main>header{display:none}.view-exams main{padding-top:22px}@media(max-width:1150px){.portal-exams{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:900px){.library-portal-grid{grid-template-columns:1fr}.library-aside{grid-template-columns:repeat(2,1fr)}.portal-exams{grid-template-columns:1fr 1fr}}@media(max-width:600px){.study-create{align-items:flex-start;flex-direction:column}.library-aside,.portal-exams{grid-template-columns:1fr}}
+.app-shell .topbar{border-top:0}.portal-library{margin-top:-6px}.library-portal-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}.library-main{display:grid;gap:16px}.study-create,.content-library,.portal-notice,.portal-performance{background:#fff;border:1px solid var(--rule)}.study-create{min-height:150px;padding:24px;display:flex;align-items:center;justify-content:space-between;gap:24px}.study-create h2{font:700 21px var(--font-primary);margin:6px 0}.study-create p{margin:0;color:var(--ink-soft);font-size:13px}.study-create .primary{height:42px;white-space:nowrap}.content-library{padding:0 20px 20px}.content-title{min-height:68px;margin:0 -20px 14px;padding:15px 20px;border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between}.content-title h3{font:700 17px var(--font-primary);margin:0}.content-title p{font-size:12px;color:var(--ink-soft);margin:4px 0 0}.content-title>span{font-size:11px;color:var(--ink-soft)}.portal-library .library-tools{padding:10px;margin-bottom:14px;border-radius:2px}.portal-library .library-tools input,.portal-library .library-tools select{height:34px}.portal-exams{grid-template-columns:repeat(3,minmax(0,1fr))}.portal-exams .exam-card{min-width:0}.library-aside{display:grid;gap:12px}.portal-notice{padding:20px;border-top:4px solid #8B0000}.portal-notice>span{font-size:9px;font-weight:800;letter-spacing:.14em;color:#8B0000}.portal-notice strong,.portal-notice p{display:block}.portal-notice strong{font:700 17px var(--font-primary);margin-top:8px}.portal-notice p{font-size:12px;line-height:1.55;color:var(--ink-soft);margin-bottom:0}.portal-performance{padding:20px}.portal-performance h3{font:700 17px var(--font-primary);margin:6px 0 18px}.portal-performance>strong,.portal-performance>span{display:block}.portal-performance>strong{font:700 34px var(--font-primary);color:#008080}.portal-performance>span{font-size:11px;color:var(--ink-soft)}.portal-performance>div:last-child{height:5px;background:#E8E8E8;margin-top:14px}.portal-performance>div:last-child i{display:block;height:100%;background:#D6A12A}.view-exams main>header{display:none}.view-exams main{padding-top:22px}@media(max-width:1150px){.portal-exams{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:900px){.library-portal-grid{grid-template-columns:1fr}.library-aside{grid-template-columns:repeat(2,1fr)}.portal-exams{grid-template-columns:1fr 1fr}}@media(max-width:600px){.study-create{align-items:flex-start;flex-direction:column}.library-aside,.portal-exams{grid-template-columns:1fr}}
 
 /* Performance uses the current Mira institutional palette */
 .view-performance{--performance-blue:#008080;--performance-cyan:#D6A12A;--performance-red:#8B0000}.view-performance .performance-controls button.active{border-color:var(--performance-blue);background:#D6EFEA;color:var(--performance-blue)}.view-performance .performance-donut{background:conic-gradient(var(--performance-cyan) var(--donut),var(--performance-red) 0)}.view-performance .donut-legend .green{background:var(--performance-cyan)}.view-performance .donut-legend .red{background:var(--performance-red)}.view-performance .correct-row{color:#006666}.view-performance .wrong-row{color:var(--performance-red)}.view-performance .completion-bar i,.view-performance .bar-track i{background:var(--performance-cyan)}.view-performance .mastery>div{background:linear-gradient(90deg,#D6EFEA,var(--performance-cyan),var(--performance-blue))}.view-performance .accuracy-gauge{background:conic-gradient(var(--performance-cyan) var(--accuracy),#E8E8E8 0)}.view-performance .exam-ranking button:hover strong,.view-performance .rank-rate b{color:var(--performance-blue)}.view-performance .performance-summary,.view-performance .notebook-analytics{border-top:3px solid var(--performance-cyan)}
 
-.study-create .primary{height:40px;padding:0 15px 0 10px;border:1px solid #006666;border-left:3px solid #D6A12A;border-radius:4px;background:#008080;color:#fff;font-size:12px;font-weight:700;letter-spacing:.01em;box-shadow:none;gap:8px}.study-create .primary:before{content:"+";width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.12);color:#fff;font:500 18px/1 Rawline}.study-create .primary:hover{background:#006666;transform:none;box-shadow:none;border-left-color:#E8B84A}.study-create .primary:active{background:#005555}
+.study-create .primary{height:40px;padding:0 15px 0 10px;border:1px solid #006666;border-left:3px solid #D6A12A;border-radius:4px;background:#008080;color:#fff;font-size:12px;font-weight:700;letter-spacing:.01em;box-shadow:none;gap:8px}.study-create .primary:before{content:"+";width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.12);color:#fff;font:500 18px/1 var(--font-primary)}.study-create .primary:hover{background:#006666;transform:none;box-shadow:none;border-left-color:#E8B84A}.study-create .primary:active{background:#005555}
 
 /* Dense exam library above the fold */
 .portal-library .study-create{min-height:128px;display:block;padding:18px 20px}.portal-library .study-create h2{font-size:18px;margin:4px 0}.portal-library .study-create p{font-size:12px}.portal-library .study-create .primary{height:36px;margin-top:17px;padding:0 14px;border:0;border-radius:2px;background:#D6A12A;text-transform:uppercase;font-size:10px;letter-spacing:.04em}.portal-library .study-create .primary:before{display:none}.portal-library .study-create .primary:hover{background:#E8B84A}.portal-library .content-title{min-height:54px;padding-top:10px;padding-bottom:10px;margin-bottom:9px}.portal-library .content-title h3{font-size:15px}.portal-library .content-title p{font-size:10px}.portal-library .library-tools{margin-bottom:9px;padding:7px}.portal-library .library-tools label span{margin-bottom:3px}.portal-library .library-tools input,.portal-library .library-tools select{height:31px;font-size:12px}.portal-library .content-library{padding-bottom:12px}.portal-exams .exam-card.organized{max-width:280px;padding:11px}.portal-exams .exam-identity .status.inline{margin-bottom:4px;padding:4px 7px;font-size:8px}.portal-exams .exam-identity h3{font-size:14px;line-height:1.3;margin:4px 0}.portal-exams .exam-meta{font-size:9px}.portal-exams .exam-card.organized .exam-performance{margin-top:9px;padding:8px}.portal-exams .performance-head{font-size:9px}.portal-exams .performance-head strong{font-size:9px}.portal-exams .mini-progress{margin:6px 0}.portal-exams .performance-numbers{margin-top:6px!important}.portal-exams .performance-numbers b{font-size:13px!important}.portal-exams .performance-numbers small{font-size:8px!important}.portal-exams .card-actions{margin-top:8px;padding-top:7px}.portal-exams .card-actions .access{font-size:11px}.portal-exams .remove,.portal-exams .circle{width:28px;height:28px}.portal-exams .remove svg,.portal-exams .circle svg{width:14px}.portal-library .library-main{gap:10px}.portal-library .library-aside{gap:10px}.portal-library .portal-notice,.portal-library .portal-performance,.portal-library .side-card{padding:15px}.portal-library .modern-heatmap .heatmap-scroll{padding:8px 0 3px}
@@ -36,12 +36,12 @@ main{padding:0 26px 44px}header{height:78px;margin-bottom:18px}header h1{font-si
 /* Full-height, consistently aligned library workspace. */
 .view-exams main{padding:16px 26px 24px}.portal-library{width:100%;margin:0}.portal-library .library-portal-grid{width:100%;min-height:calc(100vh - 116px);grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:stretch}.portal-library .library-main{grid-template-rows:auto minmax(0,1fr);gap:12px}.portal-library .content-library{height:100%;min-height:0}.portal-library .library-aside{grid-template-rows:auto minmax(0,1fr);align-content:stretch;gap:12px}.portal-library .portal-performance{height:100%;min-height:0}.portal-library .study-create,.portal-library .content-library,.portal-library .side-card,.portal-library .portal-performance{margin:0}@media(max-width:900px){.portal-library .library-portal-grid{min-height:0;grid-template-columns:1fr}.portal-library .library-aside{grid-template-columns:1fr 1fr;grid-template-rows:auto}.portal-library .portal-performance{height:auto}}@media(max-width:600px){.view-exams main{padding:12px}.portal-library .library-aside{grid-template-columns:1fr}}
 
-.view-exams{font-family:"Rawline","Plus Jakarta Sans",Rawline,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.view-exams{font-family:var(--font-primary)}
 .view-solve .eyebrow{display:none!important}
 
 /* Dashboard uses the study card; library no longer reserves its removed header row. */
 .view-dashboard .dashboard-study-create{min-height:128px;margin:0 0 18px;padding:20px;display:flex;align-items:center;justify-content:space-between;gap:24px;border:1px solid var(--rule);background:#fff}
-.view-dashboard .dashboard-study-create h2{font:700 18px Rawline;margin:6px 0 4px;color:var(--ink)}
+.view-dashboard .dashboard-study-create h2{font:700 18px var(--font-primary);margin:6px 0 4px;color:var(--ink)}
 .view-dashboard .dashboard-study-create p{margin:0;color:var(--ink-soft);font-size:12px}
 .view-dashboard .dashboard-study-create .notebook-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
 .view-dashboard .dashboard-study-create .notebook-actions button{height:38px;margin:0;padding:0 16px;border-radius:2px;font-size:12px}
@@ -54,13 +54,45 @@ main{padding:0 26px 44px}header{height:78px;margin-bottom:18px}header h1{font-si
   gap:8px;
 }
 
-/* Final typographic override: the whole app uses Rawline. */
+/* Sistema tipográfico: Atkinson Hyperlegible Next (plataforma) + Gabarito (prova) */
 html,
 body,
 #root,
-.app-shell,
-.app-shell *{
-  font-family:"Rawline",sans-serif !important;
+.app-shell{
+  font-family:var(--font-primary) !important;
+}
+/* Conteúdo da prova - Gabarito */
+.view-solve .question-number,
+.view-solve .question-statement,
+.view-solve .question-statement .exam-text,
+.view-solve .exam-text,
+.view-solve .option-text,
+.view-solve .option-letter,
+.view-solve .feedback-label,
+.view-solve .feedback-text,
+.view-solve .feedback-content{
+  font-family:var(--font-prova) !important;
+}
+/* Sistema funcional da prova - Atkinson Hyperlegible Next (rótulos/texto) */
+.view-solve .clock-label,
+.view-solve .index-title,
+.view-solve .answer-title,
+.view-solve .drag-hint,
+.view-solve .image-toolbar button{
+  font-family:var(--font-functional) !important;
+}
+/* Números da prova (cronômetro, índice, contadores) - sempre Gabarito.
+   Precisa do prefixo .view-solve para igualar a especificidade (0,2,0)
+   dos seletores funcionais acima e vencer a disputa de !important.
+   .image-title ("Questão N no PDF") e o readout de zoom são identificadores
+   numéricos da questão, por isso ficam aqui e não no bloco funcional. */
+.view-solve .clock-time,
+.view-solve .index-count,
+.view-solve .index-btn,
+.view-solve .image-title,
+.view-solve .image-toolbar span{
+  font-family:var(--font-number) !important;
+  font-variant-numeric:tabular-nums;
 }/* Square-corner override for the full app shell. */
 .app-shell :is(
   button,input,textarea,select,.panel,.stat,.exam-card,.empty,.study-notebooks,.side-card,.performance-panel,.performance-summary,.performance-controls,.notebook-analytics,.question-list,.study-create,.content-library,.portal-notice,.portal-performance,.dropzone,.smart-note,.alternative-edit .letter,.alternative-edit textarea,.number-grid button,.feedback,.image-toolbar button,.fit-button,.nav,.top-import,.brand-mark,.avatar,.stat-icon,.doc-icon,.circle,.upload-icon,.brand-crosshair,.brand-crosshair:before,.brand-crosshair:after,.brand-crosshair i,.brand-crosshair b,.brand-target,.brand-target:before,.brand-target:after,.brand-dot,.progress,.mini-progress,.quick-track,.completion-bar,.performance-donut,.accuracy-gauge
@@ -93,16 +125,17 @@ body,
 }
 .view-solve .next-action:not(:disabled):hover svg{
   transform:none;
-}/* Answer choices: quiet{
+}/* Answer choices: Gabarito para conteúdo da prova */
+.quiet{
   display:block;
   white-space:pre-wrap;
   color:#6C7480;
-  font-family:Arial,Helvetica,sans-serif;
-  font-size:13px;
+  font-family:var(--font-prova);
+  font-size:14px;
   font-weight:400;
-  line-height:1.7;
-  letter-spacing:.01em;
-  word-spacing:.12em;
+  line-height:1.6;
+  letter-spacing:0;
+  word-spacing:normal;
   text-align:left;
 }
 
@@ -143,7 +176,7 @@ body,
   pointer-events:none;
   opacity:.22;
   color:var(--summary-color);
-  font:900 150px/1 Rawline,sans-serif;
+  font:900 150px/1 var(--font-primary),sans-serif;
   letter-spacing:-.08em;
   animation:summary-float 9s ease-in-out infinite alternate;
 }
@@ -218,7 +251,7 @@ body,
   max-width:680px;
   margin:10px 0 8px;
   color:var(--summary-ink,var(--exam-charcoal));
-  font:800 clamp(32px,4.8vw,58px)/1 Rawline,sans-serif;
+  font:800 clamp(32px,4.8vw,58px)/1 var(--font-primary),sans-serif;
   letter-spacing:-.06em;
   display:flex;
   align-items:flex-start;
@@ -283,7 +316,7 @@ body,
 }
 .view-solve .approval-orbit strong{
   color:var(--summary-ink,var(--exam-charcoal));
-  font:800 42px/1 Rawline,sans-serif;
+  font:800 42px/1 var(--font-number),sans-serif;
 }
 .view-solve .approval-orbit span{
   margin-top:8px;
@@ -318,7 +351,7 @@ body,
 .view-solve .summary-grid strong{
   margin-top:14px;
   color:var(--summary-ink,var(--exam-charcoal));
-  font:800 28px/1 Rawline,sans-serif;
+  font:800 28px/1 var(--font-primary),sans-serif;
 }
 .view-solve .summary-insight{
   padding:26px 28px;
@@ -329,7 +362,7 @@ body,
 .view-solve .summary-insight h3{
   margin:0 0 8px;
   color:var(--exam-charcoal);
-  font:800 22px Rawline,sans-serif;
+  font:800 22px var(--font-primary),sans-serif;
 }
 .view-solve .summary-insight p{
   max-width:760px;
@@ -521,7 +554,7 @@ body,
 }
 .view-solve .summary-warning p strong{
   color:#D6A12A!important;
-  font:800 14px Rawline,sans-serif;
+  font:800 14px var(--font-primary),sans-serif;
 }
 .view-solve .summary-warning button{
   height:36px;
@@ -572,7 +605,7 @@ body,
   margin:8px 0 0;
   text-align:left;
   color:#2E333D;
-  font:700 clamp(20px,2.2vw,26px)/1.2 Rawline,sans-serif;
+  font:700 clamp(20px,2.2vw,26px)/1.2 var(--font-primary),sans-serif;
   letter-spacing:-.03em;
 }
 .view-solve .summary-hero.modern-result p{
@@ -624,7 +657,7 @@ body,
 .view-solve .feature-card strong{
   margin-top:12px;
   color:#2E333D;
-  font:800 38px/1 Rawline,sans-serif;
+  font:800 38px/1 var(--font-primary),sans-serif;
 }
 .view-solve .feature-card>div{
   height:9px;
@@ -679,7 +712,7 @@ body,
 .view-solve .summary-compact-grid strong{
   margin-top:10px;
   color:#2E333D;
-  font:800 24px/1 Rawline,sans-serif;
+  font:800 24px/1 var(--font-primary),sans-serif;
 }
 .view-solve .summary-compact-grid .metric-wrong strong,
 .view-solve .summary-compact-grid .metric-score strong{
@@ -698,7 +731,7 @@ body,
 .view-solve .summary-warning strong{
   display:block;
   color:#2E333D;
-  font:800 17px Rawline,sans-serif;
+  font:800 17px var(--font-primary),sans-serif;
 }
 .view-solve .summary-warning p{
   margin:5px 0 0;
@@ -765,7 +798,7 @@ body,
 }
 .view-solve .panel-title>strong{
   color:#8B0000;
-  font:800 14px Rawline,sans-serif;
+  font:800 14px var(--font-primary),sans-serif;
   white-space:nowrap;
 }
 .view-solve .critical-empty{
@@ -788,7 +821,7 @@ body,
 }
 .view-solve .time-reading strong{
   color:#2E333D;
-  font:800 34px/1 Rawline,sans-serif;
+  font:800 34px/1 var(--font-primary),sans-serif;
 }
 .view-solve .time-reading span{
   color:#6C7480;
@@ -815,7 +848,7 @@ body,
 }
 .view-solve .critical-summary strong{
   color:#8B0000;
-  font:800 26px/1 Rawline,sans-serif;
+  font:800 26px/1 var(--font-primary),sans-serif;
 }
 .view-solve .critical-summary span{
   color:#8B0000;
@@ -931,7 +964,7 @@ body,
 .view-solve .summary-lower-grid article>strong{
   display:block;
   color:#2E333D;
-  font:800 28px/1 Rawline,sans-serif;
+  font:800 28px/1 var(--font-primary),sans-serif;
 }
 .view-solve .summary-lower-grid p{
   margin:10px 0 0;
@@ -1009,7 +1042,7 @@ body,
 .view-solve .summary-warning strong{
   display:inline!important;
   color:#D6A12A!important;
-  font:800 14px Rawline,sans-serif!important;
+  font:800 14px var(--font-primary),sans-serif!important;
 }
 .view-solve .summary-warning button{
   height:34px!important;
@@ -1276,7 +1309,7 @@ body,
   background:#fff;
 }
 .view-exams .dashboard-study-create h2{
-  font:700 18px Rawline;
+  font:700 18px var(--font-primary);
   margin:6px 0 4px;
   color:var(--ink);
 }
@@ -1296,7 +1329,7 @@ body,
   margin:0;
   padding:0 18px;
   border-radius:0;
-  font:700 12px/1 Rawline,sans-serif;
+  font:700 12px/1 var(--font-primary),sans-serif;
   letter-spacing:0;
   display:inline-flex;
   align-items:center;
@@ -1480,7 +1513,7 @@ body,
   background:#fff;
   color:#4A5060;
   cursor:pointer;
-  font:800 18px/1 Rawline,sans-serif;
+  font:800 18px/1 var(--font-primary),sans-serif;
   list-style:none;
 }
 .view-exams .exam-menu summary::-webkit-details-marker{
@@ -1568,7 +1601,7 @@ body,
   display:none;
 }
 .view-exams .glance-performance>strong{
-  font:800 44px/1 Rawline,sans-serif;
+  font:800 44px/1 var(--font-primary),sans-serif;
   color:#008080;
 }
 .view-exams .glance-performance>span{
@@ -1658,7 +1691,7 @@ body,
   margin-bottom:6px;
 }
 .view-exams .featured-heatmap .side-title h3{
-  font:800 15px/1.1 Rawline,sans-serif;
+  font:800 15px/1.1 var(--font-primary),sans-serif;
   color:#2E333D;
   margin-top:3px;
 }
@@ -1862,7 +1895,7 @@ body,
 }
 .view-exams .inline-stats strong{
   color:#2E333D;
-  font:800 18px/1 Rawline,sans-serif;
+  font:800 18px/1 var(--font-primary),sans-serif;
 }
 .view-exams .inline-stats span{
   color:#6C7480;
@@ -2070,7 +2103,7 @@ body,
   margin:0 0 14px!important;
 }
 .view-exams .modern-heatmap .side-title h3{
-  font:800 16px/1.2 Rawline,sans-serif!important;
+  font:800 16px/1.2 var(--font-primary),sans-serif!important;
   margin:7px 0 0!important;
   color:#2E333D!important;
 }
@@ -2203,7 +2236,7 @@ body,
   margin:0 0 14px!important;
 }
 .view-exams .modern-heatmap .side-title h3{
-  font:800 16px/1.2 Rawline,sans-serif!important;
+  font:800 16px/1.2 var(--font-primary),sans-serif!important;
   margin:6px 0 0!important;
 }
 .view-exams .modern-heatmap .activity-total{
@@ -2275,7 +2308,7 @@ body,
 .view-exams .dashboard-side .modern-heatmap .side-title h3{
   margin:6px 0 0!important;
   color:#2E333D!important;
-  font:800 16px/1.2 Rawline,sans-serif!important;
+  font:800 16px/1.2 var(--font-primary),sans-serif!important;
   letter-spacing:-.02em!important;
 }
 .view-exams .dashboard-side .modern-heatmap .activity-total{
@@ -2365,7 +2398,7 @@ body,
   display:block!important;
   margin:0!important;
   color:#008080!important;
-  font:800 48px/1 Rawline,sans-serif!important;
+  font:800 48px/1 var(--font-number),sans-serif!important;
   letter-spacing:-.04em!important;
 }
 .view-exams .dashboard-side .glance-performance>span{
@@ -2575,7 +2608,7 @@ body,
 .view-exams .dashboard-side .modern-heatmap .side-title h3{
   margin:6px 0 0!important;
   color:#2E333D!important;
-  font:800 16px/1.2 Rawline,sans-serif!important;
+  font:800 16px/1.2 var(--font-primary),sans-serif!important;
   letter-spacing:-.02em!important;
 }
 .view-exams .dashboard-side .modern-heatmap .activity-total{
@@ -2667,7 +2700,7 @@ body,
   display:block!important;
   margin:0!important;
   color:#008080!important;
-  font:800 48px/1 Rawline,sans-serif!important;
+  font:800 48px/1 var(--font-number),sans-serif!important;
   letter-spacing:-.04em!important;
 }
 .view-exams .dashboard-side .glance-performance>span{
@@ -2726,7 +2759,7 @@ body,
 }
 .view-exams .dashboard-side .modern-heatmap .side-title h3{
   color:#2E333D!important;
-  font:800 16px/1.2 Rawline,sans-serif!important;
+  font:800 16px/1.2 var(--font-primary),sans-serif!important;
   margin:6px 0 0!important;
   letter-spacing:-.02em!important;
 }
@@ -2845,7 +2878,7 @@ body,
 }
 .view-exams .dashboard-side .modern-heatmap .side-title h3{
   color:#2E333D!important;
-  font:800 18px/1.15 Rawline,sans-serif!important;
+  font:800 18px/1.15 var(--font-primary),sans-serif!important;
   margin:6px 0 0!important;
 }
 .view-exams .dashboard-side .modern-heatmap .activity-total{
@@ -2934,7 +2967,7 @@ body,
   display:block!important;
   margin:0!important;
   color:#008080!important;
-  font:800 52px/0.95 Rawline,sans-serif!important;
+  font:800 52px/0.95 var(--font-number),sans-serif!important;
   letter-spacing:-.04em!important;
 }
 .view-exams .dashboard-side .glance-performance>span{
@@ -3026,7 +3059,7 @@ body,
 }
 .view-exams .modern-heatmap .side-title h3{
   color:#F7F5F0!important;
-  font:800 18px/1.15 Rawline,sans-serif!important;
+  font:800 18px/1.15 var(--font-primary),sans-serif!important;
 }
 .view-exams .modern-heatmap .activity-total{
   color:#6C7480!important;
@@ -3113,7 +3146,7 @@ body,
   display:block!important;
   margin:0!important;
   color:#008080!important;
-  font:800 48px/0.95 Rawline,sans-serif!important;
+  font:800 48px/0.95 var(--font-number),sans-serif!important;
   letter-spacing:-.04em!important;
 }
 .view-exams .glance-performance>span{
@@ -3183,7 +3216,7 @@ body,
   display:block!important;
   margin:0!important;
   color:#008080!important;
-  font:800 52px/1 Rawline,sans-serif!important;
+  font:800 52px/1 var(--font-number),sans-serif!important;
 }
 .view-exams .glance-performance>span{
   display:block!important;
@@ -3441,7 +3474,7 @@ body,
   color:#6C7480!important;
 }
 .view-exams .modern-heatmap .side-title h3{
-  font:800 18px/1.15 Rawline,sans-serif!important;
+  font:800 18px/1.15 var(--font-primary),sans-serif!important;
   margin:6px 0 0!important;
   color:#2E333D!important;
   letter-spacing:-.02em;
@@ -3529,7 +3562,7 @@ body,
 .view-exams .dashboard-side .modern-heatmap .side-title h3{
   margin:2px 0 0!important;
   color:#2E333D!important;
-  font:800 15px/1.15 Rawline,sans-serif!important;
+  font:800 15px/1.15 var(--font-primary),sans-serif!important;
   letter-spacing:-.02em!important;
 }
 .view-exams .dashboard-side .modern-heatmap .activity-total{
@@ -3619,7 +3652,7 @@ body,
   display:block!important;
   margin:0!important;
   color:#008080!important;
-  font:800 48px/1 Rawline,sans-serif!important;
+  font:800 48px/1 var(--font-number),sans-serif!important;
   letter-spacing:-.04em!important;
 }
 .view-exams .dashboard-side .glance-performance>span{
@@ -3743,7 +3776,7 @@ body,
 }
 .exam-card-header-text { flex: 1; min-width: 0; }
 .exam-card-header-text h3 {
-  font: 700 16px "Inter", sans-serif;
+  font: 700 16px var(--font-primary);
   color: var(--card-slate-900);
   margin: 0;
   line-height: 1.3;
@@ -3876,7 +3909,7 @@ body,
   align-items: flex-start;
 }
 .exam-card-stat-info strong {
-  font: 700 14px "Inter", sans-serif;
+  font: 700 14px var(--font-primary);
   color: var(--card-slate-900);
   line-height: 1.2;
 }
@@ -3966,7 +3999,7 @@ body,
 }
 .exam-edit-header h3 {
   margin: 0;
-  font: 700 16px "Inter", sans-serif;
+  font: 700 16px var(--font-primary);
   color: var(--card-slate-900);
 }
 .exam-edit-close {
@@ -3997,7 +4030,7 @@ body,
   gap: 6px;
 }
 .exam-edit-field label {
-  font: 600 12px "Inter", sans-serif;
+  font: 600 12px var(--font-primary);
   color: var(--card-slate-600);
   text-transform: uppercase;
   letter-spacing: .04em;
@@ -4007,7 +4040,7 @@ body,
   border: 1px solid var(--card-slate-200);
   border-radius: 0;
   padding: 0 12px;
-  font: 400 14px "Inter", sans-serif;
+  font: 400 14px var(--font-primary);
   color: var(--card-slate-900);
   background: var(--card-slate-50);
   outline: none;
@@ -4040,7 +4073,7 @@ body,
   border-radius: 0;
   background: #fff;
   color: var(--card-slate-600);
-  font: 600 12px "Inter", sans-serif;
+  font: 600 12px var(--font-primary);
   cursor: pointer;
   transition: all 150ms ease;
 }
@@ -4065,7 +4098,7 @@ body,
   border-radius: 0;
   background: #fff;
   color: var(--card-slate-600);
-  font: 600 12px "Inter", sans-serif;
+  font: 600 12px var(--font-primary);
   cursor: pointer;
   transition: all 150ms ease;
 }
@@ -4079,7 +4112,7 @@ body,
   border-radius: 0;
   background: var(--card-blue);
   color: #fff;
-  font: 700 12px "Inter", sans-serif;
+  font: 700 12px var(--font-primary);
   cursor: pointer;
   transition: background 150ms ease;
 }
@@ -4135,24 +4168,24 @@ body,
 }
 .view-solve .summary-hero.modern-result h2{
   color:var(--result-neutral)!important;
-  font:800 25px/1.22 Rawline,sans-serif!important;
+  font:800 25px/1.22 var(--font-primary),sans-serif!important;
   letter-spacing:0!important;
 }
 .view-solve .summary-hero.modern-result p{
   color:#6C7480!important;
-  font:500 14px/1.55 Rawline,sans-serif!important;
+  font:500 14px/1.55 var(--font-primary),sans-serif!important;
   font-style:normal!important;
 }
 .view-solve .feature-card span,
 .view-solve .summary-compact-grid span,
 .view-solve .summary-lower-grid .eyebrow{
   color:var(--result-muted)!important;
-  font:800 11px/1.2 Rawline,sans-serif!important;
+  font:800 11px/1.2 var(--font-primary),sans-serif!important;
   letter-spacing:.08em!important;
 }
 .view-solve .feature-card strong{
   color:var(--result-neutral)!important;
-  font:800 32px/1.05 Rawline,sans-serif!important;
+  font:800 32px/1.05 var(--font-number),sans-serif!important;
   letter-spacing:0!important;
 }
 .view-solve .feature-score strong,
@@ -4163,7 +4196,7 @@ body,
 .view-solve .summary-compact-grid strong,
 .view-solve .time-reading strong{
   color:var(--result-neutral)!important;
-  font:800 23px/1.05 Rawline,sans-serif!important;
+  font:800 23px/1.05 var(--font-number),sans-serif!important;
   letter-spacing:0!important;
 }
 .view-solve .summary-compact-grid .metric-wrong{
@@ -4188,13 +4221,13 @@ body,
 }
 .view-solve .critical-summary strong{
   color:var(--result-red)!important;
-  font:800 18px/1 Rawline,sans-serif!important;
+  font:800 18px/1 var(--font-number),sans-serif!important;
 }
 .view-solve .critical-summary span,
 .view-solve .time-panel p,
 .view-solve .critical-empty{
   color:#6C7480!important;
-  font:600 11px/1.45 Rawline,sans-serif!important;
+  font:600 11px/1.45 var(--font-primary),sans-serif!important;
 }
 .view-solve .summary-compact-grid .metric-blank{
   background:#F1F2F4!important;
@@ -4274,7 +4307,7 @@ body,
   border-radius:0!important;
 }
 
-/* Typography: modern UI text, preserving Rawline for numeric emphasis. */
+/* Typography: Atkinson Hyperlegible Next para UI, tabular-nums para métricas */
 body,
 .app-shell,
 button,
@@ -4298,7 +4331,7 @@ select,
 .feature-card span,
 .summary-compact-grid span,
 .summary-lower-grid .eyebrow{
-  font-family:"Plus Jakarta Sans",Rawline,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;
+  font-family:var(--font-primary) !important;
 }
 .stat strong,
 .glance-performance>strong,
@@ -4307,7 +4340,7 @@ select,
 .summary-compact-grid strong,
 .approval-orbit strong,
 .time-reading strong{
-  font-family:Rawline,"Plus Jakarta Sans",Rawline,sans-serif!important;
+  font-family:var(--font-primary) !important;
   font-variant-numeric:tabular-nums;
 }
 .view-solve .feedback{
@@ -4336,4 +4369,63 @@ select,
   border-color:#8B0000!important;
   background:linear-gradient(135deg,#FFF0EE 0%,#FFD5D5 100%)!important;
   color:#8B0000!important;
+}
+
+/* =====================================================================
+   REGRA GLOBAL DE NÚMEROS = GABARITO
+   Onde quer que a plataforma exiba números (métricas, estatísticas,
+   cronômetros, contadores, índices, percentuais), usar Gabarito.
+   Centralizado aqui para vencer qualquer regra legada de fonte.
+   ===================================================================== */
+.stat strong,
+.score-ring strong,
+.accuracy-gauge strong,
+.mastery span,
+.day-column strong,
+.performance-donut strong,
+.donut-card strong,
+.notebook-totals dd,
+.time-totals b,
+.completion-block b,
+.rank-rate b,
+.exam-ranking b,
+.side-card .activity-total,
+.portal-performance>strong,
+.glance-performance>strong,
+.quick-performance>strong,
+.exam-card-stat-info strong,
+.exam-card-progress-text strong,
+.exam-card-progress-text .progress-total,
+.performance-numbers b,
+.feature-card strong,
+.summary-compact-grid strong,
+.time-reading strong,
+.approval-orbit strong,
+.critical-summary strong,
+.index-count,
+.index-btn,
+.clock-time,
+.number-grid button,
+.steps span,
+.pdf-modal-counter,
+.pdf-reader-counter,
+.pdf-reader-zoom,
+.pdf-chip,
+.pdf-page-tag,
+.mira-pdf-title,
+.mira-pdf-page strong,
+.editor-head .eyebrow,
+.tecconkursos-feature-card p strong,
+.tecconkursos-stat strong,
+.numero-metrica,
+.metric,
+.stat-valor,
+[data-numeric]{
+  font-family:var(--font-number)!important;
+  font-variant-numeric:tabular-nums;
+}
+/* Classes utilitárias para números onde quer que apareçam */
+.num,.number,.numeric{
+  font-family:var(--font-number);
+  font-variant-numeric:tabular-nums;
 }

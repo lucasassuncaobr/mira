@@ -1,13 +1,186 @@
-/* Mira: uma identidade editorial inspirada em provas impressas. */
-:root{--paper:#FFFFFF;--paper-deep:#F7F5F0;--ink:#2E333D;--ink-soft:#6C7480;--navy:#008080;--navy-deep:#006666;--terracotta:#D6A12A;--rule:#E8E8E8;--green:#008080;--deep:var(--navy-deep);--mint:#E2E8DE;--line:var(--rule);--accent:#008080;--accent-soft:#E2E8DE;--success:#008080;--error:#8B0000;color:var(--ink);background:var(--paper-deep);font-family:"Rawline",sans-serif}
-body,.app-shell{background:var(--paper-deep);color:var(--ink)}
-.topbar{height:72px;background:rgba(226,232,222,.97);border-color:var(--rule);box-shadow:none}.topbar-inner{max-width:1480px;padding:0 32px;gap:32px}.brand{font-family:Georgia,"Times New Roman",serif;font-size:25px;font-weight:700;letter-spacing:-.03em;color:var(--ink)}.brand-mark{width:36px;height:36px;border:1px solid var(--ink);border-radius:50%;background:transparent;position:relative}.brand-target,.brand-target:before,.brand-target:after{display:block;position:absolute}.brand-target{width:18px;height:18px;inset:8px;border:1.5px solid var(--terracotta);border-radius:50%}.brand-target:before{content:"";width:6px;height:6px;inset:4.5px;background:var(--terracotta);border-radius:50%}.brand-target:after{content:"";width:26px;height:1px;background:var(--ink);left:-5px;top:8px}
+/* Mira: sistema tipográfico completo */
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800&display=swap');
+
+:root{
+  --paper:#FFFFFF;
+  --paper-deep:#F7F5F0;
+  --ink:#2E333D;
+  --ink-soft:#6C7480;
+  --navy:#008080;
+  --navy-deep:#006666;
+  --terracotta:#D6A12A;
+  --rule:#E8E8E8;
+  --green:#008080;
+  --deep:var(--navy-deep);
+  --mint:#E2E8DE;
+  --line:var(--rule);
+  --accent:#008080;
+  --accent-soft:#E2E8DE;
+  --success:#008080;
+  --error:#8B0000;
+  
+  /* Tipografia - Famílias */
+  --font-primary: "Atkinson Hyperlegible Next", sans-serif;
+  --font-prova: "Gabarito", "Atkinson Hyperlegible Next", sans-serif;
+  --font-functional: "Atkinson Hyperlegible Next", sans-serif;
+  /* Números (métricas, cronômetros, contadores) = sempre Gabarito */
+  --font-number: "Gabarito", "Atkinson Hyperlegible Next", sans-serif;
+  
+  /* Pesos Atkinson Hyperlegible Next */
+  --font-weight-atl-300: 300;
+  --font-weight-atl-400: 400;
+  --font-weight-atl-500: 500;
+  --font-weight-atl-600: 600;
+  --font-weight-atl-700: 700;
+  --font-weight-atl-800: 800;
+  
+  /* Pesos Gabarito */
+  --font-weight-gb-400: 400;
+  --font-weight-gb-500: 500;
+  --font-weight-gb-600: 600;
+  --font-weight-gb-700: 700;
+  
+  /* Tamanhos de fonte */
+  --font-size-xs: 0.75rem;     /* 12px */
+  --font-size-sm: 0.875rem;    /* 14px */
+  --font-size-base: 1rem;      /* 16px */
+  --font-size-lg: 1.125rem;    /* 18px */
+  --font-size-xl: 1.25rem;     /* 20px */
+  --font-size-2xl: 1.5rem;     /* 24px */
+  --font-size-3xl: 1.875rem;   /* 30px */
+  --font-size-4xl: 2.25rem;    /* 36px */
+  --font-size-5xl: 3rem;       /* 48px */
+
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.6;
+  --line-height-heading: 1.3;
+
+  /* Cores de texto */
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-paper: var(--paper);
+  --color-paper-deep: var(--paper-deep);
+}
+
+body,.app-shell{
+  background: var(--paper-deep);
+  color: var(--ink);
+  font-family: var(--font-primary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+}
+
+/* === SISTEMA TIPOGRÁFICO COMPLETO ===
+
+   Arquitetura: Atkinson Hyperlegible Next (principal) | Gabarito (prova) | Atkinson funcional
+
+   1. HEADINGS - Atkinson Hyperlegible Next
+   2. PARÁGRAFOS E TEXTO GERAL
+   3. GABARITO - Conteúdo da prova
+   4. ATCKINSON FUNCIONAL - Página de prova
+   5. BOTÕES E FORMULÁRIOS
+   6. TABELAS E LISTAS
+   7. LINKS E OUTROS ELEMENTOS
+   8. ACESSIBILIDADE E ESTADOS
+*/
+
+/* 1. HEADINGS - Atkinson Hyperlegible Next */
+h1{font-family:var(--font-primary);font-size:var(--font-size-5xl);font-weight:var(--font-weight-atl-800);line-height:var(--line-height-heading);color:var(--ink);margin:0 0 1rem;}
+h2{font-family:var(--font-primary);font-size:var(--font-size-4xl);font-weight:var(--font-weight-atl-800);line-height:var(--line-height-heading);color:var(--ink);margin:0 0 1rem;}
+h3{font-family:var(--font-primary);font-size:var(--font-size-3xl);font-weight:var(--font-weight-atl-700);line-height:var(--line-height-heading);color:var(--ink);margin:0 0 1rem;}
+h4{font-family:var(--font-primary);font-size:var(--font-size-2xl);font-weight:var(--font-weight-atl-600);line-height:var(--line-height-heading);color:var(--ink);margin:0 0 1rem;}
+h5{font-family:var(--font-primary);font-size:var(--font-size-xl);font-weight:var(--font-weight-atl-500);line-height:var(--line-height-heading);color:var(--ink);margin:0 0 1rem;}
+h6{font-family:var(--font-primary);font-size:var(--font-size-lg);font-weight:var(--font-weight-atl-500);line-height:var(--line-height-heading);color:var(--ink);margin:0 0 0.5rem;}
+
+/* 2. PARÁGRAFOS E TEXTO GERAL - Atkinson Hyperlegible Next */
+p{font-family:var(--font-primary);font-size:var(--font-size-base);font-weight:var(--font-weight-atl-400);line-height:var(--line-height-relaxed);margin:0 0 1rem;}
+p small{font-size:var(--font-size-sm);font-weight:var(--font-weight-atl-400);}
+p.lead{font-size:var(--font-size-xl);font-weight:var(--font-weight-atl-500);}
+
+/* Texto em negrito/itálico dentro do sistema */
+b,strong{font-weight:var(--font-weight-atl-600);}
+i,em{font-style:italic;font-family:var(--font-primary);font-weight:var(--font-weight-atl-400);}
+
+/* 3. GABARITO - Conteúdo da prova */
+.gabarito,.prova-conteudo,
+.questao-titulo,.enunciado,.alternativa,.feedback-content,
+.questao-numero,.feedback-label,.feedback-text{font-family:var(--font-prova);font-weight:var(--font-weight-gb-400);}
+
+/* Gabarito com pesos variados */
+.gabarito-peso-500,.prova-conteudo-peso-500{font-weight:var(--font-weight-gb-500);}
+.gabarito-peso-600,.prova-conteudo-peso-600{font-weight:var(--font-weight-gb-600);}
+.gabarito-peso-700,.prova-conteudo-peso-700{font-weight:var(--font-weight-gb-700);}
+
+/* Texto destacado/ênfase no conteúdo */
+.texto-destaque{font-weight:var(--font-weight-gb-500);}
+
+/* 4. ATCKINSON FUNCIONAL - Página de prova */
+.atl-functional,.clock,.cronometro,.tempo-restante,
+.questoes-qtd,.progresso-prova,.status-prova,
+.info-alabel,.labels-pequenos,.textos-apoio,
+.indicadores,.tooltips,.info-tecnica,
+.navegacao-compacta,.info-funcional{
+  font-family:var(--font-functional);
+}
+
+/* Pesos funcinais Atkinson */
+.atl-peso-400{font-weight:var(--font-weight-atl-400);}
+.atl-peso-500{font-weight:var(--font-weight-atl-500);}
+.atl-peso-600{font-weight:var(--font-weight-atl-600);}
+
+/* Clock e cronômetro */
+.clock-inner,.clock-label,.clock-time{font-family:var(--font-functional);font-weight:var(--font-weight-atl-600);}
+
+/* 5. BOTÕES E FORMULÁRIOS */
+.btn,.button{font-family:var(--font-primary);font-weight:var(--font-weight-atl-700);}
+
+/* Labels e inputs */
+label{font-family:var(--font-primary);font-weight:var(--font-weight-atl-500);font-size:var(--font-size-sm);}
+input,select,textarea{font-family:var(--font-primary);font-size:var(--font-size-base);font-weight:var(--font-weight-atl-400);}
+
+/* Números e métricas - sempre Gabarito */
+.numero-metrica,.metric,.stat-valor{font-family:var(--font-number);font-weight:var(--font-weight-gb-700);font-variant-numeric:tabular-nums;}
+
+/* Estados da interface */
+.badge,.tag,.tooltip{font-family:var(--font-primary);font-weight:var(--font-weight-atl-500);}
+
+/* 6. TABELAS E LISTAS */
+th{font-family:var(--font-primary);font-weight:var(--font-weight-atl-600);font-size:var(--font-size-sm);}
+td{font-family:var(--font-primary);font-size:var(--font-size-base);font-weight:var(--font-weight-atl-400);}
+
+/* Lists */
+ul,ol{font-family:var(--font-primary);font-size:var(--font-size-base);font-weight:var(--font-weight-atl-400);line-height:var(--line-height-relaxed);margin:0 0 1rem;}
+ul li,ol li{margin-bottom:0.25rem;}
+
+/* 7. LINKS E OUTROS ELEMENTOS */
+a{font-family:var(--font-primary);color:var(--navy);text-decoration:underline;text-underline-offset:4px;}
+
+/* Placeholder */
+::placeholder{font-family:var(--font-primary);font-size:var(--font-size-base);font-weight:var(--font-weight-atl-400);color:var(--color-ink-soft);}
+
+/* Focus state - acessível e visível apenas no teclado */
+*:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+*:focus:not(:focus-visible){outline:none}
+
+/* 8. ACESSIBILIDADE - Estados combinados (cor + ícone/texto) */
+.estado-combinado{display:flex;align-items:center;gap:0.5rem;}
+.estado-icon{width:18px;height:18px;border:2px solid currentColor;border-radius:50%;flex-shrink:0;}
+
+/* Responsividade - tipografia */
+@media(max-width:768px){
+  h1{font-size:var(--font-size-3xl);}
+  h2{font-size:var(--font-size-2xl);}
+  h3{font-size:var(--font-size-xl);}
+}
+.topbar{height:72px;background:rgba(226,232,222,.97);border-color:var(--rule);box-shadow:none}.topbar-inner{max-width:1480px;padding:0 32px;gap:32px}.brand{font-family:var(--font-primary);font-size:25px;font-weight:800;letter-spacing:-.03em;color:var(--ink)}.brand-mark{width:36px;height:36px;border:1px solid var(--ink);border-radius:50%;background:transparent;position:relative}.brand-target,.brand-target:before,.brand-target:after{display:block;position:absolute}.brand-target{width:18px;height:18px;inset:8px;border:1.5px solid var(--terracotta);border-radius:50%}.brand-target:before{content:"";width:6px;height:6px;inset:4.5px;background:var(--terracotta);border-radius:50%}.brand-target:after{content:"";width:26px;height:1px;background:var(--ink);left:-5px;top:8px}
 .nav{border-radius:3px;padding:10px 12px;color:var(--ink-soft)}.nav:hover{color:var(--ink);background:rgba(0,0,0,.05)}.nav.active{color:var(--navy);background:#D6EFEA;box-shadow:inset 0 -2px var(--navy)}.top-import{border-radius:4px;background:var(--navy);box-shadow:none}.top-import:hover{background:var(--navy-deep)}.profile{border-color:var(--rule)}.profile .avatar{background:var(--ink)}
-main{max-width:1480px;padding:0 32px 64px}header{height:104px;border-bottom:1px solid var(--rule);margin-bottom:24px}header h1,.section-head h3,.library-head h2,.center-title h2,.editor-head h2{font-family:Georgia,"Times New Roman",serif;color:var(--ink);letter-spacing:-.02em}.eyebrow{color:#7a837f;font-weight:600;letter-spacing:.16em}
+main{max-width:1480px;padding:0 32px 64px}header{height:104px;border-bottom:1px solid var(--rule);margin-bottom:24px}header h1,.section-head h3,.library-head h2,.center-title h2,.editor-head h2{font-family:var(--font-primary);font-weight:800;color:var(--ink);letter-spacing:-.02em}.eyebrow{font-family:var(--font-primary);color:#7a837f;font-weight:600;letter-spacing:.16em}
 .panel,.stat,.exam-card,.empty,.study-notebooks,.side-card,.performance-panel,.performance-summary,.performance-controls,.notebook-analytics,.question-list{background:var(--paper);border:1px solid var(--rule);border-radius:4px;box-shadow:none}.primary,.secondary{border-radius:4px;box-shadow:none}.primary{background:var(--navy)}.primary:hover{background:var(--navy-deep)}.secondary{background:transparent;border-color:#aeb5b5;color:var(--ink)}
-.stats{gap:12px;margin:0 0 30px}.stat{padding:17px 18px}.stat-icon{background:#D6EFEA;color:var(--navy);border-radius:50%}.stat strong{font-family:Georgia,"Times New Roman",serif;color:var(--ink)}
-.study-notebooks{padding:25px 28px}.study-notebooks h3,.side-card h3,.performance-panel h2,.notebook-totals h2{font-family:Georgia,"Times New Roman",serif}.study-notebooks p,.side-card p{color:var(--ink-soft)}.dashboard-study-grid{gap:16px}.side-card{padding:21px}.next-study{border-top-color:var(--terracotta)}.next-study button,.card-actions .access{color:var(--navy)}
-.exam-grid{gap:12px}.exam-card.organized{padding:18px}.exam-emblem{border-radius:50%;background:#D6EFEA;border-color:#C0D8D4;color:var(--navy);font-family:Georgia,"Times New Roman",serif}.exam-identity h3{font-family:Georgia,"Times New Roman",serif;font-size:17px;color:var(--ink)}.status{background:#D6EFEA;color:var(--success);border-radius:2px}.exam-performance{border-radius:2px;background:#F1F2F4}.mini-progress,.quick-track,.completion-bar{border-radius:0;background:#dfdfd8}.mini-progress i,.quick-track i,.completion-bar i{border-radius:0;background:var(--navy)}.circle{background:#D6EFEA;color:var(--navy)}
+.stats{gap:12px;margin:0 0 30px}.stat{padding:17px 18px}.stat-icon{background:#D6EFEA;color:var(--navy);border-radius:50%}.stat strong{font-family:var(--font-primary);font-weight:700;color:var(--ink)}
+.study-notebooks{padding:25px 28px}.study-notebooks h3,.side-card h3,.performance-panel h2,.notebook-totals h2{font-family:var(--font-primary);font-weight:700}.study-notebooks p,.side-card p{font-family:var(--font-primary);color:var(--ink-soft)}.dashboard-study-grid{gap:16px}.side-card{padding:21px}.next-study{border-top-color:var(--terracotta)}.next-study button,.card-actions .access{font-family:var(--font-primary);color:var(--navy)}
+.exam-grid{gap:12px}.exam-card.organized{padding:18px}.exam-emblem{border-radius:50%;background:#D6EFEA;border-color:#C0D8D4;color:var(--navy);font-family:var(--font-primary);font-weight:700}.exam-identity h3{font-family:var(--font-primary);font-weight:700;font-size:17px;color:var(--ink)}.status{background:#D6EFEA;color:var(--success);border-radius:2px}.exam-performance{border-radius:2px;background:#F1F2F4}.mini-progress,.quick-track,.completion-bar{border-radius:0;background:#dfdfd8}.mini-progress i,.quick-track i,.completion-bar i{border-radius:0;background:var(--navy)}.circle{background:#D6EFEA;color:var(--navy)}
 .import-panel{border-top:3px solid var(--navy)}.dropzone{border-radius:3px;background:#F7F5F0}.dropzone.selected{border-color:var(--navy);background:#D6EFEA}.upload-icon{border-radius:50%;background:#D6EFEA;color:var(--navy)}.smart-note{border-radius:3px;background:#D6EFEA;color:var(--navy)}
 .question-list,.alternative-edit .letter,.alternative-edit textarea{border-radius:3px}.number-grid button{border-radius:2px;background:var(--paper)}.number-grid button.active,.alternative-edit .letter.correct{background:var(--navy);border-color:var(--navy)}.editor{border-top:3px solid var(--navy)}
 .performance-donut{background:conic-gradient(var(--navy) var(--donut),var(--terracotta) 0)}.accuracy-gauge{background:conic-gradient(var(--navy) var(--accuracy),var(--rule) 0)}.bar-track i,.progress i{background:var(--terracotta)}.performance-controls button.active{border-color:var(--navy);color:var(--navy);background:#D6EFEA}

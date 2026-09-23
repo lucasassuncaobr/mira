@@ -1,0 +1,444 @@
+/* Leitor PDF embutido (PDF.js em canvas).
+   Personalize as cores sobrescrevendo estas variáveis. */
+.pdf-modal-backdrop {
+  --pdf-bg: rgba(17, 21, 32, 0.72);
+  --pdf-panel: #ffffff;
+  --pdf-toolbar: #f7f5f0;
+  --pdf-ink: #2e333d;
+  --pdf-soft: #6c7480;
+  --pdf-accent: #008080;
+  --pdf-accent-deep: #006666;
+  --pdf-rule: #e8e8e8;
+  --pdf-canvas-bg: #525659;
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: var(--pdf-bg);
+  display: grid;
+  place-items: center;
+  padding: 22px;
+}
+
+.pdf-modal {
+  background: var(--pdf-panel);
+  color: var(--pdf-ink);
+  border-radius: 12px;
+  width: min(1020px, 100%);
+  max-height: calc(100vh - 44px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+}
+
+.pdf-modal-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  background: var(--pdf-toolbar);
+  border-bottom: 1px solid var(--pdf-rule);
+}
+
+.pdf-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  color: var(--pdf-accent-deep);
+}
+
+.pdf-modal-title strong {
+  font: 700 14px var(--font-primary);
+  color: var(--pdf-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 340px;
+}
+
+.pdf-modal-title span {
+  font-size: 11px;
+  color: var(--pdf-soft);
+  white-space: nowrap;
+}
+
+.pdf-modal-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pdf-modal-controls i {
+  width: 1px;
+  height: 22px;
+  background: var(--pdf-rule);
+  margin: 0 4px;
+}
+
+.pdf-modal-controls button {
+  border: 1px solid var(--pdf-rule);
+  background: #fff;
+  color: var(--pdf-ink);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.pdf-modal-controls button:hover:not(:disabled) {
+  border-color: var(--pdf-accent);
+  color: var(--pdf-accent-deep);
+}
+
+.pdf-modal-controls button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.pdf-modal-counter {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--pdf-soft);
+  min-width: 52px;
+  text-align: center;
+}
+
+.pdf-modal-close {
+  background: var(--pdf-accent) !important;
+  border-color: var(--pdf-accent) !important;
+  color: #fff !important;
+}
+
+.pdf-modal-close:hover {
+  background: var(--pdf-accent-deep) !important;
+}
+
+.pdf-modal-body {
+  background: var(--pdf-canvas-bg);
+  overflow: auto;
+  display: grid;
+  justify-items: center;
+  padding: 18px;
+  min-height: 320px;
+}
+
+.pdf-modal-embed {
+  height: min(860px, calc(100vh - 44px));
+}
+
+.pdf-modal-backdrop:fullscreen {
+  padding: 0;
+}
+
+.pdf-modal-backdrop:fullscreen .pdf-modal-embed,
+.pdf-modal-embed.pdf-modal-maximized {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  border-radius: 0;
+}
+
+.pdf-modal-embed-body {
+  padding: 0;
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+  display: block;
+}
+
+.pdf-modal-loading {
+  background: #fff;
+  border-radius: 8px;
+  padding: 26px 30px;
+  font-size: 13px;
+  color: var(--pdf-soft);
+  margin: 18px auto;
+  width: fit-content;
+}
+
+.pdf-modal-canvas {
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+  max-width: 100%;
+  height: auto;
+}
+
+.pdf-modal-error {
+  background: #fff;
+  border-radius: 8px;
+  padding: 26px 30px;
+  font-size: 13px;
+  color: var(--pdf-soft);
+  margin: 18px auto;
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pdf-modal-retry {
+  border: 0;
+  border-radius: 8px;
+  background: var(--pdf-accent);
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 9px 14px;
+  cursor: pointer;
+}
+
+.pdf-modal-retry:hover {
+  background: var(--pdf-accent-deep);
+}
+
+@media (max-width: 640px) {
+  .pdf-modal-backdrop {
+    padding: 10px;
+  }
+
+  .pdf-modal-title strong {
+    max-width: 160px;
+  }
+
+  .pdf-modal-title span {
+    display: none;
+  }
+}
+
+/* Leitor híbrido: imagens pré-renderizadas + overlays próprios.
+   Barra com a mesma identidade da .image-toolbar do app. */
+.pdf-reader-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 14px;
+  background: #fff;
+  border-bottom: 1px solid var(--pdf-rule);
+}
+
+.pdf-reader-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pdf-reader-group button {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--pdf-ink);
+  min-width: 31px;
+  height: 31px;
+  padding: 0 6px;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  font: 700 11px var(--font-primary);
+}
+
+.pdf-reader-group button:hover:not(:disabled) {
+  background: #d6efea;
+  color: var(--pdf-accent-deep);
+}
+
+.pdf-reader-group button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.pdf-reader-group button.is-active {
+  background: var(--pdf-accent);
+  color: #fff;
+}
+
+.pdf-reader-sep {
+  width: 1px;
+  height: 22px;
+  background: var(--pdf-rule);
+}
+
+.pdf-reader-counter {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--pdf-soft);
+  min-width: 58px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.pdf-reader-zoom {
+  min-width: 52px !important;
+}
+
+.pdf-reader-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f7f5f0;
+  border: 1px solid var(--pdf-rule);
+  border-radius: 7px;
+  padding: 0 8px;
+  height: 31px;
+  color: var(--pdf-soft);
+}
+
+.pdf-reader-search input {
+  border: 0;
+  background: transparent;
+  outline: 0;
+  font-size: 12px;
+  width: 130px;
+  color: var(--pdf-ink);
+}
+
+.pdf-reader-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 7px 14px;
+  background: #d6efea;
+  color: var(--pdf-accent-deep);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pdf-chip {
+  border: 1px solid var(--pdf-accent);
+  background: #fff;
+  color: var(--pdf-accent-deep);
+  border-radius: 99px;
+  min-width: 26px;
+  height: 24px;
+  padding: 0 8px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.pdf-chip:hover {
+  background: var(--pdf-accent);
+  color: #fff;
+}
+
+.pdf-chip-clear {
+  border-color: transparent;
+  color: var(--pdf-soft);
+  display: inline-flex;
+  align-items: center;
+}
+
+.pdf-reader-scroll {
+  overflow: auto;
+  scrollbar-width: thin;
+}
+
+.pdf-reader-pages {
+  margin: 0 auto;
+  padding: 18px;
+  display: grid;
+  gap: 16px;
+  align-content: start;
+  min-height: 100%;
+}
+
+.pdf-reader-page {
+  position: relative;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+  line-height: 0;
+  user-select: none;
+  touch-action: pan-x pan-y;
+  container-type: inline-size;
+  --ar: 1.414;
+}
+
+.pdf-textline {
+  position: absolute;
+  color: transparent;
+  white-space: pre;
+  overflow: hidden;
+  line-height: 1.1;
+  cursor: text;
+  user-select: text;
+}
+
+.pdf-textline::selection {
+  background: rgba(0, 128, 128, 0.28);
+}
+
+.pdf-reader-page.is-marking {
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.pdf-reader-page img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 200ms ease;
+  pointer-events: none;
+}
+
+.pdf-reader-page img.is-loaded {
+  opacity: 1;
+}
+
+.pdf-mark {
+  position: absolute;
+  background: #000;
+  border-radius: 1px;
+}
+
+.pdf-draft {
+  position: absolute;
+  border: 2px dashed var(--pdf-accent);
+  background: rgba(0, 128, 128, 0.12);
+  border-radius: 1px;
+  pointer-events: none;
+}
+
+.pdf-page-tag {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  background: rgba(46, 51, 61, 0.85);
+  color: #fff;
+  border-radius: 7px;
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.4;
+  pointer-events: none;
+}
+
+.pdf-page-failed {
+  display: grid;
+  place-items: center;
+  min-height: 320px;
+  color: var(--pdf-soft);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .pdf-reader-search input {
+    width: 90px;
+  }
+
+  .pdf-reader-pages {
+    padding: 10px;
+  }
+}

@@ -1,0 +1,64 @@
+/* =====================================================================
+   MOTOR DE SCROLL/FOCO ULTRALEVE — Arquitetura híbrida (Mira)
+   Regras:
+   - Nada de canvas/PDF no fluxo principal: só <img loading="lazy">.
+   - O viewport é um container de rolagem NATIVO; o foco é calculado com a
+     altura dinâmica do elemento de página (clientHeight) em tempo de
+     execução e aplicado com rolagem seca: container.scrollTop = valor.
+   - Sem animações pesadas: o marcador usa apenas transform/opacity
+     (propriedades compostas pela GPU de forma nativa).
+   Importado por último no main.tsx para sobrepor os estilos legados.
+   ===================================================================== */
+
+/* Container de página: posiciona o marcador de foco sobre a imagem. */
+.pagina-pdf {
+    position: relative;
+    width: 100%;
+    margin: 0;
+}
+
+/* Viewport vira scroll container nativo (sem transform de pan/zoom). */
+.image-viewport {
+    overflow: auto;
+    cursor: grab;
+    touch-action: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+}
+
+.image-viewport.dragging {
+    cursor: grabbing;
+}
+
+/* Imagem JPEG compacta (150 DPI / 75%): altura automática para o
+   clientHeight refletir o tamanho real renderizado da página. */
+.image-viewport img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    transform: none;
+    transition: none;
+    will-change: auto;
+    pointer-events: none;
+}
+
+/* Indicador de foco da questão — borda lateral + gradiente leve. */
+.marcador-foco-questao {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 40px; /* Ajustado via JS conforme a altura do bloco da questão */
+    border-left: 5px solid #00bcd4;
+    background: linear-gradient(90deg, rgba(0, 188, 212, 0.15) 0%, rgba(0, 0, 0, 0) 100%);
+    pointer-events: none; /* O clique/rolagem passa direto para a imagem */
+    opacity: 0;
+    transform: scaleY(0.8);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 10;
+}
+
+.marcador-foco-questao.ativo {
+    opacity: 1;
+    transform: scaleY(1);
+}

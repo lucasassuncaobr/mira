@@ -8,7 +8,12 @@ export type ParsedQuestion = {
 
 export type ParsedAnswer = { number: number; answer: string };
 
-const questionStart = /(?:^|\n)[ \t]*(?:quest[aã]o[ \t]*)?(\d{1,3})(?:[ \t]*[.\-–):][ \t]*|[ \t]+(?=[A-ZÁÉÍÓÚÂÊÔÃÕÇN]))/gim;
+// Sem flag /i: com /i a classe [A-Z...] aceita minúsculas e uma linha de
+// continuação tipo "19 maiores economias do mundo" virava uma "questão 19"
+// falsa — que cortava o bloco da questão seguinte e a fazia sumir do índice.
+// O separador (ex.: "36.") também exige início de enunciado em maiúscula,
+// aspa ou parêntese, para não capturar paginação ("15.") ou números decimais.
+const questionStart = /(?:^|\n)[ \t]*(?:[Qq][Uu][Ee][Ss][Tt][AaãÃ][Oo][ \t]*)?(\d{1,3})(?:[ \t]*[.\-–):][ \t]*|[ \t]+)(?=[A-ZÁÉÍÓÚÂÊÔÃÕÇN"'“‘(§])/gm;
 const alternativeStart = /(?:^|\n)\s*\(?([A-E])\s*[).\-–]\s+/gim;
 
 export function parseQuestions(text: string): ParsedQuestion[] {
@@ -24,12 +29,33 @@ export function parseQuestions(text: string): ParsedQuestion[] {
     if (context.length >= 30) pageContexts.set(Number(pageMatch[1]), context);
   }
 
-  return matches.flatMap((match, index) => {
+  // Fase 1 — só blocos com alternativas são questões candidatas. Isto descarta
+  // cabeçalho, paginação e a lista numerada das INSTRUÇÕES ("1. Confira...",
+  // "10. O envelope..."), que aparece antes das questões reais e, sem este
+  // filtro, definiria a ordem de leitura e faria as questões 1..9 parecerem
+  // regressivas (e fossem descartadas).
+  let lastNumber = 0;
+  const ordered = matches.filter((match, index) => {
+    const number = Number(match[1]);
+    const start = (match.index ?? 0) + match[0].length;
+    const end = matches[index + 1]?.index ?? normalized.length;
+    const block = normalized.slice(start, end).trim();
+    if ([...block.matchAll(alternativeStart)].length < 2) return false;
+    // Fase 2 — na ordem de leitura os números só avançam: derruba duplicações
+    // e falsos positivos com número regressivo (ex.: a linha de continuação
+    // "19 maiores economias..." capturada depois da questão 20), que antes
+    // cortavam o bloco da questão seguinte e a faziam sumir do índice.
+    if (number <= lastNumber) return false;
+    lastNumber = number;
+    return true;
+  });
+
+  return ordered.flatMap((match, index) => {
     const number = Number(match[1]);
     const pageMatches = [...normalized.slice(0, match.index).matchAll(/\[\[PAGE:(\d+)\]\]/g)];
     const pageNumber = Number(pageMatches.at(-1)?.[1] ?? 1);
     const start = (match.index ?? 0) + match[0].length;
-    const end = matches[index + 1]?.index ?? normalized.length;
+    const end = ordered[index + 1]?.index ?? normalized.length;
     const block = normalized.slice(start, end).trim();
     const alternatives = [...block.matchAll(alternativeStart)];
 
@@ -49,9 +75,38 @@ export function parseQuestions(text: string): ParsedQuestion[] {
   });
 }
 
+// Remove o ruído de marca d'água/coluna que o OCR gruda no fim da alternativa
+// ("...dez dias. 4 VP"). Só remove quando o ÚLTIMO token é lixo em caixa-alta
+// (e o grupo final até a palavra sólida também é suspeito): finais legítimos
+// sem pontuação ("igual a 15", "venceu por 15") ficam intactos.
+export function stripTrailingOcrNoise(value: string): string {
+  const tokens = value.split(/\s+/);
+  let start = tokens.length;
+  while (start > 0) {
+    const token = tokens[start - 1];
+    if (/[.,;:!?…)\]]$/.test(token)) break;
+    const letters = token.replace(/[^A-Za-zÀ-ÿ]/g, "");
+    const compact = token.replace(/[^A-Za-zÀ-ÿ0-9]/g, "");
+    const suspicious = (letters !== "" && !/[a-záéíóúâêôãõç]/.test(token)) || compact.length <= 2;
+    if (!suspicious) break;
+    start -= 1;
+  }
+  if (start === tokens.length) return value;
+  const last = tokens[tokens.length - 1];
+  const lastLetters = last.replace(/[^A-Za-zÀ-ÿ]/g, "");
+  const isCapsGarbage = lastLetters.length >= 1 && lastLetters.length <= 4
+    && lastLetters === lastLetters.toLocaleUpperCase("pt-BR");
+  if (!isCapsGarbage) return value;
+  return tokens.slice(0, start).join(" ").trimEnd();
+}
+
 export function cleanAlternativeText(value: string): string {
   const cleaned = cleanExtractedText(value);
-  return normalizeQuestionFlow(cleaned.split(/(?:\b(?:TEXTO|QUADRO|TABELA|GR[ÁA]FICO|FIGURA)\s+[IVX\d]+\b|\bCONHECIMENTOS\s+[A-ZÁÉÍÓÚÇ ]+|\bCreate\s+table\b|\bselect\s+[A-Z_]+\s*\()/i)[0]);
+  // Corta no cabeçalho do texto de apoio da PRÓXIMA questão ("Texto base
+  // para as questões de 09 a 10", "TEXTO-BASE") e na citação fonte
+  // ("Disponível em:") — sem isto, a última alternativa de uma questão
+  // engolia o texto-base inteiro da questão seguinte.
+  return normalizeQuestionFlow(cleaned.split(/(?:\b(?:TEXTO|QUADRO|TABELA|GR[ÁA]FICO|FIGURA)\s+[IVX\d]+\b|\btextos?[\s-]*base\b|\bdispon[íi]vel\s+em\s*[:：]|\bCONHECIMENTOS\s+[A-ZÁÉÍÓÚÇ ]+|\bCreate\s+table\b|\bselect\s+[A-Z_]+\s*\()/i)[0]);
 }
 
 function normalizeQuestionFlow(value: string): string {
@@ -91,9 +146,22 @@ function extractSameLinePairs(line: string): Array<{ number: number; answer: str
 export function parseAnswerKey(text: string, examHint = ""): ParsedAnswer[] {
   const rawLines = text.replace(/\r/g, "").split("\n").map((line) => line.trim()).filter(Boolean);
   const lines = rawLines.map((l) => l.replace(/\s+/g, " "));
-  const tabularSections: Array<{ title: string; answers: ParsedAnswer[] }> = [];
+  // Cada página do gabarito traz um cargo diferente ("CARGO / PROVA OBJETIVA /
+  // GABARITO OFICIAL"). Responder por cargo — e não por matéria isolada — é o
+  // que garante as 40 respostas do cargo certo, com todas as matérias juntas.
+  const tabularSections: Array<{ title: string; cargo: string; answers: ParsedAnswer[] }> = [];
+  let currentCargo = "";
 
   for (let index = 0; index < lines.length; index += 1) {
+    if (/^gabarito oficial/i.test(lines[index])) {
+      for (let back = index - 1; back >= 0 && back >= index - 6; back -= 1) {
+        const candidate = lines[back];
+        if (!candidate || /^(?:prova\s+|concurso\s+|prefeitura\s+|n[ií]vel\s+)/i.test(candidate)) continue;
+        currentCargo = candidate;
+        break;
+      }
+      continue;
+    }
     const cleanLine = lines[index].replace(/\bQ(?=\s*\d)/gi, "");
     const lineDigits = [...cleanLine.matchAll(/\b(\d{1,3})\b/g)].map((m) => Number(m[1]));
     const lineLetters = [...lines[index].matchAll(/\b([A-E])\b/gi)].map((m) => m[1].toUpperCase());
@@ -105,34 +173,37 @@ export function parseAnswerKey(text: string, examHint = ""): ParsedAnswer[] {
     const hasSplitPairs = lineDigits.length >= 3 && nextLetters.length >= 2 && lineDigits.every((n) => n >= 1 && n <= 99);
     // Format: números e letras mesclados na mesma linha (01 D B 21 B C)
     const hasMixedPairs = sameLinePairs.length >= 2 && lineDigits.length >= 2 && lineLetters.length >= 2;
+    // Linha única onde o cabeçalho da matéria encosta na resposta
+    // ("06 B D CONHECIMENTOS ESPECÍFICOS", "20 C B") — um só par por linha.
+    const hasSoloPair = sameLinePairs.length === 1 && lineDigits.length >= 1 && lineLetters.length >= 2;
     // Format: só letras na linha e números na anterior (já pego como split)
     const hasAnswerRow = lineLetters.length >= 4 && nextLetters.length === 0 && lineDigits.length === 0;
 
     if (isHeader) continue;
-    if (!hasSplitPairs && !hasMixedPairs && !hasAnswerRow) continue;
+    if (!hasSplitPairs && !hasMixedPairs && !hasSoloPair && !hasAnswerRow) continue;
 
     let answers: Array<{ number: number; answer: string }> = [];
 
     if (hasSplitPairs) {
       const answerCells = nextLetters.length ? nextLetters : lineLetters;
       answers = lineDigits.map((num, i) => ({ number: num, answer: answerCells[i] ?? "" })).filter((a) => a.answer);
-    } else if (hasMixedPairs) {
+    } else if (hasMixedPairs || hasSoloPair) {
       answers = sameLinePairs;
     }
 
-    if (answers.length < 2) continue;
+    if (answers.length < (hasSoloPair ? 1 : 2)) continue;
 
     let heading = "";
     for (let cursor = index - 1; cursor >= 0; cursor -= 1) {
       if (/^[A-E\s]+$/i.test(lines[cursor]) && !/[A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-z]/.test(lines[cursor])) continue;
       if (/^Q\s*\d+/i.test(lines[cursor])) continue;
-      if (/^(?:www\.|pcimarkpci|concurso|prefeitura|gabarito|n[ií]vel\b)/i.test(lines[cursor])) continue;
+      if ( /^(?:www\.|pcimarkpci|concurso|prefeitura|gabarito|n[ií]vel\b)/i.test(lines[cursor])) continue;
       if (/^\d/.test(lines[cursor])) continue;
       heading = lines[cursor];
       break;
     }
-    let section = tabularSections.find((s) => s.title === heading);
-    if (!section) { section = { title: heading, answers: [] }; tabularSections.push(section); }
+    let section = tabularSections.find((s) => s.title === heading && s.cargo === currentCargo);
+    if (!section) { section = { title: heading, cargo: currentCargo, answers: [] }; tabularSections.push(section); }
     for (const a of answers) section.answers.push(a);
   }
 
@@ -140,18 +211,25 @@ export function parseAnswerKey(text: string, examHint = ""): ParsedAnswer[] {
     const cargo = examHint.match(/(?:^|\n)\s*CARGO\s*:\s*([^\n]+)/i)?.[1] ?? examHint.split("\n").slice(0, 25).join(" ");
     const hint = normalizedMatchText(cargo);
     const hintTokens = new Set(hint.split(" ").map((t) => t.replace(/s$/, "")).filter((t) => t.length >= 4));
-
-    if (hintTokens.size > 0) {
-      const ranked = tabularSections.map((section) => {
-        const tokens = normalizedMatchText(section.title).split(" ").map((t) => t.replace(/s$/, "")).filter((t) => t.length >= 4);
-        const matches = tokens.filter((t) => hintTokens.has(t)).length;
-        return { section, score: matches * 10 - Math.abs(tokens.length - hintTokens.size) };
-      }).sort((a, b) => b.score - a.score || b.section.answers.length - a.section.answers.length);
-      if (ranked[0] && (ranked[0].score > 0 || tabularSections.length === 1))
-        return [...new Map(ranked[0].section.answers.map((item) => [item.number, item])).values()];
+    // Agrupa TODAS as matérias de cada cargo e ranqueia os grupos pelo cargo
+    // da prova: o gabarito com vários cargos deixa de ser escolhido por
+    // "maior matéria" e passa a ser escolhido pelo cargo informado no PDF.
+    const cargoGroups = new Map<string, ParsedAnswer[]>();
+    for (const section of tabularSections) {
+      // Sem cabeçalho "GABARITO OFICIAL" o próprio título da seção faz o
+      // papel de cargo (formatos legados "Q01 Q02 / A B C D").
+      const key = section.cargo || section.title;
+      const group = cargoGroups.get(key) ?? [];
+      const seen = new Set(group.map((item) => item.number));
+      for (const item of section.answers) if (!seen.has(item.number)) { group.push(item); seen.add(item.number); }
+      cargoGroups.set(key, group);
     }
-    const best = tabularSections.sort((a, b) => b.answers.length - a.answers.length)[0];
-    if (best) return [...new Map(best.answers.map((item) => [item.number, item])).values()];
+    const ranked = [...cargoGroups.entries()].map(([name, answers]) => {
+      const tokens = normalizedMatchText(name).split(" ").map((t) => t.replace(/s$/, "")).filter((t) => t.length >= 4);
+      const matches = tokens.filter((t) => hintTokens.has(t)).length;
+      return { answers, score: matches * 10 - Math.abs(tokens.length - hintTokens.size) };
+    }).sort((a, b) => b.score - a.score || b.answers.length - a.answers.length);
+    if (ranked[0]) return ranked[0].answers;
   }
 
   const normalized = normalizeOcrDigits(text.replace(/\r/g, " ").replace(/\s+/g, " "));

@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch --import tsx src/server.ts",
+    "p2p": "node --import tsx src/p2p-server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "test": "node --import tsx --test src/**/*.test.ts"
@@ -14,6 +15,7 @@
     "express": "^5.1.0",
     "multer": "^2.0.2",
     "pdf-parse": "1.1.1",
+    "peer": "^1.0.2",
     "zod": "^4.0.17"
   },
   "devDependencies": {

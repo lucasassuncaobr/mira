@@ -1,9 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { BarChart3, BookOpen, Check, ChevronLeft, ChevronRight, Clock3, ClipboardCheck, FileText, Maximize2, Menu, Move, Pencil, RotateCcw, Sparkles, Trash2, UploadCloud, X, ZoomIn, ZoomOut } from "lucide-react";
+import { PdfModal } from "./PdfModal";
+import { warmPdfReader } from "./pdf-cache";
+import { getFocusMap, getPageSrc, hostExam, shutdownP2P, type FocusEntry, type FocusMap } from "./p2p";
 
 const API = "http://localhost:3333/api";
 type Alternative = { label: string; text: string };
-type Question = { id: number; number: number; statement: string; alternatives: Alternative[]; correct_answer: string | null; subject: string | null; topic: string | null; page_number?: number | null; context?: string | null };
+type Question = { id: number; number: number; statement: string; alternatives: Alternative[]; correct_answer: string | null; subject: string | null; topic: string | null; page_number?: number | null; context?: string | null; y_inicio?: number | null; x_center?: number | null; focus_scale?: number | null };
 type Exam = { id: number; title: string; filename: string; board?: string | null; status: string; created_at?: string; question_count?: number; answered_count?: number; correct_count?: number; wrong_count?: number; study_seconds?: number; logo?: string | null; questions?: Question[] };
 type View = "dashboard" | "exams" | "performance" | "import" | "review" | "solve";
 
@@ -352,18 +355,124 @@ function Review({ exam, onChange, onSolve }: { exam: Exam & { questions?: Questi
   return <div className="review-layout"><aside className="question-list"><h3>{exam.title}</h3><p>{questions.length} questões encontradas</p><div className="number-grid">{questions.map((q, index) => <button className={index === selected ? "active" : ""} onClick={() => setSelected(index)} key={q.id}>{q.number}</button>)}</div><button className="primary wide" onClick={onSolve}>Começar prova</button></aside><section className="panel editor"><div className="editor-head"><div><span className="eyebrow">QUESTÃO {question.number}</span><h2>Confira as alternativas</h2></div><span className="status">REVISÃO PENDENTE</span></div><div className="alternatives review-choices">{question.alternatives.map((alt, index) => <div className="alternative-edit" key={alt.label}><button className={question.correct_answer === alt.label ? "letter correct" : "letter"} onClick={() => patch({ correct_answer: alt.label })}>{alt.label}</button><textarea value={alt.text} onChange={e => { const alternatives = [...question.alternatives]; alternatives[index] = { ...alt, text: e.target.value }; patch({ alternatives }); }}/></div>)}</div><div className="editor-footer"><span>Clique na letra para definir o gabarito.</span><button className="primary" onClick={save}>{saving ? "Salvando..." : "Salvar e avançar"}<ChevronRight size={18}/></button></div></section></div>;
 }
 
-function PageReference({ examId, page, questionNumber }: { examId: number; page: number; questionNumber: number }) {
-  const [scale, setScale] = useState(1); const [fitWidthScale, setFitWidthScale] = useState(1); const [focus, setFocus] = useState({ x: .5, y: .15, scale: 2 }); const [position, setPosition] = useState({ x: 0, y: 0 }); const [dragging, setDragging] = useState(false); const viewport = useRef<HTMLDivElement | null>(null); const drag = useRef<{ x: number; y: number; originX: number; originY: number } | null>(null);
-  function reset() { setScale(1); setPosition({ x: 0, y: 0 }); }
-  function fitWidth(nextScale: number = focus.scale || fitWidthScale, target: { x: number; y: number; scale: number } = focus) { const rect = viewport.current?.getBoundingClientRect(); if (!rect) return; setScale(nextScale); setPosition(clamp({ x: rect.width * nextScale * (.5 - target.x), y: rect.height * nextScale * (.5 - target.y) }, nextScale)); }
-  function clamp(next: { x: number; y: number }, nextScale = scale) { const rect = viewport.current?.getBoundingClientRect(); if (!rect || nextScale <= 1) return { x: 0, y: 0 }; const maxX = rect.width * (nextScale - 1) / 2; const maxY = rect.height * (nextScale - 1) / 2; return { x: Math.max(-maxX, Math.min(maxX, next.x)), y: Math.max(-maxY, Math.min(maxY, next.y)) }; }
-  function zoom(delta: number, clientX?: number, clientY?: number) { const nextScale = Math.min(4, Math.max(1, Number((scale + delta).toFixed(2)))); if (nextScale === scale) return; const rect = viewport.current?.getBoundingClientRect(); if (rect && clientX !== undefined && clientY !== undefined) { const cursor = { x: clientX - rect.left - rect.width / 2, y: clientY - rect.top - rect.height / 2 }; const ratio = nextScale / scale; setPosition(clamp({ x: cursor.x - (cursor.x - position.x) * ratio, y: cursor.y - (cursor.y - position.y) * ratio }, nextScale)); } else setPosition((current) => clamp(current, nextScale)); setScale(nextScale); }
-  function pointerDown(event: React.PointerEvent<HTMLDivElement>) { if (scale <= 1) return; drag.current = { x: event.clientX, y: event.clientY, originX: position.x, originY: position.y }; setDragging(true); event.currentTarget.setPointerCapture(event.pointerId); }
-  function pointerMove(event: React.PointerEvent<HTMLDivElement>) { if (!drag.current) return; setPosition(clamp({ x: drag.current.originX + event.clientX - drag.current.x, y: drag.current.originY + event.clientY - drag.current.y })); }
-  function pointerUp(event: React.PointerEvent<HTMLDivElement>) { drag.current = null; setDragging(false); if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId); }
-  useEffect(() => { fetch(`${API}/exams/${examId}/pages/${page}/focus/${questionNumber}`).then((response) => response.json()).then((target) => { const nextFocus = typeof target.x === "number" && typeof target.y === "number" ? { x: target.x, y: target.y, scale: typeof target.scale === "number" ? target.scale : 2 } : { x: .5, y: .15, scale: 2 }; setFocus(nextFocus); requestAnimationFrame(() => fitWidth(nextFocus.scale, nextFocus)); }).catch(() => { const fallback = { x: .5, y: .15, scale: 2 }; setFocus(fallback); requestAnimationFrame(() => fitWidth(fallback.scale, fallback)); }); }, [examId, page, questionNumber]);
-  useEffect(() => { const element = viewport.current; if (!element) return; const handler = (event: WheelEvent) => { event.preventDefault(); zoom(event.deltaY < 0 ? .2 : -.2, event.clientX, event.clientY); }; element.addEventListener("wheel", handler, { passive: false }); return () => element.removeEventListener("wheel", handler); }, [scale, position]);
-  return <figure className="page-reference"><figcaption className="image-title"><FileText size={17}/> Questão {questionNumber} no PDF</figcaption><div ref={viewport} className={dragging ? "image-viewport dragging" : "image-viewport"} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerUp} onPointerCancel={() => { drag.current = null; setDragging(false); }}><div className="drag-hint"><Move/> Foco automático • arraste para mover</div><img draggable={false} onLoad={(event) => { const rect = viewport.current?.getBoundingClientRect(); if (!rect) return; const renderedWidth = Math.min(rect.width, rect.height * (event.currentTarget.naturalWidth / event.currentTarget.naturalHeight)); const fitted = Math.min(4, rect.width / renderedWidth); setFitWidthScale(fitted); requestAnimationFrame(() => fitWidth(fitted, { x: .5, y: .5, scale: fitted })); }} style={{ transition: "transform 0.15s ease-out", transform: `translate(${position.x}px, ${position.y}px) scale(${scale})` }} src={`${API}/exams/${examId}/pages/${page}`} alt={`Página ${page} do PDF original`}/></div><div className="image-toolbar"><span>Zoom {Math.round(scale * 100)}%</span><div><button className="fit-button" onClick={reset}><Maximize2/> Página inteira</button><button className="fit-button" onClick={() => fitWidth()}><FileText/> Focar questão</button><button aria-label="Diminuir zoom" onClick={() => zoom(-.25)}><ZoomOut/></button><button aria-label="Aumentar zoom" onClick={() => zoom(.25)}><ZoomIn/></button><button aria-label="Redefinir imagem" onClick={() => fitWidth()}><RotateCcw/></button></div></div></figure>;
+type PageReferenceProps = { examId: number; page: number; questionNumber: number; examTitle?: string; focus?: FocusEntry };
+
+function PageReference({ examId, page, questionNumber, examTitle, focus }: PageReferenceProps) {
+  const [zoom, setZoom] = useState(1);
+  const [src, setSrc] = useState<string | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const [pdfOpen, setPdfOpen] = useState(false);
+  const viewport = useRef<HTMLDivElement | null>(null);
+  const pagina = useRef<HTMLDivElement | null>(null);
+  const marcador = useRef<HTMLDivElement | null>(null);
+  const markerTimer = useRef<number | undefined>(undefined);
+  const drag = useRef<{ x: number; y: number; scrollLeft: number; scrollTop: number } | null>(null);
+
+  // Imagem JPEG compacta via lazy loading: P2P (PeerJS) primeiro e, se falhar
+  // firewall/NAT/sinalização, fallback HTTP rígido de 3 segundos.
+  useEffect(() => {
+    let alive = true;
+    setSrc(null);
+    getPageSrc(examId, page).then(
+      (value) => { if (alive) setSrc(value); },
+      () => { if (alive) setSrc(`${API}/exams/${examId}/pages/${page}`); }
+    );
+    return () => { alive = false; };
+  }, [examId, page]);
+
+  // Pré-aquece o leitor de PDF (bytes + info + primeiras páginas) ao montar.
+  useEffect(() => { warmPdfReader(examId); }, [examId]);
+
+  // MOTOR DE SCROLL RÁPIDO (instrução 3):
+  //  - altura dinâmica do elemento de página (clientHeight) lida em TEMPO DE EXECUÇÃO;
+  //  - rolagem seca/instantânea: container.scrollTop = ... (sem smooth/animação);
+  //  - metadado y_inicio é % vertical (nunca pixel fixo) — pixel = % × clientHeight.
+  const aplicarFoco = useCallback(() => {
+    const container = viewport.current;
+    const elementopagina = pagina.current;
+    if (!container || !elementopagina || !elementopagina.clientHeight) return;
+    if (focus?.y_inicio == null) return;
+    const alvo = (focus.y_inicio / 100) * elementopagina.clientHeight;
+    container.scrollTop = Math.max(0, alvo - container.clientHeight * 0.15);
+    const marc = marcador.current;
+    if (marc) {
+      // Altura do bloco estimada da dica de zoom normalizada (0..1).
+      const alturaBloco = focus.focus_scale ? Math.min(1, 0.86 / focus.focus_scale) : 0.5;
+      marc.style.top = `${Math.max(0, alvo - 6)}px`;
+      marc.style.height = `${Math.max(40, Math.round(alturaBloco * elementopagina.clientHeight))}px`;
+      window.clearTimeout(markerTimer.current);
+      marc.classList.add("ativo");
+      markerTimer.current = window.setTimeout(() => marc.classList.remove("ativo"), 3000);
+    }
+  }, [focus?.y_inicio, focus?.focus_scale]);
+
+  useEffect(() => { aplicarFoco(); }, [aplicarFoco, src, zoom]);
+  useEffect(() => () => window.clearTimeout(markerTimer.current), []);
+
+  function changeZoom(delta: number) {
+    setZoom((current) => Math.min(4, Math.max(1, Math.round((current + delta) * 100) / 100)));
+  }
+
+  // Arraste = mutação direta de scrollLeft/scrollTop no DOM: zero re-render
+  // por frame (nada de setState no movimento do ponteiro).
+  function pointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    const container = viewport.current;
+    if (!container) return;
+    drag.current = { x: event.clientX, y: event.clientY, scrollLeft: container.scrollLeft, scrollTop: container.scrollTop };
+    setDragging(true);
+    event.currentTarget.setPointerCapture(event.pointerId);
+  }
+  function pointerMove(event: React.PointerEvent<HTMLDivElement>) {
+    const container = viewport.current;
+    const start = drag.current;
+    if (!container || !start) return;
+    container.scrollLeft = start.scrollLeft - (event.clientX - start.x);
+    container.scrollTop = start.scrollTop - (event.clientY - start.y);
+  }
+  function pointerUp(event: React.PointerEvent<HTMLDivElement>) {
+    drag.current = null;
+    setDragging(false);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+  }
+
+  return (
+    <figure className="page-reference">
+      <figcaption className="image-title"><FileText size={17}/> Questão {questionNumber} no PDF</figcaption>
+      <div
+        ref={viewport}
+        className={dragging ? "image-viewport dragging" : "image-viewport"}
+        onPointerDown={pointerDown}
+        onPointerMove={pointerMove}
+        onPointerUp={pointerUp}
+        onPointerCancel={pointerUp}
+      >
+        <div className="drag-hint"><Move/> Foco automático • arraste para mover</div>
+        <div className="pagina-pdf" ref={pagina} style={{ width: `${zoom * 100}%` }}>
+          <img
+            draggable={false}
+            loading="lazy"
+            decoding="async"
+            src={src ?? undefined}
+            alt={`Página ${page} do PDF original`}
+            onLoad={() => requestAnimationFrame(aplicarFoco)}
+          />
+          <div className="marcador-foco-questao" ref={marcador} aria-hidden="true" />
+        </div>
+      </div>
+      <div className="image-toolbar">
+        <span>Zoom {Math.round(zoom * 100)}%</span>
+        <div>
+          {/* Exceção mantida: o leitor wasm só é aquecido sob intenção explícita. */}
+          <button className="fit-button" onClick={() => setPdfOpen(true)} onMouseEnter={() => warmPdfReader(examId)} onFocus={() => warmPdfReader(examId)}><Maximize2/> Página inteira</button>
+          <button className="fit-button" onClick={aplicarFoco}><FileText/> Focar questão</button>
+          <button aria-label="Diminuir zoom" onClick={() => changeZoom(-.25)}><ZoomOut/></button>
+          <button aria-label="Aumentar zoom" onClick={() => changeZoom(.25)}><ZoomIn/></button>
+          <button aria-label="Redefinir imagem" onClick={() => setZoom(1)}><RotateCcw/></button>
+        </div>
+      </div>
+      {pdfOpen && <PdfModal examId={examId} title={examTitle ?? `Questão ${questionNumber}`} onClose={() => setPdfOpen(false)} />}
+    </figure>
+  );
 }
 
 function FormattedText({ children }: { children: string }) { return <span className="exam-text">{children}</span>; }
@@ -381,6 +490,20 @@ function Solve({ exam, onFinish }: { exam: Exam & { questions?: Question[] }; on
   const question = questions[currentIdx];
   const total = questions.length;
   const indexGridRef = useRef<HTMLDivElement>(null);
+  const [focusMap, setFocusMap] = useState<FocusMap | null>(null);
+
+  // Mapa de metadados normalizados (y_inicio em %): transferência P2P via
+  // PeerJS com fallback HTTP rígido de 3s. Esta prova também é publicada como
+  // "anfitriã" para que outros usuários recebam os dados direto pelo canal.
+  useEffect(() => {
+    let alive = true;
+    getFocusMap(exam.id).then(
+      (map) => { if (alive) setFocusMap(map); },
+      () => undefined
+    );
+    void hostExam(exam.id);
+    return () => { alive = false; void shutdownP2P(); };
+  }, [exam.id]);
 
   useEffect(() => {
     const grid = indexGridRef.current;
@@ -448,13 +571,15 @@ function Solve({ exam, onFinish }: { exam: Exam & { questions?: Question[] }; on
   if (!question) return <div className="panel" style={{ padding: 40, textAlign: "center", color: "#6C7480" }}>Nenhuma questão encontrada.</div>;
 
   const selected = answers[question.id] ?? null;
+  const focusEntry = focusMap?.[String(question.number)];
+  const currentPage = focusEntry?.page ?? question.page_number;
 
   return (
     <div className="solve notranslate" translate="no">
       <div className="solve-workspace">
         <aside className="pdf-column">
-          {question.page_number ? (
-            <PageReference examId={exam.id} page={question.page_number} questionNumber={question.number} />
+          {currentPage ? (
+            <PageReference examId={exam.id} page={currentPage} questionNumber={question.number} examTitle={exam.title} focus={focusEntry} />
           ) : (
             <div className="pdf-empty"><FileText/><span>Página original indisponível</span></div>
           )}
@@ -474,7 +599,7 @@ function Solve({ exam, onFinish }: { exam: Exam & { questions?: Question[] }; on
           <div className="question-index">
             <div className="index-header">
               <span className="index-title">ÍNDICE DE QUESTÕES</span>
-              <span className="index-count">{currentIdx + 1}/{total}</span>
+              <span className="index-count">{question ? question.number : currentIdx + 1}/{total}</span>
             </div>
             <div className="index-grid" ref={indexGridRef}>
               {questions.map((q, i) => {
@@ -486,7 +611,10 @@ function Solve({ exam, onFinish }: { exam: Exam & { questions?: Question[] }; on
                     className={`index-btn${i === currentIdx ? " active" : ""}${statusClass}`}
                     onClick={() => { setFeedback(null); setCurrentIdx(i); }}
                   >
-                    {String(i + 1).padStart(2, "0")}
+                    {/* Rótulo = número REAL da questão no gabarito (nunca a
+                        posição): numeração com lacunas não pode desalinhar o
+                        seletor do enunciado exibido. */}
+                    {String(q.number).padStart(2, "0")}
                   </button>
                 );
               })}

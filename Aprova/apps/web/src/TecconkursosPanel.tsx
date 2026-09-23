@@ -87,7 +87,7 @@ const depoimentos: Depoimento[] = [
 function LogoFallback({ initials, bgColor, style }: { initials: string; bgColor: string; style?: React.CSSProperties }) {
   return (
     <svg width="48" height="48" viewBox="0 0 48 48" style={{ background: bgColor, ...style }}>
-      <text x="50%" y="55%" dominantBaseline="middle" textAnchor="middle" fill="white" fontFamily="Manrope, sans-serif" fontWeight="700" fontSize="14">{initials}</text>
+      <text x="50%" y="55%" dominantBaseline="middle" textAnchor="middle" fill="white" fontFamily="Atkinson Hyperlegible Next, sans-serif" fontWeight="700" fontSize="14">{initials}</text>
     </svg>
   );
 }

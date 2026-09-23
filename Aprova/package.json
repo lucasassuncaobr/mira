@@ -3,12 +3,14 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev": "concurrently -n api,web -c green,cyan \"npm run dev -w apps/api\" \"npm run dev -w apps/web\"",
+    "dev": "concurrently -n api,web,p2p -c green,cyan,magenta \"npm run dev -w apps/api\" \"npm run dev -w apps/web\" \"npm run p2p -w apps/api\"",
     "build": "npm run build -w apps/api && npm run build -w apps/web",
     "test": "npm run test -w apps/api",
     "start": "npm run start -w apps/api"
   },
-  "workspaces": ["apps/*"],
+  "workspaces": [
+    "apps/*"
+  ],
   "devDependencies": {
     "concurrently": "^9.2.0"
   }

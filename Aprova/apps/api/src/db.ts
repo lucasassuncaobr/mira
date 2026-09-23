@@ -38,6 +38,13 @@ db.exec(`
 
 try { db.exec("ALTER TABLE questions ADD COLUMN page_number INTEGER"); } catch { /* coluna já existe */ }
 try { db.exec("ALTER TABLE questions ADD COLUMN context TEXT"); } catch { /* coluna já existe */ }
+// Metadados de localização SOMENTE numéricos e normalizados (sem pixels):
+// y_inicio = porcentagem vertical do topo da questão na página (0..100)
+// x_center = porcentagem horizontal do centro da coluna (0..100)
+// focus_scale = dica de zoom normalizada derivada da altura do bloco
+try { db.exec("ALTER TABLE questions ADD COLUMN y_inicio REAL"); } catch { /* coluna já existe */ }
+try { db.exec("ALTER TABLE questions ADD COLUMN x_center REAL"); } catch { /* coluna já existe */ }
+try { db.exec("ALTER TABLE questions ADD COLUMN focus_scale REAL"); } catch { /* coluna já existe */ }
 try { db.exec("ALTER TABLE exams ADD COLUMN board TEXT"); } catch { /* coluna já existe */ }
 try { db.exec("ALTER TABLE exams ADD COLUMN logo TEXT"); } catch { /* coluna já existe */ }
 
