@@ -6,7 +6,7 @@ import { getFocusMap, getPageSrc, hostExam, shutdownP2P, type FocusEntry, type F
 
 const API = "http://localhost:3333/api";
 type Alternative = { label: string; text: string };
-type Question = { id: number; number: number; statement: string; alternatives: Alternative[]; correct_answer: string | null; subject: string | null; topic: string | null; page_number?: number | null; context?: string | null; y_inicio?: number | null; x_center?: number | null; focus_scale?: number | null };
+type Question = { id: number; number: number; statement: string; alternatives: Alternative[]; correct_answer: string | null; subject: string | null; topic: string | null; page_number?: number | null; context?: string | null; y_inicio?: number | null; x_center?: number | null; focus_height?: number | null; focus_scale?: number | null };
 type Exam = { id: number; title: string; filename: string; board?: string | null; status: string; created_at?: string; question_count?: number; answered_count?: number; correct_count?: number; wrong_count?: number; study_seconds?: number; logo?: string | null; questions?: Question[] };
 type View = "dashboard" | "exams" | "performance" | "import" | "review" | "solve";
 
@@ -393,18 +393,25 @@ function PageReference({ examId, page, questionNumber, examTitle, focus }: PageR
     if (!container || !elementopagina || !elementopagina.clientHeight) return;
     if (focus?.y_inicio == null) return;
     const alvo = (focus.y_inicio / 100) * elementopagina.clientHeight;
-    container.scrollTop = Math.max(0, alvo - container.clientHeight * 0.15);
+    container.scrollTop = Math.max(0, alvo - container.clientHeight * 0.22);
+    if (Number.isFinite(focus.x_center)) {
+      const alvoX = elementopagina.offsetLeft + (focus.x_center / 100) * elementopagina.clientWidth;
+      container.scrollLeft = Math.max(0, alvoX - container.clientWidth * 0.5);
+    }
     const marc = marcador.current;
     if (marc) {
-      // Altura do bloco estimada da dica de zoom normalizada (0..1).
-      const alturaBloco = focus.focus_scale ? Math.min(1, 0.86 / focus.focus_scale) : 0.5;
+      const alturaPrecisa = Number.isFinite(focus.focus_height) && focus.focus_height ? focus.focus_height / 100 : null;
+      const alturaBloco = focus.focus_scale ? Math.min(0.34, Math.max(0.16, 0.86 / focus.focus_scale)) : 0.24;
+      const alturaBase = Math.max(72, Math.round((alturaPrecisa ?? alturaBloco) * elementopagina.clientHeight));
+      const limiteEstimado = alturaPrecisa ? elementopagina.clientHeight : Math.round(container.clientHeight * 0.78);
+      const alturaMarcador = Math.min(alturaBase, Math.max(72, limiteEstimado), Math.max(72, elementopagina.clientHeight - alvo));
       marc.style.top = `${Math.max(0, alvo - 6)}px`;
-      marc.style.height = `${Math.max(40, Math.round(alturaBloco * elementopagina.clientHeight))}px`;
+      marc.style.height = `${alturaMarcador}px`;
       window.clearTimeout(markerTimer.current);
       marc.classList.add("ativo");
       markerTimer.current = window.setTimeout(() => marc.classList.remove("ativo"), 3000);
     }
-  }, [focus?.y_inicio, focus?.focus_scale]);
+  }, [focus?.y_inicio, focus?.x_center, focus?.focus_height, focus?.focus_scale]);
 
   useEffect(() => { aplicarFoco(); }, [aplicarFoco, src, zoom]);
   useEffect(() => () => window.clearTimeout(markerTimer.current), []);
@@ -447,7 +454,14 @@ function PageReference({ examId, page, questionNumber, examTitle, focus }: PageR
         onPointerCancel={pointerUp}
       >
         <div className="drag-hint"><Move/> Foco automático • arraste para mover</div>
-        <div className="pagina-pdf" ref={pagina} style={{ width: `${zoom * 100}%` }}>
+        <div
+          className="pagina-pdf"
+          ref={pagina}
+          style={{
+            "--pdf-zoom-percent": `${zoom * 100}%`,
+            "--pdf-zoom-width": `${Math.round(960 * zoom)}px`,
+          } as React.CSSProperties}
+        >
           <img
             draggable={false}
             loading="lazy"

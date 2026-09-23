@@ -12,7 +12,7 @@
 
 import type { DataConnection, Peer } from "peerjs";
 
-export type FocusEntry = { page: number; y_inicio: number; x_center: number; focus_scale: number };
+export type FocusEntry = { page: number; y_inicio: number; x_center: number; focus_height?: number; focus_scale: number };
 export type FocusMap = Record<string, FocusEntry>;
 
 const API = "http://localhost:3333/api";

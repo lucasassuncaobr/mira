@@ -23,6 +23,7 @@ export type FocusEntry = {
   page: number;
   y_inicio: number;   // % vertical do topo do bloco (0..100)
   x_center: number;   // % horizontal do centro da coluna (0..100)
+  focus_height: number; // % vertical coberto pela questão (0..100)
   focus_scale: number; // dica de zoom normalizada derivada da altura do bloco
 };
 
@@ -37,6 +38,18 @@ type Candidate = {
   pageW: number;
   pageH: number;
   rank: number;
+  lineStart: boolean;
+};
+
+type BboxLine = {
+  page: number;
+  text: string;
+  xMin: number;
+  xMax: number;
+  yMin: number;
+  yMax: number;
+  pageW: number;
+  pageH: number;
 };
 
 const PADDLE_TIMEOUT_MS = Number(process.env.MIRA_PADDLE_TIMEOUT_MS ?? 180_000);
@@ -49,6 +62,7 @@ function parseBboxCandidates(bboxText: string): Candidate[] {
   let pageW = 0;
   let pageH = 0;
   let previousWord = "";
+  let previousLineY = Number.NaN;
 
   const token = /<page\s+width="([\d.]+)"\s+height="([\d.]+)"|<word\s+xMin="([\d.]+)"\s+yMin="([\d.]+)"\s+xMax="([\d.]+)"\s+yMax="([\d.]+)">([^<]*)<\/word>/g;
   for (const match of bboxText.matchAll(token)) {
@@ -57,6 +71,7 @@ function parseBboxCandidates(bboxText: string): Candidate[] {
       pageW = Number(match[1]);
       pageH = Number(match[2]);
       previousWord = "";
+      previousLineY = Number.NaN;
       continue;
     }
     const xMin = Number(match[3]);
@@ -66,14 +81,16 @@ function parseBboxCandidates(bboxText: string): Candidate[] {
     const word = match[7].trim();
     if (!word || !pageW || !pageH) continue;
 
+    const lineStart = !Number.isFinite(previousLineY) || Math.abs(yMin - previousLineY) > Math.max(2.5, (yMax - yMin) * 0.65);
     // Descarta cabeçalho/rodapé (número de página solto) — fora da faixa útil.
     const inBody = yMin > pageH * 0.03 && yMax < pageH * 0.97;
     const numeric = word.match(/^(\d{1,3})([.)])?$/);
-    const label = previousWord.replace(/\p{Diacritic}/gu, "").toLowerCase();
+    const label = lineStart ? "" : previousWord.replace(/\p{Diacritic}/gu, "").toLowerCase();
 
     if (numeric && inBody) {
       const hasSeparator = numeric[2] !== undefined;
       const fromLabel = label === "questao" || label === "questão" || label === "q";
+      const nearQuestionColumn = xMin < pageW * 0.24;
       candidates.push({
         number: Number(numeric[1]),
         page,
@@ -82,17 +99,91 @@ function parseBboxCandidates(bboxText: string): Candidate[] {
         xMax,
         pageW,
         pageH,
-        // Ranqueamento: "QUESTÃO 05" > "05." / "05)" > "05" solto.
-        rank: (fromLabel ? 100 : 0) + (hasSeparator ? 60 : 30),
+        lineStart,
+        // Ranqueamento: "QUESTÃO 05" > início de linha "05" > "05." / "05)" > número solto.
+        // Isso evita capturar referências como "questões de 01 a 05" no cabeçalho/texto-base.
+        rank: (fromLabel ? 120 : 0) + (lineStart ? 90 : 0) + (nearQuestionColumn ? 20 : 0) + (hasSeparator ? 35 : 0) + (lineStart || fromLabel || hasSeparator ? 20 : 0),
       });
     }
     previousWord = word;
+    previousLineY = yMin;
   }
   return candidates;
 }
 
+/** Agrupa palavras do bbox em linhas de leitura para estimar o fim real do bloco. */
+function parseBboxLines(bboxText: string): BboxLine[] {
+  const lines: BboxLine[] = [];
+  let page = 0;
+  let pageW = 0;
+  let pageH = 0;
+  let current: BboxLine | null = null;
+
+  const token = /<page\s+width="([\d.]+)"\s+height="([\d.]+)"|<word\s+xMin="([\d.]+)"\s+yMin="([\d.]+)"\s+xMax="([\d.]+)"\s+yMax="([\d.]+)">([^<]*)<\/word>/g;
+  const flush = () => {
+    if (current?.text.trim()) lines.push({ ...current, text: current.text.trim() });
+    current = null;
+  };
+
+  for (const match of bboxText.matchAll(token)) {
+    if (match[1] !== undefined) {
+      flush();
+      page += 1;
+      pageW = Number(match[1]);
+      pageH = Number(match[2]);
+      continue;
+    }
+    const xMin = Number(match[3]);
+    const yMin = Number(match[4]);
+    const xMax = Number(match[5]);
+    const yMax = Number(match[6]);
+    const word = match[7].trim();
+    if (!word || !pageW || !pageH) continue;
+
+    const sameLine = current && current.page === page && Math.abs(yMin - current.yMin) <= Math.max(2.5, (yMax - yMin) * 0.65);
+    if (!sameLine) {
+      flush();
+      current = { page, text: word, xMin, xMax, yMin, yMax, pageW, pageH };
+    } else {
+      const line = current as BboxLine;
+      line.text += ` ${word}`;
+      line.xMin = Math.min(line.xMin, xMin);
+      line.xMax = Math.max(line.xMax, xMax);
+      line.yMin = Math.min(line.yMin, yMin);
+      line.yMax = Math.max(line.yMax, yMax);
+    }
+  }
+  flush();
+  return lines;
+}
+
+function isSectionHeading(line: BboxLine): boolean {
+  const letters = line.text.normalize("NFD").replace(/\p{M}/gu, "").replace(/[^\p{L}]/gu, "");
+  if (letters.length < 6) return false;
+  const uppercase = letters.replace(/[^\p{Lu}]/gu, "").length / letters.length;
+  const centered = line.xMin > line.pageW * 0.08 && line.xMax < line.pageW * 0.92;
+  return centered && uppercase > 0.86;
+}
+
+function estimateQuestionBottom(best: Candidate, next: Candidate | undefined, lines: BboxLine[]): number {
+  const limit = next ? next.yMin - best.pageH * 0.012 : best.yMin + best.pageH * 0.42;
+  const relevant = lines
+    .filter((line) => line.page === best.page && line.yMax >= best.yMin - 2 && line.yMin < limit)
+    .sort((a, b) => a.yMin - b.yMin);
+  let started = false;
+  let lastY = best.yMin;
+  for (const line of relevant) {
+    const startsQuestion = new RegExp(`^\\s*${best.number}(?:[.)]\\s*|\\s+)`).test(line.text);
+    if (!started && !startsQuestion) continue;
+    started = true;
+    if (!startsQuestion && isSectionHeading(line)) break;
+    lastY = Math.max(lastY, line.yMax);
+  }
+  return Math.min(best.pageH, Math.max(best.yMin + best.pageH * 0.08, lastY + best.pageH * 0.012));
+}
+
 /** Escolhe, para cada questão, o candidato mais plausível (página dica + rank). */
-function selectEntries(candidates: Candidate[], hints: FocusHint[]): Map<number, FocusEntry> {
+function selectEntries(candidates: Candidate[], lines: BboxLine[], hints: FocusHint[]): Map<number, FocusEntry> {
   const entries = new Map<number, FocusEntry>();
 
   for (const hint of hints) {
@@ -108,7 +199,7 @@ function selectEntries(candidates: Candidate[], hints: FocusHint[]): Map<number,
       .filter((candidate) => candidate.page === best.page && candidate.yMin > best.yMin + 4 && Math.abs(candidate.xMin - best.xMin) < best.pageW * 0.12)
       .sort((a, b) => a.yMin - b.yMin)[0];
     const top = Math.max(0, best.yMin - best.pageH * 0.01);
-    const bottom = Math.min(best.pageH, next ? next.yMin - best.pageH * 0.012 : best.yMin + best.pageH * 0.42);
+    const bottom = estimateQuestionBottom(best, next, lines);
 
     const columnLeft = best.xMin < best.pageW / 2 ? Math.max(0, best.xMin - best.pageW * 0.03) : Math.max(best.pageW / 2, best.xMin - best.pageW * 0.03);
     const columnRight = best.xMin < best.pageW / 2 ? best.pageW / 2 : best.pageW;
@@ -119,6 +210,7 @@ function selectEntries(candidates: Candidate[], hints: FocusHint[]): Map<number,
       page: best.page,
       y_inicio: round2((top / best.pageH) * 100),
       x_center: round2((((best.xMin + best.xMax) / 2) / best.pageW) * 100),
+      focus_height: round2(Math.max(4, ((bottom - top) / best.pageH) * 100)),
       focus_scale: Math.min(3.2, Math.max(1.65, Math.min(0.94 / width, 0.86 / height))),
     });
   }
@@ -151,6 +243,7 @@ async function focusMapFromPaddle(buffer: Buffer): Promise<Map<number, FocusEntr
         page: Math.max(1, Number(row.pagina) || 1),
         y_inicio: round2(Math.min(100, Math.max(0, row.y_inicio))),
         x_center: round2(Math.min(100, Math.max(0, row.x_centro ?? 50))),
+        focus_height: 18,
         focus_scale: 2.2,
       });
     }
@@ -172,7 +265,7 @@ export async function buildFocusMap(buffer: Buffer, hints: FocusHint[]): Promise
   const precise = spawnSync("pdftotext", ["-bbox", "-", "-"], { input: buffer, encoding: "utf8", maxBuffer: 30 * 1024 * 1024 });
   let map = new Map<number, FocusEntry>();
   if (precise.status === 0 && precise.stdout.trim()) {
-    map = selectEntries(parseBboxCandidates(precise.stdout), hints);
+    map = selectEntries(parseBboxCandidates(precise.stdout), parseBboxLines(precise.stdout), hints);
   }
 
   const expected = hints.length;

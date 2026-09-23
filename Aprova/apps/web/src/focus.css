@@ -13,8 +13,15 @@
 /* Container de página: posiciona o marcador de foco sobre a imagem. */
 .pagina-pdf {
     position: relative;
-    width: 100%;
+    --pdf-zoom-percent: 100%;
+    --pdf-zoom-width: 960px;
+    width: min(var(--pdf-zoom-percent), var(--pdf-zoom-width));
+    max-width: none;
     margin: 0;
+}
+
+.view-solve .pagina-pdf {
+    margin-inline: auto;
 }
 
 /* Viewport vira scroll container nativo (sem transform de pan/zoom). */

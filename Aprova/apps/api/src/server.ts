@@ -115,28 +115,28 @@ app.get("/api/p2p/config", (_req, res) => {
 
 /** Lê o mapa de foco já persistido; se faltar, calcula (vetorial → PaddleOCR) e grava. */
 async function loadOrBuildFocusMap(examId: string) {
-  const rows = db.prepare("SELECT number, page_number, y_inicio, x_center, focus_scale FROM questions WHERE exam_id = ? ORDER BY number").all(examId) as Array<{ number: number; page_number: number | null; y_inicio: number | null; x_center: number | null; focus_scale: number | null }>;
-  const map = new Map<number, { page: number; y_inicio: number; x_center: number; focus_scale: number }>();
-  const missing = rows.filter((row) => row.y_inicio === null);
+  const rows = db.prepare("SELECT number, page_number, y_inicio, x_center, focus_height, focus_scale FROM questions WHERE exam_id = ? ORDER BY number").all(examId) as Array<{ number: number; page_number: number | null; y_inicio: number | null; x_center: number | null; focus_height: number | null; focus_scale: number | null }>;
+  const map = new Map<number, { page: number; y_inicio: number; x_center: number; focus_height: number; focus_scale: number }>();
+  const missing = rows.filter((row) => row.y_inicio === null || row.focus_height === null);
   if (missing.length) {
     const source = path.join(examAssets, examId, "source.pdf");
     if (existsSync(source)) {
       const hints: FocusHint[] = rows.map((row) => ({ number: row.number, pageNumber: row.page_number }));
       const built = await buildFocusMapFromPdf(source, hints);
       if (built.size) {
-        const persist = db.prepare("UPDATE questions SET y_inicio = ?, x_center = ?, focus_scale = ?, page_number = ? WHERE exam_id = ? AND number = ?");
+        const persist = db.prepare("UPDATE questions SET y_inicio = ?, x_center = ?, focus_height = ?, focus_scale = ?, page_number = ? WHERE exam_id = ? AND number = ?");
         db.exec("BEGIN");
         try {
-          for (const [number, entry] of built) persist.run(entry.y_inicio, entry.x_center, entry.focus_scale, entry.page, examId, number);
+          for (const [number, entry] of built) persist.run(entry.y_inicio, entry.x_center, entry.focus_height, entry.focus_scale, entry.page, examId, number);
           db.exec("COMMIT");
         } catch (error) { db.exec("ROLLBACK"); throw error; }
       }
     }
   }
-  const fresh = db.prepare("SELECT number, page_number, y_inicio, x_center, focus_scale FROM questions WHERE exam_id = ? ORDER BY number").all(examId) as typeof rows;
+  const fresh = db.prepare("SELECT number, page_number, y_inicio, x_center, focus_height, focus_scale FROM questions WHERE exam_id = ? ORDER BY number").all(examId) as typeof rows;
   for (const row of fresh) {
     if (row.y_inicio === null || row.x_center === null) continue;
-    map.set(row.number, { page: row.page_number ?? 1, y_inicio: row.y_inicio, x_center: row.x_center, focus_scale: row.focus_scale ?? 2 });
+    map.set(row.number, { page: row.page_number ?? 1, y_inicio: row.y_inicio, x_center: row.x_center, focus_height: row.focus_height ?? 18, focus_scale: row.focus_scale ?? 2 });
   }
   return map;
 }
@@ -350,9 +350,9 @@ app.get("/api/exams/:id/pages/:page/text", async (req, res, next) => {
 // sob demanda caso a prova seja anterior à coluna y_inicio.
 app.get("/api/exams/:id/pages/:page/focus/:question", async (req, res, next) => {
   try {
-    const stored = db.prepare("SELECT page_number, y_inicio, x_center, focus_scale FROM questions WHERE exam_id = ? AND number = ?").get(req.params.id, req.params.question) as { page_number: number | null; y_inicio: number | null; x_center: number | null; focus_scale: number | null } | undefined;
+    const stored = db.prepare("SELECT page_number, y_inicio, x_center, focus_height, focus_scale FROM questions WHERE exam_id = ? AND number = ?").get(req.params.id, req.params.question) as { page_number: number | null; y_inicio: number | null; x_center: number | null; focus_height: number | null; focus_scale: number | null } | undefined;
     let entry = stored && stored.y_inicio !== null && stored.x_center !== null
-      ? { page: stored.page_number ?? Number(req.params.page), y_inicio: stored.y_inicio, x_center: stored.x_center, focus_scale: stored.focus_scale ?? 2 }
+      ? { page: stored.page_number ?? Number(req.params.page), y_inicio: stored.y_inicio, x_center: stored.x_center, focus_height: stored.focus_height ?? 18, focus_scale: stored.focus_scale ?? 2 }
       : undefined;
     if (!entry) {
       const map = await loadOrBuildFocusMap(String(req.params.id));
@@ -362,6 +362,7 @@ app.get("/api/exams/:id/pages/:page/focus/:question", async (req, res, next) => 
     res.json({
       y_inicio: entry.y_inicio,
       x_center: entry.x_center,
+      focus_height: entry.focus_height,
       scale: entry.focus_scale,
       x: entry.x_center / 100,
       y: entry.y_inicio / 100
@@ -410,8 +411,8 @@ app.post("/api/exams/:id/reprocess", async (req, res, next) => {
     const existing = db.prepare("SELECT id, number, correct_answer FROM questions WHERE exam_id = ? ORDER BY number, id").all(req.params.id) as { id: number; number: number; correct_answer: string | null }[];
     const byNumber = new Map<number, { id: number; correct_answer: string | null }[]>();
     for (const row of existing) byNumber.set(row.number, [...(byNumber.get(row.number) ?? []), { id: row.id, correct_answer: row.correct_answer }]);
-    const update = db.prepare("UPDATE questions SET statement=?, alternatives=?, page_number=?, context=?, y_inicio=COALESCE(?, y_inicio), x_center=COALESCE(?, x_center), focus_scale=COALESCE(?, focus_scale), correct_answer=? WHERE id=?");
-    const insert = db.prepare("INSERT INTO questions (exam_id, number, statement, alternatives, correct_answer, page_number, context, y_inicio, x_center, focus_scale) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    const update = db.prepare("UPDATE questions SET statement=?, alternatives=?, page_number=?, context=?, y_inicio=COALESCE(?, y_inicio), x_center=COALESCE(?, x_center), focus_height=COALESCE(?, focus_height), focus_scale=COALESCE(?, focus_scale), correct_answer=? WHERE id=?");
+    const insert = db.prepare("INSERT INTO questions (exam_id, number, statement, alternatives, correct_answer, page_number, context, y_inicio, x_center, focus_height, focus_scale) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     const moveAttempts = db.prepare("UPDATE attempts SET question_id = ? WHERE question_id = ?");
     const dropAttempts = db.prepare("DELETE FROM attempts WHERE question_id = ?");
     const dropQuestion = db.prepare("DELETE FROM questions WHERE id = ?");
@@ -427,14 +428,14 @@ app.post("/api/exams/:id/reprocess", async (req, res, next) => {
         const keeper = rows[0];
         const correct = answerMap.get(question.number) ?? keeper?.correct_answer ?? null;
         if (keeper) {
-          update.run(question.statement, JSON.stringify(question.alternatives), question.pageNumber ?? 1, question.context ?? null, focus?.y_inicio ?? null, focus?.x_center ?? null, focus?.focus_scale ?? null, correct, keeper.id);
+          update.run(question.statement, JSON.stringify(question.alternatives), question.pageNumber ?? 1, question.context ?? null, focus?.y_inicio ?? null, focus?.x_center ?? null, focus?.focus_height ?? null, focus?.focus_scale ?? null, correct, keeper.id);
           for (const duplicate of rows.slice(1)) {
             moveAttempts.run(keeper.id, duplicate.id);
             dropQuestion.run(duplicate.id);
             repaired += 1;
           }
         } else {
-          insert.run(req.params.id, question.number, question.statement, JSON.stringify(question.alternatives), correct, question.pageNumber ?? 1, question.context ?? null, focus?.y_inicio ?? null, focus?.x_center ?? null, focus?.focus_scale ?? null);
+          insert.run(req.params.id, question.number, question.statement, JSON.stringify(question.alternatives), correct, question.pageNumber ?? 1, question.context ?? null, focus?.y_inicio ?? null, focus?.x_center ?? null, focus?.focus_height ?? null, focus?.focus_scale ?? null);
           added += 1;
         }
         seen.add(question.number);
@@ -507,10 +508,10 @@ app.post("/api/exams/import", upload.fields([{ name: "exam", maxCount: 1 }, { na
     // percentuais normalizados (y_inicio/x_center) — nunca pixel fixo.
     const focusMap = await buildFocusMap(examFile.buffer, questions.map((question) => ({ number: question.number, pageNumber: question.pageNumber ?? 1 })));
     const result = db.prepare("INSERT INTO exams (title, filename, board) VALUES (?, ?, ?)").run(title, examFile.originalname, board);
-    const insert = db.prepare("INSERT INTO questions (exam_id, number, statement, alternatives, correct_answer, page_number, context, y_inicio, x_center, focus_scale) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    const insert = db.prepare("INSERT INTO questions (exam_id, number, statement, alternatives, correct_answer, page_number, context, y_inicio, x_center, focus_height, focus_scale) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     for (const question of questions) {
       const focus = focusMap.get(question.number) ?? null;
-      insert.run(result.lastInsertRowid, question.number, question.statement, JSON.stringify(question.alternatives), answerMap.get(question.number) ?? null, focus?.page ?? question.pageNumber ?? 1, question.context ?? null, focus?.y_inicio ?? null, focus?.x_center ?? null, focus?.focus_scale ?? null);
+      insert.run(result.lastInsertRowid, question.number, question.statement, JSON.stringify(question.alternatives), answerMap.get(question.number) ?? null, focus?.page ?? question.pageNumber ?? 1, question.context ?? null, focus?.y_inicio ?? null, focus?.x_center ?? null, focus?.focus_height ?? null, focus?.focus_scale ?? null);
     }
     const assetDir = path.join(examAssets, String(result.lastInsertRowid));
     await mkdir(assetDir, { recursive: true });
