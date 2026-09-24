@@ -50,14 +50,16 @@
     pointer-events: none;
 }
 
-/* Indicador de foco da questão — borda lateral + gradiente leve. */
+/* Indicador de foco da questão — traço de marca-texto amarelo vívido, sem traço lateral. */
 .marcador-foco-questao {
     position: absolute;
     left: 0;
     width: 100%;
     height: 40px; /* Ajustado via JS conforme a altura do bloco da questão */
-    border-left: 5px solid #00bcd4;
-    background: linear-gradient(90deg, rgba(0, 188, 212, 0.15) 0%, rgba(0, 0, 0, 0) 100%);
+    border-left: none;
+    border-radius: 2px;
+    background: #FFC83D;
+    mix-blend-mode: multiply;
     pointer-events: none; /* O clique/rolagem passa direto para a imagem */
     opacity: 0;
     transform: scaleY(0.8);

@@ -3864,7 +3864,7 @@ body,
 .exam-card-progress-bar i {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, var(--card-blue), var(--card-cyan));
+  background: linear-gradient(90deg, var(--card-green), var(--card-blue), var(--card-slate-200));
   border-radius: 0;
   transition: width 500ms cubic-bezier(.4,0,.2,1);
 }
@@ -4356,7 +4356,7 @@ select,
 .view-solve .feedback{
   margin:2px 0 12px!important;
   padding:16px 18px!important;
-  border:1px solid #E8E8E8!important;
+  border:none!important;
   border-radius:12px!important;
   display:flex!important;
   align-items:center!important;
@@ -4364,13 +4364,11 @@ select,
   box-shadow:0 2px 12px rgba(0,0,0,.06)!important;
 }
 .view-solve .feedback::before{display:none!important}
-.view-solve .feedback.success{
-  border-color:#008080!important;
+.view-solve .feedback.correct{
   background:linear-gradient(135deg,#D6EFEA 0%,#B8D8D4 100%)!important;
   color:#006666!important;
 }
-.view-solve .feedback.danger{
-  border-color:#8B0000!important;
+.view-solve .feedback.incorrect{
   background:linear-gradient(135deg,#FFF0EE 0%,#FFD5D5 100%)!important;
   color:#8B0000!important;
 }

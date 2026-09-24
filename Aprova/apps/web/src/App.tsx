@@ -669,7 +669,7 @@ function Solve({ exam, onFinish }: { exam: Exam & { questions?: Question[] }; on
                   onClick={() => { if (!feedback) setAnswers({ ...answers, [question.id]: alt.label }); }}
                 >
                   <div className="option-letter">{alt.label}</div>
-                  <div className="option-text">{alt.text}</div>
+                  <div className="option-text texto-questao">{alt.text}</div>
                 </div>
               );
             })}
