@@ -106,7 +106,25 @@ export function cleanAlternativeText(value: string): string {
   // para as questões de 09 a 10", "TEXTO-BASE") e na citação fonte
   // ("Disponível em:") — sem isto, a última alternativa de uma questão
   // engolia o texto-base inteiro da questão seguinte.
-  return normalizeQuestionFlow(cleaned.split(/(?:\b(?:TEXTO|QUADRO|TABELA|GR[ÁA]FICO|FIGURA)\s+[IVX\d]+\b|\btextos?[\s-]*base\b|\bdispon[íi]vel\s+em\s*[:：]|\bCONHECIMENTOS\s+[A-ZÁÉÍÓÚÇ ]+|\bCreate\s+table\b|\bselect\s+[A-Z_]+\s*\()/i)[0]);
+  // Regra aprimorada: também corta em "Acesso em:" e em qualquer URL
+  // (inclui links quebrados/encodados que o pdftotext espalha em várias linhas).
+  let cut = cleaned.split(/(?:\b(?:TEXTO|QUADRO|TABELA|GR[ÁA]FICO|FIGURA)\s+[IVX\d]+\b|\btextos?[\s-]*base\b|\bdispon[íi]vel\s+em\s*[:：]|\bAcesso\s+em\s*[:：]|\bCONHECIMENTOS\s+[A-ZÁÉÍÓÚÇ ]+|\bCreate\s+table\b|\bselect\s+[A-Z_]+\s*\()/i)[0];
+  // Segunda barreira: qualquer URL (http, www, .com, ou encodado %2F/%3A) não pertence à alternativa.
+  // Usado como split para capturar links que aparecem mesmo sem o rótulo "Disponível em:".
+  cut = cut.split(/(?:https?:\/\/|www\.|https?%3A|%2Fwww|\.com(?:\.br)?\b)/i)[0];
+  // Remove resíduo de fragmento encodado que sobrevive ao split parcial
+  // (ex: "7183654896889861%7Ctwgr%5E02bb..." — linha quebrada do link).
+  cut = cut.replace(/\s+[A-Za-z0-9%_\-]{20,}[^\s]*\s*$/g, (m) => /%[0-9A-F]{2}|twsrc|twcamp|tweetembed|ref_url/i.test(m) ? "" : m);
+  // Filtra linhas que são só fragmentos de URL
+  cut = cut.split("\n").filter((line) => {
+    const t = line.trim();
+    if (!t) return false;
+    if (/%[0-9A-F]{2}/i.test(t) && t.replace(/[^A-Za-z0-9%]/g, "").length > 20) return false;
+    if (/^(?:https?:\/\/|www\.)/i.test(t)) return false;
+    if (/twsrc|twcamp|tweetembed|ref_url/i.test(t)) return false;
+    return true;
+  }).join("\n");
+  return normalizeQuestionFlow(cut);
 }
 
 function normalizeQuestionFlow(value: string): string {

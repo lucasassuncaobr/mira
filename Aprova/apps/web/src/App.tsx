@@ -387,31 +387,47 @@ function PageReference({ examId, page, questionNumber, examTitle, focus }: PageR
   //  - altura dinâmica do elemento de página (clientHeight) lida em TEMPO DE EXECUÇÃO;
   //  - rolagem seca/instantânea: container.scrollTop = ... (sem smooth/animação);
   //  - metadado y_inicio é % vertical (nunca pixel fixo) — pixel = % × clientHeight.
+  // Cria o marcador uma única vez por página no carregamento inicial
+  useEffect(() => {
+    document.querySelectorAll(".pagina-pdf").forEach((pag) => {
+      if (!pag.querySelector(".marcador-foco-questao")) {
+        const marcadorEl = document.createElement("div");
+        marcadorEl.className = "marcador-foco-questao";
+        pag.appendChild(marcadorEl);
+      }
+    });
+  }, []);
+
+  function destacarBlocoVisual(elementoPagina: HTMLElement, pixelDestinoNoY: number) {
+    // Remove marcadores ativos anteriores
+    document.querySelectorAll(".marcador-foco-questao").forEach((m) => m.classList.remove("ativo"));
+    // Seleciona o marcador específico da página onde a questão está
+    const marcadorEl = elementoPagina.querySelector(".marcador-foco-questao") as HTMLElement | null;
+    if (marcadorEl) {
+      marcadorEl.style.top = `${pixelDestinoNoY}px`;
+      marcadorEl.classList.add("ativo");
+      window.clearTimeout(markerTimer.current);
+      markerTimer.current = window.setTimeout(() => marcadorEl.classList.remove("ativo"), 3000);
+    }
+  }
+
   const aplicarFoco = useCallback(() => {
     const container = viewport.current;
     const elementopagina = pagina.current;
-    if (!container || !elementopagina || !elementopagina.clientHeight) return;
+    if (!container || !elementopagina) return;
+    if (!elementopagina.clientHeight) {
+      requestAnimationFrame(aplicarFoco);
+      return;
+    }
     if (focus?.y_inicio == null) return;
-    const alvo = (focus.y_inicio / 100) * elementopagina.clientHeight;
-    container.scrollTop = Math.max(0, alvo - container.clientHeight * 0.22);
+    const pixelDestinoNoY = (focus.y_inicio / 100) * elementopagina.clientHeight;
+    container.scrollTop = Math.max(0, pixelDestinoNoY - container.clientHeight * 0.22);
     if (Number.isFinite(focus.x_center)) {
       const alvoX = elementopagina.offsetLeft + (focus.x_center / 100) * elementopagina.clientWidth;
       container.scrollLeft = Math.max(0, alvoX - container.clientWidth * 0.5);
     }
-    const marc = marcador.current;
-    if (marc) {
-      const alturaPrecisa = Number.isFinite(focus.focus_height) && focus.focus_height ? focus.focus_height / 100 : null;
-      const alturaBloco = focus.focus_scale ? Math.min(0.34, Math.max(0.16, 0.86 / focus.focus_scale)) : 0.24;
-      const alturaBase = Math.max(72, Math.round((alturaPrecisa ?? alturaBloco) * elementopagina.clientHeight));
-      const limiteEstimado = alturaPrecisa ? elementopagina.clientHeight : Math.round(container.clientHeight * 0.78);
-      const alturaMarcador = Math.min(alturaBase, Math.max(72, limiteEstimado), Math.max(72, elementopagina.clientHeight - alvo));
-      marc.style.top = `${Math.max(0, alvo - 6)}px`;
-      marc.style.height = `${alturaMarcador}px`;
-      window.clearTimeout(markerTimer.current);
-      marc.classList.add("ativo");
-      markerTimer.current = window.setTimeout(() => marc.classList.remove("ativo"), 3000);
-    }
-  }, [focus?.y_inicio, focus?.x_center, focus?.focus_height, focus?.focus_scale]);
+    destacarBlocoVisual(elementopagina, Math.max(0, pixelDestinoNoY - 6));
+  }, [focus?.y_inicio, focus?.x_center]);
 
   useEffect(() => { aplicarFoco(); }, [aplicarFoco, src, zoom]);
   useEffect(() => () => window.clearTimeout(markerTimer.current), []);
