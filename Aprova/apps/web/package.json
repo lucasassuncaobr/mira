@@ -8,6 +8,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/cli": "^8.5.0",
+    "@capacitor/core": "^8.5.0",
     "@techstark/opencv-js": "^5.0.0-release.1",
     "@vitejs/plugin-react": "^4.7.0",
     "lucide-react": "^0.539.0",

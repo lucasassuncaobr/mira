@@ -364,8 +364,9 @@ function PageReference({ examId, page, questionNumber, examTitle, focus }: PageR
   const [pdfOpen, setPdfOpen] = useState(false);
   const viewport = useRef<HTMLDivElement | null>(null);
   const pagina = useRef<HTMLDivElement | null>(null);
-  const marcador = useRef<HTMLDivElement | null>(null);
-  const markerTimer = useRef<number | undefined>(undefined);
+  const faixa = useRef<HTMLDivElement | null>(null);
+  const [faixaFixa, setFaixaFixa] = useState(false);
+  const faixaTimer = useRef<number | undefined>(undefined);
   const drag = useRef<{ x: number; y: number; scrollLeft: number; scrollTop: number } | null>(null);
 
   // Imagem JPEG compacta via lazy loading: P2P (PeerJS) primeiro e, se falhar
@@ -383,34 +384,6 @@ function PageReference({ examId, page, questionNumber, examTitle, focus }: PageR
   // Pré-aquece o leitor de PDF (bytes + info + primeiras páginas) ao montar.
   useEffect(() => { warmPdfReader(examId); }, [examId]);
 
-  // MOTOR DE SCROLL RÁPIDO (instrução 3):
-  //  - altura dinâmica do elemento de página (clientHeight) lida em TEMPO DE EXECUÇÃO;
-  //  - rolagem seca/instantânea: container.scrollTop = ... (sem smooth/animação);
-  //  - metadado y_inicio é % vertical (nunca pixel fixo) — pixel = % × clientHeight.
-  // Cria o marcador uma única vez por página no carregamento inicial
-  useEffect(() => {
-    document.querySelectorAll(".pagina-pdf").forEach((pag) => {
-      if (!pag.querySelector(".marcador-foco-questao")) {
-        const marcadorEl = document.createElement("div");
-        marcadorEl.className = "marcador-foco-questao";
-        pag.appendChild(marcadorEl);
-      }
-    });
-  }, []);
-
-  function destacarBlocoVisual(elementoPagina: HTMLElement, pixelDestinoNoY: number) {
-    // Remove marcadores ativos anteriores
-    document.querySelectorAll(".marcador-foco-questao").forEach((m) => m.classList.remove("ativo"));
-    // Seleciona o marcador específico da página onde a questão está
-    const marcadorEl = elementoPagina.querySelector(".marcador-foco-questao") as HTMLElement | null;
-    if (marcadorEl) {
-      marcadorEl.style.top = `${pixelDestinoNoY}px`;
-      marcadorEl.classList.add("ativo");
-      window.clearTimeout(markerTimer.current);
-      markerTimer.current = window.setTimeout(() => marcadorEl.classList.remove("ativo"), 3000);
-    }
-  }
-
   const aplicarFoco = useCallback(() => {
     const container = viewport.current;
     const elementopagina = pagina.current;
@@ -419,18 +392,78 @@ function PageReference({ examId, page, questionNumber, examTitle, focus }: PageR
       requestAnimationFrame(aplicarFoco);
       return;
     }
-    if (focus?.y_inicio == null) return;
-    const pixelDestinoNoY = (focus.y_inicio / 100) * elementopagina.clientHeight;
-    container.scrollTop = Math.max(0, pixelDestinoNoY - container.clientHeight * 0.22);
-    if (Number.isFinite(focus.x_center)) {
-      const alvoX = elementopagina.offsetLeft + (focus.x_center / 100) * elementopagina.clientWidth;
-      container.scrollLeft = Math.max(0, alvoX - container.clientWidth * 0.5);
+
+    // Esconde a faixa se não houver dados de foco
+    const faixaEl = faixa.current;
+    if (focus?.y_inicio == null) {
+      if (faixaEl) faixaEl.classList.remove("ativa");
+      return;
     }
-    destacarBlocoVisual(elementopagina, Math.max(0, pixelDestinoNoY - 6));
-  }, [focus?.y_inicio, focus?.x_center]);
+
+    const alvo = (focus.y_inicio / 100) * elementopagina.clientHeight;
+    const alvoTop = Math.max(0, alvo - container.clientHeight * 0.22);
+    const alvoLeft = Number.isFinite(focus.x_center)
+      ? Math.max(0, elementopagina.offsetLeft + (focus.x_center / 100) * elementopagina.clientWidth - container.clientWidth * 0.5)
+      : container.scrollLeft;
+    // Mover moderno e ultra-leve: smooth nativo quando possível, instant em lag/reduced-motion
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isLaggy = (navigator as unknown as { deviceMemory?: number }).deviceMemory !== undefined && (navigator as unknown as { deviceMemory?: number }).deviceMemory! < 4;
+    if (prefersReduced || isLaggy) {
+      container.scrollTop = alvoTop;
+      container.scrollLeft = alvoLeft;
+    } else if ('scrollBehavior' in document.documentElement.style) {
+      try { container.scrollTo({ top: alvoTop, left: alvoLeft, behavior: 'smooth' }); } catch { container.scrollTop = alvoTop; container.scrollLeft = alvoLeft; }
+    } else {
+      const startTop = container.scrollTop;
+      const startLeft = container.scrollLeft;
+      const dTop = alvoTop - startTop;
+      const dLeft = alvoLeft - startLeft;
+      const dur = 260;
+      let t0: number | null = null;
+      const step = (t: number) => {
+        if (t0 === null) t0 = t;
+        const p = Math.min(1, (t - t0) / dur);
+        const e = 1 - Math.pow(1 - p, 3);
+        container.scrollTop = startTop + dTop * e;
+        container.scrollLeft = startLeft + dLeft * e;
+        if (p < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+
+    // Faixa aumentada — cobre questão + escolhas com respiro extra (beirando 100%)
+    if (faixaEl) {
+      const alturaPrecisa = Number.isFinite(focus.focus_height) && focus.focus_height ? focus.focus_height / 100 : null;
+      const alturaBloco = focus.focus_scale ? Math.min(0.34, Math.max(0.16, 0.86 / focus.focus_scale)) : 0.24;
+      const alturaBase = Math.max(88, Math.round((alturaPrecisa ?? alturaBloco) * elementopagina.clientHeight));
+      const limiteEstimado = alturaPrecisa ? elementopagina.clientHeight : Math.round(container.clientHeight * 0.86);
+      const base = Math.min(alturaBase, Math.max(88, limiteEstimado), Math.max(88, elementopagina.clientHeight - alvo));
+      // Leve respiro sem cobrir questão de cima (Image 1 Q09) — reduzido
+      const alturaFaixa = Math.min(elementopagina.clientHeight - Math.max(0, alvo - 4), base + 12);
+      faixaEl.style.top = `${Math.max(0, alvo - 4)}px`;
+      faixaEl.style.height = `${alturaFaixa}px`;
+      const rot = ((questionNumber * 13) % 7 - 3) * 0.09;
+      faixaEl.style.setProperty('--faixa-rotate', `${rot.toFixed(2)}deg`);
+      window.clearTimeout(faixaTimer.current);
+      faixaEl.classList.remove("ativa");
+      void faixaEl.offsetWidth;
+      faixaEl.classList.add("ativa");
+      // Temporizador reduzido: some em 1800ms, fixa via botão não some
+      if (!faixaFixa) {
+        faixaTimer.current = window.setTimeout(() => faixaEl.classList.remove("ativa"), 1800);
+      }
+    }
+  }, [focus?.y_inicio, focus?.x_center, focus?.focus_height, focus?.focus_scale, faixaFixa, questionNumber]);
 
   useEffect(() => { aplicarFoco(); }, [aplicarFoco, src, zoom]);
-  useEffect(() => () => window.clearTimeout(markerTimer.current), []);
+  useEffect(() => () => window.clearTimeout(faixaTimer.current), []);
+  useEffect(() => {
+    if (faixaFixa) {
+      window.clearTimeout(faixaTimer.current);
+      const el = faixa.current;
+      if (el) { void el.offsetWidth; el.classList.add("ativa"); }
+    }
+  }, [faixaFixa]);
 
   function changeZoom(delta: number) {
     setZoom((current) => Math.min(4, Math.max(1, Math.round((current + delta) * 100) / 100)));
@@ -486,7 +519,7 @@ function PageReference({ examId, page, questionNumber, examTitle, focus }: PageR
             alt={`Página ${page} do PDF original`}
             onLoad={() => requestAnimationFrame(aplicarFoco)}
           />
-          <div className="marcador-foco-questao" ref={marcador} aria-hidden="true" />
+          <div className="faixa-questao" ref={faixa} aria-hidden="true" />
         </div>
       </div>
       <div className="image-toolbar">
@@ -494,7 +527,8 @@ function PageReference({ examId, page, questionNumber, examTitle, focus }: PageR
         <div>
           {/* Exceção mantida: o leitor wasm só é aquecido sob intenção explícita. */}
           <button className="fit-button" onClick={() => setPdfOpen(true)} onMouseEnter={() => warmPdfReader(examId)} onFocus={() => warmPdfReader(examId)}><Maximize2/> Página inteira</button>
-          <button className="fit-button" onClick={aplicarFoco}><FileText/> Focar questão</button>
+          <button className="fit-button" onClick={() => { const el = faixa.current; if (!el) return; const isActive = el.classList.contains("ativa"); window.clearTimeout(faixaTimer.current); if (isActive) { el.classList.remove("ativa"); setFaixaFixa(false); } else { setFaixaFixa(true); aplicarFoco(); // garante que fique fixa, limpa timer que aplicarFoco pode ter criado
+            setTimeout(() => window.clearTimeout(faixaTimer.current), 60); } }}><FileText/> Foco</button>
           <button aria-label="Diminuir zoom" onClick={() => changeZoom(-.25)}><ZoomOut/></button>
           <button aria-label="Aumentar zoom" onClick={() => changeZoom(.25)}><ZoomIn/></button>
           <button aria-label="Redefinir imagem" onClick={() => setZoom(1)}><RotateCcw/></button>

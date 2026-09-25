@@ -165,21 +165,95 @@ function isSectionHeading(line: BboxLine): boolean {
   return centered && uppercase > 0.86;
 }
 
+function isAlternativeStart(line: BboxLine): boolean {
+  const t = line.text.trim();
+  // Padrões reais do Mira: "A as mudanças...", "A) texto", "A. texto", "(A) texto", "A - texto"
+  // Evita falsos positivos de "A" solto no meio do enunciado.
+  if (/^\([A-E]\)\s+/.test(t)) return true;
+  if (/^[A-E][\)\.\-—]\s+/.test(t)) return true;
+  // "A " + texto com pelo menos 3 palavras e sem ser cabeçalho (ex: "A as mudanças...")
+  if (/^[A-E]\s+[a-zà-ú]/i.test(t) && t.split(/\s+/).length >= 3 && t.length > 6) {
+    // Garante que não é "A" no meio de frase: alternativa sempre começa no início da linha com xMin próximo da margem esquerda da coluna
+    return true;
+  }
+  return false;
+}
+
 function estimateQuestionBottom(best: Candidate, next: Candidate | undefined, lines: BboxLine[]): number {
-  const limit = next ? next.yMin - best.pageH * 0.012 : best.yMin + best.pageH * 0.42;
+  // Para estruturas variadas: considera até a próxima questão (mesma página ou próxima) e inclui alternativas mesmo em colunas diferentes
+  const samePageNext = next && next.page === best.page ? next : undefined;
+  const limit = samePageNext ? samePageNext.yMin - best.pageH * 0.012 : best.yMin + best.pageH * 0.48;
   const relevant = lines
-    .filter((line) => line.page === best.page && line.yMax >= best.yMin - 2 && line.yMin < limit)
-    .sort((a, b) => a.yMin - b.yMin);
+    .filter((line) => {
+      if (line.page < best.page || line.page > (next?.page ?? best.page)) return false;
+      if (line.page === best.page && line.yMax < best.yMin - 2) return false;
+      if (line.page === best.page && line.yMin >= limit) return false;
+      // Se a questão vai para a próxima página (sem next na mesma página), inclui até o fim da página atual
+      if (line.page > best.page && samePageNext) return false;
+      return true;
+    })
+    .sort((a, b) => a.page - b.page || a.yMin - b.yMin);
   let started = false;
   let lastY = best.yMin;
+  let lastPage = best.page;
   for (const line of relevant) {
     const startsQuestion = new RegExp(`^\\s*${best.number}(?:[.)]\\s*|\\s+)`).test(line.text);
     if (!started && !startsQuestion) continue;
-    started = true;
-    if (!startsQuestion && isSectionHeading(line)) break;
+    if (!started) {
+      started = true;
+      lastY = line.yMax;
+      lastPage = line.page;
+      continue;
+    }
+    // Se encontrou próxima questão (qualquer número diferente), para
+    const nextQ = /^\s*\d{1,3}(?:[.)]\s*|\s+)/.test(line.text) && !new RegExp(`^\\s*${best.number}(?:[.)]\\s*|\\s+)`).test(line.text);
+    if (nextQ && line.page === best.page) {
+      // Verifica se é realmente início de outra questão (rank alto ou início de linha)
+      const maybeNext = parseInt(line.text.trim().split(/[.)\s]/)[0], 10);
+      if (!Number.isNaN(maybeNext) && maybeNext !== best.number && line.yMin > best.yMin + 10) break;
+    }
+    if (isSectionHeading(line)) break;
+    // Evita capturar "Texto base para as questões de XX a YY" como parte da questão
+    if (/^\s*Texto\s+base\s+para\s+as\s+quest/i.test(line.text) && line.yMin > lastY + 5) break;
+    lastY = Math.max(lastY, line.yMax);
+    lastPage = line.page;
+  }
+  // Cobertura beirando 100% — garante que pegue até a última alternativa mesmo com quebras, tabelas e imagens
+  if (lastPage === best.page && !samePageNext) {
+    return Math.min(best.pageH, Math.max(best.yMin + best.pageH * 0.14, lastY + best.pageH * 0.028));
+  }
+  return Math.min(best.pageH, Math.max(best.yMin + best.pageH * 0.12, lastY + best.pageH * 0.022));
+}
+
+function estimateStatementBottom(best: Candidate, lines: BboxLine[]): number {
+  // Só o enunciado: do início da questão até a primeira alternativa (A-E), sem incluir alternativas/contexto seguinte.
+  const limit = best.yMin + best.pageH * 0.42;
+  const relevant = lines
+    .filter((line) => line.page === best.page && line.yMin >= best.yMin - 2 && line.yMin < limit)
+    .sort((a, b) => a.yMin - b.yMin);
+  let started = false;
+  let lastY = best.yMin;
+  let firstAltY: number | null = null;
+  for (const line of relevant) {
+    const startsQuestion = new RegExp(`^\\s*${best.number}(?:[.)]\\s*|\\s+)`).test(line.text);
+    if (!started && !startsQuestion) continue;
+    if (!started) {
+      started = true;
+      lastY = line.yMax;
+      continue;
+    }
+    // Se encontrou início de alternativa, para antes dela
+    if (isAlternativeStart(line)) {
+      firstAltY = line.yMin;
+      break;
+    }
+    if (isSectionHeading(line)) break;
+    // Evita capturar "Texto base para as questões de 06 a 08." como parte do enunciado da 05
+    if (/^\s*Texto\s+base\s+para\s+as\s+quest/i.test(line.text)) break;
     lastY = Math.max(lastY, line.yMax);
   }
-  return Math.min(best.pageH, Math.max(best.yMin + best.pageH * 0.08, lastY + best.pageH * 0.012));
+  const bottom = firstAltY !== null ? firstAltY - best.pageH * 0.008 : lastY + best.pageH * 0.012;
+  return Math.min(best.pageH, Math.max(best.yMin + best.pageH * 0.06, bottom));
 }
 
 /** Escolhe, para cada questão, o candidato mais plausível (página dica + rank). */
@@ -199,12 +273,14 @@ function selectEntries(candidates: Candidate[], lines: BboxLine[], hints: FocusH
       .filter((candidate) => candidate.page === best.page && candidate.yMin > best.yMin + 4 && Math.abs(candidate.xMin - best.xMin) < best.pageW * 0.12)
       .sort((a, b) => a.yMin - b.yMin)[0];
     const top = Math.max(0, best.yMin - best.pageH * 0.01);
-    const bottom = estimateQuestionBottom(best, next, lines);
+    const fullBottom = estimateQuestionBottom(best, next, lines);
+    // Faixa como na Image 1: cobre a questão inteira (enunciado + alternativas) com degrade no final
+    const bottom = fullBottom;
 
     const columnLeft = best.xMin < best.pageW / 2 ? Math.max(0, best.xMin - best.pageW * 0.03) : Math.max(best.pageW / 2, best.xMin - best.pageW * 0.03);
     const columnRight = best.xMin < best.pageW / 2 ? best.pageW / 2 : best.pageW;
     const width = Math.max(0.28, (columnRight - columnLeft) / best.pageW);
-    const height = Math.max(0.16, (bottom - top) / best.pageH);
+    const height = Math.max(0.12, (bottom - top) / best.pageH);
 
     entries.set(hint.number, {
       page: best.page,

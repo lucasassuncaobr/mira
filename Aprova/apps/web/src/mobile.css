@@ -1,0 +1,249 @@
+/* ============================================================
+   MIRA — Mobile-first responsive overrides
+   Breakpoints: 900px (tablet), 600px (phone)
+   ============================================================ */
+
+/* ---------- Base reset ---------- */
+@media (max-width: 900px) {
+  body { min-width: 0 !important; }
+  main { padding: 0 18px 40px !important; }
+  header { height: 80px !important; }
+  header h1 { font-size: 20px !important; }
+}
+
+@media (max-width: 600px) {
+  main { padding: 0 12px 32px !important; }
+  header { height: 64px !important; }
+  header h1 { font-size: 17px !important; }
+}
+
+/* ---------- Topbar ---------- */
+@media (max-width: 900px) {
+  .app-shell .topbar { height: auto !important; }
+  .app-shell .topbar-inner {
+    padding: 8px 14px !important;
+    gap: 10px !important;
+    flex-wrap: wrap;
+  }
+  .app-shell .brand { min-width: 90px !important; }
+  .app-shell .topbar nav {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    gap: 2px;
+    margin-top: 2px;
+  }
+  .app-shell .nav { padding: 7px 10px !important; font-size: 12px; }
+  .app-shell .top-import { margin-left: auto; }
+  .app-shell .profile { display: none; }
+}
+
+@media (max-width: 600px) {
+  .app-shell .topbar-inner { padding: 6px 10px !important; gap: 8px !important; }
+  .app-shell .brand { min-width: 80px !important; }
+  .app-shell .brand-name { font-size: 18px !important; }
+  .app-shell .nav { padding: 6px 8px !important; }
+  .app-shell .nav span { font-size: 11px; }
+  .app-shell .top-import { font-size: 0; padding: 8px; }
+  .app-shell .top-import svg { margin: 0; }
+}
+
+/* ---------- Stats grid ---------- */
+@media (max-width: 900px) {
+  .stats { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+}
+@media (max-width: 600px) {
+  .stats { grid-template-columns: 1fr !important; gap: 8px !important; }
+  .stat { min-height: 64px !important; padding: 12px !important; }
+}
+
+/* ---------- Dashboard study grid ---------- */
+@media (max-width: 900px) {
+  .dashboard-study-grid { grid-template-columns: 1fr !important; }
+  .dashboard-side { grid-template-columns: 1fr !important; gap: 10px !important; }
+}
+
+/* ---------- Study create / CTA card ---------- */
+@media (max-width: 700px) {
+  .study-create,
+  .dashboard-study-create {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 14px !important;
+  }
+  .notebook-actions { width: 100% !important; }
+  .notebook-actions button { flex: 1 !important; }
+}
+
+/* ---------- Exam card v2 (Dashboard view) ---------- */
+@media (max-width: 600px) {
+  .exam-card-v2 {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .exam-card-visual { display: none; }
+  .exam-card-stats { flex-wrap: wrap; gap: 8px; }
+  .exam-card-footer { border-top: 1px solid #E8E8E8; padding-top: 10px; }
+}
+
+/* ---------- Exam grid (Library / Exams view) ---------- */
+@media (max-width: 900px) {
+  .portal-exams { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media (max-width: 600px) {
+  .portal-exams { grid-template-columns: 1fr !important; }
+}
+
+/* ---------- Library portal grid ---------- */
+@media (max-width: 900px) {
+  .library-portal-grid { grid-template-columns: 1fr !important; }
+  .library-aside { grid-template-columns: 1fr 1fr !important; }
+}
+@media (max-width: 600px) {
+  .library-aside { grid-template-columns: 1fr !important; }
+  .view-exams main { padding: 12px !important; }
+}
+
+/* ---------- Library tools ---------- */
+@media (max-width: 600px) {
+  .library-tools { flex-direction: column; gap: 8px; }
+  .library-tools select { min-width: 0; }
+}
+
+/* ---------- Performance page ---------- */
+@media (max-width: 900px) {
+  .notebook-analytics { grid-template-columns: 1fr !important; }
+  .notebook-totals { border-right: 0 !important; border-bottom: 1px solid #E8E8E8; }
+  .performance-grid { grid-template-columns: 1fr !important; }
+  .donut-area { grid-template-columns: 1fr !important; gap: 28px; }
+}
+@media (max-width: 600px) {
+  .performance-controls {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    padding: 10px 14px !important;
+  }
+  .performance-donut { width: 160px !important; height: 160px !important; }
+  .weekly-chart { height: 180px !important; gap: 6px !important; }
+}
+
+/* ---------- Solve workspace ---------- */
+@media (max-width: 1050px) {
+  .view-solve .solve-workspace {
+    flex-direction: column !important;
+    min-height: auto;
+  }
+  .view-solve .pdf-column {
+    position: static !important;
+    height: auto !important;
+    max-height: none !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid #E8E8E8;
+    padding: 14px !important;
+  }
+  .view-solve .pdf-column .image-viewport {
+    height: 50vh !important;
+    min-height: 320px;
+  }
+  .view-solve .question-panel {
+    width: 100% !important;
+    border-left: 0 !important;
+    height: auto !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .view-solve .pdf-column { padding: 8px !important; }
+  .view-solve .pdf-column .image-viewport {
+    height: 40vh !important;
+    min-height: 260px;
+  }
+  .view-solve .question-panel { min-height: auto; }
+  .option { padding: 12px !important; gap: 10px !important; }
+  .option-text { font-size: 12px !important; }
+  .bottom-nav { padding: 14px 16px !important; flex-wrap: wrap; gap: 10px; }
+  .btn-respond { padding: 12px 24px !important; font-size: 13px; }
+  .question-header { padding: 14px 16px !important; }
+  .answer-section { padding: 12px 16px !important; }
+}
+
+/* ---------- Review layout ---------- */
+@media (max-width: 900px) {
+  .review-layout { grid-template-columns: 1fr !important; }
+  .question-list { position: static !important; }
+}
+@media (max-width: 600px) {
+  .number-grid { grid-template-columns: repeat(5, 1fr) !important; gap: 5px; }
+  .alternative-edit { grid-template-columns: 36px 1fr !important; gap: 8px; }
+}
+
+/* ---------- Import panel ---------- */
+@media (max-width: 900px) {
+  .import-panel { padding: 28px 20px !important; }
+  .upload-grid { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 600px) {
+  .import-panel { padding: 20px 14px !important; }
+  .steps { margin-bottom: 20px; }
+  .center-title h2 { font-size: 20px !important; }
+}
+
+/* ---------- Heatmap / Constância ---------- */
+@media (max-width: 900px) {
+  .view-exams .dashboard-side {
+    grid-template-rows: auto !important;
+  }
+  .view-exams .dashboard-side .modern-heatmap {
+    height: auto !important;
+    min-height: 180px !important;
+  }
+  .view-exams .dashboard-side .glance-performance {
+    height: auto !important;
+    min-height: auto !important;
+  }
+}
+
+/* ---------- Edit modal ---------- */
+@media (max-width: 600px) {
+  .exam-edit-modal {
+    width: calc(100vw - 24px) !important;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+/* ---------- Summary / Finish screen ---------- */
+@media (max-width: 900px) {
+  .view-solve .summary-hero.modern-result {
+    grid-template-columns: 1fr !important;
+    gap: 20px;
+  }
+  .view-solve .main-orbit { justify-self: center; }
+  .view-solve .summary-compact-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  .view-solve .summary-lower-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .view-solve .solve-summary { padding: 14px !important; }
+  .view-solve .summary-feature-grid,
+  .view-solve .summary-compact-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .view-solve .summary-warning {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .view-solve .next-steps > div {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ---------- Utility: hide on mobile ---------- */
+@media (max-width: 600px) {
+  .desktop-only { display: none !important; }
+}
