@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { BarChart3, BookOpen, Check, ChevronLeft, ChevronRight, Clock3, ClipboardCheck, FileText, Maximize2, Menu, Move, Pencil, RotateCcw, Sparkles, Trash2, UploadCloud, X, ZoomIn, ZoomOut } from "lucide-react";
 import { PdfModal } from "./PdfModal";
 import { warmPdfReader } from "./pdf-cache";
@@ -525,7 +525,7 @@ function PageReference({ examId, page, questionNumber, examTitle, focus }: PageR
         <span>Zoom {Math.round(zoom * 100)}%</span>
         <div>
           {/* Exceção mantida: o leitor wasm só é aquecido sob intenção explícita. */}
-          <button className="fit-button" onClick={() => setPdfOpen(true)} onMouseEnter={() => warmPdfReader(examId)} onFocus={() => warmPdfReader(examId)}><Maximize2/> Página inteira</button>
+          <button className="fit-button" onClick={() => setPdfOpen(true)} onMouseEnter={() => warmPdfReader(examId, true)} onFocus={() => warmPdfReader(examId, true)}><Maximize2/> Página inteira</button>
           <button className="fit-button" onClick={() => { const el = faixa.current; if (!el) return; const isActive = el.classList.contains("ativa"); window.clearTimeout(faixaTimer.current); if (isActive) { el.classList.remove("ativa"); setFaixaFixa(false); } else { setFaixaFixa(true); aplicarFoco(); // garante que fique fixa, limpa timer que aplicarFoco pode ter criado
             setTimeout(() => window.clearTimeout(faixaTimer.current), 60); } }}><FileText/> Foco</button>
           <button aria-label="Diminuir zoom" onClick={() => changeZoom(-.25)}><ZoomOut/></button>
@@ -540,6 +540,20 @@ function PageReference({ examId, page, questionNumber, examTitle, focus }: PageR
 
 function FormattedText({ children }: { children: string }) { return <span className="exam-text">{children}</span>; }
 
+/* Relógio isolado: o tick de 1s atualiza SÓ este span, sem re-renderizar
+   a árvore do Solve (índice, opções, PDF). Custo ~zero em PCs fracos. */
+const ExamClock = memo(function ExamClock() {
+  const [elapsed, setElapsed] = useState(0);
+  useEffect(() => {
+    const timer = window.setInterval(() => setElapsed((s) => s + 1), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+  const h = Math.floor(elapsed / 3600);
+  const m = Math.floor((elapsed % 3600) / 60);
+  const s = elapsed % 60;
+  return <>{`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`}</>;
+});
+
 function Solve({ exam, onFinish }: { exam: Exam & { questions?: Question[] }; onFinish: () => void }) {
   const questions = (exam.questions ?? []).filter(
     (q, i, arr) => arr.findIndex((x) => x.number === q.number) === i
@@ -547,7 +561,6 @@ function Solve({ exam, onFinish }: { exam: Exam & { questions?: Question[] }; on
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [results, setResults] = useState<Record<number, "correct" | "wrong">>({});
-  const [elapsed, setElapsed] = useState(0);
   const [feedback, setFeedback] = useState<{ correct: boolean; correctAnswer: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const question = questions[currentIdx];
@@ -574,18 +587,6 @@ function Solve({ exam, onFinish }: { exam: Exam & { questions?: Question[] }; on
     const active = grid.querySelector(".index-btn.active");
     if (active) active.scrollIntoView({ block: "nearest", inline: "nearest" });
   }, [currentIdx]);
-
-  useEffect(() => {
-    const timer = window.setInterval(() => setElapsed((s) => s + 1), 1000);
-    return () => window.clearInterval(timer);
-  }, []);
-
-  function formatClock(sec: number) {
-    const h = Math.floor(sec / 3600);
-    const m = Math.floor((sec % 3600) / 60);
-    const s = sec % 60;
-    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-  }
 
   async function submitAnswer() {
     if (!question || !answers[question.id] || submitting) return;
@@ -654,7 +655,7 @@ function Solve({ exam, onFinish }: { exam: Exam & { questions?: Question[] }; on
               <div className="clock-inner">
                 <svg className="clock-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 <span className="clock-label">TEMPO DE PROVA</span>
-                <span className="clock-time">{formatClock(elapsed)}</span>
+                <span className="clock-time"><ExamClock /></span>
               </div>
             </div>
           </div>
@@ -704,10 +705,10 @@ function Solve({ exam, onFinish }: { exam: Exam & { questions?: Question[] }; on
                   {feedback ? (
                     <div className="option-letter">({alt.label})</div>
                   ) : (
-                    <div className="radio pull-left m-b-0 m-l-10 radio-complete">
+                    <label className="radio-wrapper-8" htmlFor={`radio-${question.id}-${alt.label}`}>
                       <input id={`radio-${question.id}-${alt.label}`} type="radio" name="respostaAluno" checked={isSelected} readOnly />
-                      <label htmlFor={`radio-${question.id}-${alt.label}`}></label>
-                    </div>
+                      <span />
+                    </label>
                   )}
                   <div className="option-text texto-questao">{alt.text}</div>
                 </div>

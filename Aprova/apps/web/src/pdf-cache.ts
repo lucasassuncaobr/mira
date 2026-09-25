@@ -55,9 +55,12 @@ export function preloadExamPages(examId: number, count = 3): void {
   }
 }
 
-/** Pré-aquece tudo ao montar a tela: bytes + info + primeiras páginas. */
-export function warmPdfReader(examId: number): void {
-  prefetchExamPdf(examId).catch(() => undefined);
+/** Pré-aquece o leitor ao montar a tela: info + primeiras páginas (leve).
+    Os bytes completos do PDF só baixam sob intenção explícita (hover no
+    botão "Página inteira" ou abertura do modal) — economia de MBs e RAM
+    em PCs fracos. */
+export function warmPdfReader(examId: number, full = false): void {
+  if (full) prefetchExamPdf(examId).catch(() => undefined);
   fetchExamInfo(examId)
     .then(({ pages }) => preloadExamPages(examId, Math.min(3, pages)))
     .catch(() => undefined);

@@ -3752,7 +3752,7 @@ body,
   background: linear-gradient(135deg, var(--card-blue) 0%, var(--navy-deep) 100%);
   color: #fff;
   box-shadow: 0 8px 24px rgba(0,128,128,.3);
-  transition: all 500ms cubic-bezier(.175,.885,.32,1.275);
+  transition: box-shadow 500ms cubic-bezier(.175,.885,.32,1.275);
 }
 .exam-card-v2:hover .exam-card-icon { box-shadow: 0 12px 32px rgba(0,128,128,.4); }
 
@@ -3780,7 +3780,7 @@ body,
   color: var(--card-slate-900);
   margin: 0;
   line-height: 1.3;
-  transition: all 400ms ease;
+  transition: color 400ms ease, letter-spacing 400ms ease;
 }
 .exam-card-v2:hover .exam-card-header-text h3 { color: var(--card-blue); letter-spacing: -0.3px; }
 .exam-card-board {
@@ -3803,7 +3803,7 @@ body,
   border: none;
   border-radius: 0;
   cursor: pointer;
-  transition: all 400ms cubic-bezier(.175,.885,.32,1.275);
+  transition: color 400ms cubic-bezier(.175,.885,.32,1.275), background-color 400ms cubic-bezier(.175,.885,.32,1.275), transform 400ms cubic-bezier(.175,.885,.32,1.275);
   transform: rotate(0deg);
 }
 .exam-card-chevron:hover {
@@ -3878,7 +3878,7 @@ body,
   padding: 10px 0;
   background: var(--card-slate-50);
   border-radius: 0;
-  transition: all 400ms ease;
+  transition: background-color 400ms ease;
 }
 .exam-card-v2:hover .exam-card-stats { background: #D6EFEA; }
 
@@ -3948,7 +3948,7 @@ body,
   background: transparent;
   color: var(--card-slate-400);
   cursor: pointer;
-  transition: all 200ms ease;
+  transition: color 200ms ease, background-color 200ms ease;
   margin: 0;
   padding: 0;
 }
@@ -4012,7 +4012,7 @@ body,
   display: grid;
   place-items: center;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: background-color 150ms ease, color 150ms ease;
 }
 .exam-edit-close:hover {
   background: var(--card-slate-100);
@@ -4075,7 +4075,7 @@ body,
   color: var(--card-slate-600);
   font: 600 12px var(--font-primary);
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: border-color 150ms ease, color 150ms ease;
 }
 .exam-edit-upload:hover {
   border-color: var(--card-blue);
@@ -4100,7 +4100,7 @@ body,
   color: var(--card-slate-600);
   font: 600 12px var(--font-primary);
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: background-color 150ms ease;
 }
 .exam-edit-cancel:hover {
   background: var(--card-slate-50);

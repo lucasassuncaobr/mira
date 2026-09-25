@@ -129,3 +129,18 @@
   .faixa-questao.ativa { transform: none; }
 }
 .faixa-questao.ativa::after { display: none; }
+
+/* =====================================================================
+   ULTRAWIDE (21:9 ou mais largo): aproxima o painel de questões do PDF.
+   Em telas muito largas a workspace estica e o painel (440px, à direita)
+   fica a centenas de px da página. Limitar a largura e centralizar o
+   conjunto traz a div de questões para perto do PDF sem mover a página.
+   CSS puro = custo zero em PCs fracos (sem JS, sem resize listener,
+   sem animação; o navegador resolve uma única vez no layout).
+   ===================================================================== */
+@media (min-aspect-ratio: 21/9) {
+    .view-solve .solve-workspace {
+        max-width: 1920px;
+        margin-inline: auto;
+    }
+}

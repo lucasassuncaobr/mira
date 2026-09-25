@@ -49,8 +49,8 @@ button,input,textarea,select{font-family:inherit}button:focus-visible,input:focu
 .index-count{font-family:var(--font-functional);font-size:11px;color:#6C7480;font-variant-numeric:tabular-nums}
 .index-grid{display:grid;grid-template-columns:repeat(15,1fr);gap:3px;padding:0 0 4px;max-height:80px;overflow-y:auto;scrollbar-width:none;justify-items:center}
 .index-grid::-webkit-scrollbar{display:none}
-.index-btn{width:100%;aspect-ratio:1;border:none;background-color:#F5F5F5;font-size:11px;font-weight:600;color:#6C7480;cursor:pointer;transition:all .15s ease;padding:0;min-height:22px;min-width:22px;border-radius:2px;font-variant-numeric:tabular-nums;justify-self:center;font-family:var(--font-functional)}
-.index-btn:hover{background-color:#E8F4F4;color:#2E333D;transform:scale(1.05)}
+.index-btn{width:100%;aspect-ratio:1;border:none;background-color:#F5F5F5;font-size:11px;font-weight:600;color:#6C7480;cursor:pointer;transition:background-color .15s ease,color .15s ease,transform .15s ease;padding:0;min-height:22px;min-width:22px;border-radius:2px;font-variant-numeric:tabular-nums;justify-self:center;font-family:var(--font-functional)}
+.index-btn:hover{background-color:#E8F4F4;color:#2E333D;transform:none}
 .index-btn.null{background-color:#F1F2F4;color:#6C7480}
 .index-btn.wrong-answer{background-color:#EBDDDC;color:#8E4A4A;font-weight:600}
 .index-btn.correct-answer{background-color:#D9E7E1;color:#2F6B5E;font-weight:600}
@@ -67,10 +67,84 @@ button,input,textarea,select{font-family:inherit}button:focus-visible,input:focu
 .question-statement .exam-text{font:400 15px/1.6 var(--font-prova);color:#2E333D}
 .answer-title{font-family:var(--font-functional);font-size:11px;font-weight:600;color:#6C7480;letter-spacing:.5px;margin:0 0 14px;text-transform:uppercase}
 .option{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid #E8E8E8;margin-bottom:10px;cursor:pointer;transition:background-color .32s cubic-bezier(.4,0,.2,1),border-color .32s cubic-bezier(.4,0,.2,1),box-shadow .32s cubic-bezier(.4,0,.2,1);background-color:#fff}
-.option .radio{display:inline-flex;align-items:center;justify-content:center;align-self:center;flex-shrink:0}
 .option:hover{border-color:#7FB3B1;background-color:#fff;transform:none;box-shadow:0 1px 2px rgba(0,0,0,.04)}
 .option:active{border-color:#008080;background-color:#EEF4F3;transform:none;box-shadow:none}
 .option:focus-visible{outline:2px solid #008080;outline-offset:2px}
+/* Estilo base da opção (garanta que tenha cantos quadrados) */
+.answer-section .option {
+  border-radius: 0 !important; /* Força cantos perfeitamente quadrados */
+  background-color: transparent;
+  transition: background-color 0.1s ease-in-out; /* Transição curtíssima e leve para o processador */
+  cursor: pointer;
+
+  /* Caso queira uma borda sutil separando as opções */
+  border: 1px solid #e2e8f0;
+  margin-bottom: 8px;
+  padding: 12px;
+}
+
+/* Hover moderno, minimalista e ultra leve */
+.answer-section .option:hover {
+  /* Um tom de cinza bem claro e moderno */
+  background-color: #f1f5f9;
+
+  /* Muda levemente a borda para dar destaque sem pesar no hardware */
+  border-color: #cbd5e1;
+  transform: none; /* neutraliza o translateX herdado */
+}
+
+/* Radio wrapper-8 (22px), adaptado ao tema teal */
+label.radio-wrapper-8 {
+  display: block;
+  cursor: pointer;
+}
+label.radio-wrapper-8 input {
+  display: none;
+  appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+}
+label.radio-wrapper-8 input + span {
+  line-height: 15px;
+  height: 15px;
+  padding-left: 15px;
+  display: block;
+  position: relative;
+}
+label.radio-wrapper-8 input + span:not(:empty) {
+  padding-left: 30px;
+}
+label.radio-wrapper-8 input + span:before, label.radio-wrapper-8 input + span:after {
+  content: "";
+  width: 15px;
+  height: 15px;
+  display: block;
+  border-radius: 50%;
+  left: 0;
+  top: 0;
+  position: absolute;
+}
+label.radio-wrapper-8 input + span:before {
+  background: #D1D7E3;
+}
+label.radio-wrapper-8 input + span:after {
+  background: #fff;
+  transform: scale(0.78);
+  transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.4);
+}
+label.radio-wrapper-8 input:checked + span:before {
+  background: #0d9488;
+}
+label.radio-wrapper-8 input:checked + span:after {
+  transform: scale(0.4);
+  transition: transform 0.3s ease;
+}
+label.radio-wrapper-8:hover input + span:after {
+  transform: scale(0.74);
+}
+label.radio-wrapper-8:hover input:checked + span:after {
+  transform: scale(0.4);
+}
 .option.selected{border-color:#E8E8E8;border-width:1px;background-color:#fff;transform:none;box-shadow:none}
 .option.selected:hover{border-color:#008080;background-color:#fff;transform:none;box-shadow:0 1px 3px rgba(0,128,128,.10)}
 .option.disabled{pointer-events:none;background-color:#F1F2F4;border-color:#E8E8E8;transform:none;box-shadow:none}
@@ -111,13 +185,13 @@ button,input,textarea,select{font-family:inherit}button:focus-visible,input:focu
 
 .bottom-nav{margin-top:auto;padding:20px 24px;border-top:1px solid #E8E8E8;display:flex;justify-content:space-between;align-items:center;background-color:#fff;flex-shrink:0}
 .nav-arrows{display:flex;gap:8px}
-.nav-arrow{width:44px;height:44px;border:1px solid #E4E7E7;background-color:#F5F5F5;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s ease;color:#6C7480}
+.nav-arrow{width:44px;height:44px;border:1px solid #E4E7E7;background-color:#F5F5F5;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s ease,color .2s ease,background-color .2s ease;color:#6C7480}
 .nav-arrow:hover:not(:disabled){border-color:#008080;color:#008080;background-color:#D6EFEA}
 .nav-arrow:disabled{opacity:.4;cursor:not-allowed}
 .nav-arrow svg{width:20px;height:20px}
 .bottom-nav.feedback-active .nav-arrows{transform:scale(.7);opacity:.5;pointer-events:none}
 .bottom-nav.feedback-active .btn-respond{background-color:#008080;flex:1;max-width:300px}
-.btn-respond{padding:14px 40px;background-color:#6C7480;color:white;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s ease;letter-spacing:.3px}
+.btn-respond{padding:14px 40px;background-color:#6C7480;color:white;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:background-color .2s ease;letter-spacing:.3px}
 .btn-respond:hover:not(:disabled){background-color:#008080}
 .btn-respond:disabled{opacity:.5;cursor:not-allowed}
 .btn-finish{background-color:#008080!important;font-size:13px;padding:14px 24px!important}
@@ -125,34 +199,3 @@ button,input,textarea,select{font-family:inherit}button:focus-visible,input:focu
 
 .view-solve .question-panel{border-left:0}
 @media(max-width:1050px){.question-panel{width:100%;border-left:0;border-top:1px solid #E8E8E8}}
-
-/* Aplicar no CSS global ou no módulo do componente <Solve> */
-.option .radio input[type="radio"] {
-  width: 13px;
-  height: 13px;
-  margin: 0 8px 0 0;
-  cursor: pointer;
-  accent-color: #008080;
-  transition: transform 0.2s cubic-bezier(0.455, 0.03, 0.215, 1.33);
-  align-self: center;
-  display: block;
-}
-/* Pequeno "bounce" ao selecionar, para reforçar o feedback visual */
-.option.selected .radio input[type="radio"]:checked {
-  transform: scale(1.05);
-}
-/* Fallback para navegadores sem accent-color: reconstrói o input manualmente */
-@supports not (accent-color: auto) {
-  .option .radio input[type="radio"] {
-    appearance: none;
-    -webkit-appearance: none;
-    border: 1px solid #d0d0d0;
-    border-radius: 50%;
-    background-color: #fff;
-    transition: border 0.3s cubic-bezier(0.455, 0.03, 0.215, 1.33);
-  }
-  .option .radio input[type="radio"]:checked {
-    border-width: 4px;
-    border-color: #008080;
-  }
-}
