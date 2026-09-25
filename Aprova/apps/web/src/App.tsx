@@ -502,7 +502,6 @@ function PageReference({ examId, page, questionNumber, examTitle, focus }: PageR
         onPointerUp={pointerUp}
         onPointerCancel={pointerUp}
       >
-        <div className="drag-hint"><Move/> Foco automático • arraste para mover</div>
         <div
           className="pagina-pdf"
           ref={pagina}
@@ -702,22 +701,19 @@ function Solve({ exam, onFinish }: { exam: Exam & { questions?: Question[] }; on
                   className={optionClass}
                   onClick={() => { if (!feedback) setAnswers({ ...answers, [question.id]: alt.label }); }}
                 >
-                  <div className="option-letter">{alt.label}</div>
+                  {feedback ? (
+                    <div className="option-letter">({alt.label})</div>
+                  ) : (
+                    <div className="radio pull-left m-b-0 m-l-10 radio-complete">
+                      <input id={`radio-${question.id}-${alt.label}`} type="radio" name="respostaAluno" checked={isSelected} readOnly />
+                      <label htmlFor={`radio-${question.id}-${alt.label}`}></label>
+                    </div>
+                  )}
                   <div className="option-text texto-questao">{alt.text}</div>
                 </div>
               );
             })}
           </div>
-
-          {feedback && (
-            <div className={`feedback ${feedback.correct ? "correct" : "incorrect"}`} id="feedback">
-              <div className="feedback-icon">{feedback.correct ? <Check size={18}/> : <X size={18}/>}</div>
-              <div className="feedback-content">
-                <div className="feedback-label">{feedback.correct ? "ACERTOU!" : "ERROU"}</div>
-                <div className="feedback-text">{feedback.correct ? "Resposta correta!" : `Gabarito: ${feedback.correctAnswer}`}</div>
-              </div>
-            </div>
-          )}
 
           <div className={`bottom-nav${feedback ? " feedback-active" : ""}`}>
             <div className="nav-arrows">

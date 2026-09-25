@@ -26,6 +26,12 @@
     margin-inline: auto;
 }
 
+/* Branco — remove fundo colorido do PDF */
+.view-solve .pdf-column,
+.view-solve .image-viewport {
+    background: #F5F5F5;
+}
+
 /* Viewport vira scroll container nativo (sem transform de pan/zoom). */
 .image-viewport {
     overflow: auto;
@@ -33,6 +39,7 @@
     touch-action: auto;
     overscroll-behavior: contain;
     scrollbar-width: thin;
+    background: #F5F5F5;
 }
 
 .image-viewport.dragging {
@@ -50,6 +57,7 @@
     transition: none;
     will-change: auto;
     pointer-events: none;
+    background: #F5F5F5;
 }
 
 /* CLASSE EXCLUSIVA PARA O ENUNCIADO — inline, quebra orgânica linha a linha */
