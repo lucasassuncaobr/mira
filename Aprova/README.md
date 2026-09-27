@@ -20,7 +20,7 @@ npm install
 npm run dev
 ```
 
-A interface abre em `http://localhost:5173` e a API em `http://localhost:3333`.
+A interface abre em `http://localhost:3344` e a API em `http://localhost:3333`.
 
 ## Limitações atuais
 
@@ -28,5 +28,5 @@ PDFs compostos somente por imagens ainda precisam da etapa de OCR. Layouts em m�
 
 ## Estrutura
 
-- `apps/web`: React e Vite.
+- `apps/goapi`: Go + Fiber servindo API e frontend AlpineJS sem build.
 - `apps/api`: Express, extração de PDF e SQLite.
