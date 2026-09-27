@@ -13,7 +13,7 @@ export type ParsedAnswer = { number: number; answer: string };
 // falsa — que cortava o bloco da questão seguinte e a fazia sumir do índice.
 // O separador (ex.: "36.") também exige início de enunciado em maiúscula,
 // aspa ou parêntese, para não capturar paginação ("15.") ou números decimais.
-const questionStart = /(?:^|\n)[ \t]*(?:[Qq][Uu][Ee][Ss][Tt][AaãÃ][Oo][ \t]*)?(\d{1,3})(?:[ \t]*[.\-–):][ \t]*|[ \t]+)(?=[A-ZÁÉÍÓÚÂÊÔÃÕÇN"'“‘(§])/gm;
+const questionStart = /(?:^|\s)[ \t]*(?:[Qq][Uu][Ee][Ss][Tt][AaãÃ][Oo][ \t]*(\d{1,3})[ \t]*(?:[.\-–):][ \t]*)?(?:\n[ \t]*)?(?=[A-Za-zÀ-ÿ"'“‘(§])|(?:^|\n)[ \t]*(\d{1,3})(?:[ \t]*[.\-–):][ \t]*|[ \t]+)(?=[A-ZÁÉÍÓÚÂÊÔÃÕÇN"'“‘(§]))/gm;
 const alternativeStart = /(?:^|\n)\s*\(?([A-E])\s*[).\-–]\s+/gim;
 
 export function parseQuestions(text: string): ParsedQuestion[] {
@@ -36,7 +36,8 @@ export function parseQuestions(text: string): ParsedQuestion[] {
   // regressivas (e fossem descartadas).
   let lastNumber = 0;
   const ordered = matches.filter((match, index) => {
-    const number = Number(match[1]);
+    // Grupo 1 = com rótulo "QUESTÃO N" (pode quebrar linha); grupo 2 = sem rótulo (mesma linha).
+    const number = Number(match[1] ?? match[2]);
     const start = (match.index ?? 0) + match[0].length;
     const end = matches[index + 1]?.index ?? normalized.length;
     const block = normalized.slice(start, end).trim();
@@ -51,7 +52,7 @@ export function parseQuestions(text: string): ParsedQuestion[] {
   });
 
   return ordered.flatMap((match, index) => {
-    const number = Number(match[1]);
+    const number = Number(match[1] ?? match[2]);
     const pageMatches = [...normalized.slice(0, match.index).matchAll(/\[\[PAGE:(\d+)\]\]/g)];
     const pageNumber = Number(pageMatches.at(-1)?.[1] ?? 1);
     const start = (match.index ?? 0) + match[0].length;

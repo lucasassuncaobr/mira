@@ -428,6 +428,12 @@ app.post("/api/exams/:id/reprocess", async (req, res, next) => {
       } catch (error) { console.warn("Não foi possível reler o gabarito desta prova", error); }
     }
     const existing = db.prepare("SELECT id, number, correct_answer FROM questions WHERE exam_id = ? ORDER BY number, id").all(req.params.id) as { id: number; number: number; correct_answer: string | null }[];
+    // Trava anti-limpeza: se o novo parse colapsar (ex.: formato não reconhecido),
+    // aborta em vez de apagar as questões boas já gravadas.
+    if (existing.length >= 3 && questions.length < Math.ceil(existing.length * 0.5)) {
+      console.warn(`[reprocess] prova ${req.params.id}: parse colapsou (${questions.length} de ${existing.length}), abortando sem alterar`);
+      return res.status(422).json({ error: `Parse retornou só ${questions.length} questões (eram ${existing.length}). Nada foi alterado.` });
+    }
     const byNumber = new Map<number, { id: number; correct_answer: string | null }[]>();
     for (const row of existing) byNumber.set(row.number, [...(byNumber.get(row.number) ?? []), { id: row.id, correct_answer: row.correct_answer }]);
     const update = db.prepare("UPDATE questions SET statement=?, alternatives=?, page_number=?, context=?, y_inicio=COALESCE(?, y_inicio), x_center=COALESCE(?, x_center), focus_height=COALESCE(?, focus_height), focus_scale=COALESCE(?, focus_scale), correct_answer=? WHERE id=?");
