@@ -567,7 +567,7 @@ function Solve({ exam, onFinish }: { exam: Exam & { questions?: Question[] }; on
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [results, setResults] = useState<Record<number, "correct" | "wrong">>({});
-  const [feedback, setFeedback] = useState<{ correct: boolean; correctAnswer: string } | null>(null);
+  const [feedback, setFeedback] = useState<{ correct: boolean; correctAnswer: string; unknown?: boolean } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const question = questions[currentIdx];
   const total = questions.length;
@@ -605,9 +605,15 @@ function Solve({ exam, onFinish }: { exam: Exam & { questions?: Question[] }; on
         body: JSON.stringify({ answer: answers[question.id], elapsedSeconds: 0 }),
       });
       const data = await res.json();
-      const isCorrect = data.isCorrect === true;
-      setFeedback({ correct: isCorrect, correctAnswer: data.correctAnswer ?? "?" });
-      setResults(prev => ({ ...prev, [question.id]: isCorrect ? "correct" : "wrong" }));
+      // Sem gabarito (isCorrect null): estado neutro — não marca o índice
+      // como erro nem destaca alternativa.
+      if (data.isCorrect === null || data.isCorrect === undefined) {
+        setFeedback({ correct: false, correctAnswer: "?", unknown: true });
+      } else {
+        const isCorrect = data.isCorrect === true;
+        setFeedback({ correct: isCorrect, correctAnswer: data.correctAnswer ?? "?" });
+        setResults(prev => ({ ...prev, [question.id]: isCorrect ? "correct" : "wrong" }));
+      }
     } catch {
       setFeedback({ correct: false, correctAnswer: "?" });
       setResults(prev => ({ ...prev, [question.id]: "wrong" }));
@@ -695,8 +701,9 @@ function Solve({ exam, onFinish }: { exam: Exam & { questions?: Question[] }; on
             <h3 className="answer-title">ESCOLHA UMA RESPOSTA</h3>
             {question.alternatives.map((alt) => {
               const isSelected = selected === alt.label;
-              const isCorrectAnswer = feedback && feedback.correctAnswer === alt.label;
-              const isWrongSelected = feedback && isSelected && !feedback.correct;
+              const isUnknown = feedback?.unknown === true;
+              const isCorrectAnswer = feedback && !isUnknown && feedback.correctAnswer === alt.label;
+              const isWrongSelected = feedback && !isUnknown && isSelected && !feedback.correct;
               let optionClass = "option";
               if (isSelected && !feedback) optionClass += " selected";
               if (feedback && isCorrectAnswer) optionClass += " correct-highlight";

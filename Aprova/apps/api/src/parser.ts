@@ -217,6 +217,16 @@ export function parseAnswerKey(text: string, examHint = ""): ParsedAnswer[] {
       if (/^[A-E\s]+$/i.test(lines[cursor]) && !/[A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-z]/.test(lines[cursor])) continue;
       if (/^Q\s*\d+/i.test(lines[cursor])) continue;
       if ( /^(?:www\.|pcimarkpci|concurso|prefeitura|gabarito|n[ií]vel\b)/i.test(lines[cursor])) continue;
+      // Marca d'água base64 (ex.: "MjgwNDowZDU5...:U3VuLCAyNy...") nunca é título.
+      if (/^[A-Za-z0-9+/=_-]{20,}/.test(lines[cursor])) continue;
+      // Fragmento de frase (ex.: "de 2026)") nunca é título — títulos reais
+      // de cargo começam em maiúscula.
+      if (/^[a-zà-ú]/.test(lines[cursor])) continue;
+      // Linhas da tabela de divisão ("1 a 20", "Questões (TIPO B)") nunca são título —
+      // sem isto, os blocos de continuação (13-20, 33-40...) agrupam sob elas e
+      // vencem o ranking com respostas de vários cargos misturados.
+      if (/^\d+\s+a\s+\d+$/.test(lines[cursor])) continue;
+      if (/^quest[õo]es\s*\(/i.test(lines[cursor])) continue;
       if (/^\d/.test(lines[cursor])) continue;
       heading = lines[cursor];
       break;
@@ -227,7 +237,7 @@ export function parseAnswerKey(text: string, examHint = ""): ParsedAnswer[] {
   }
 
   if (tabularSections.length) {
-    const cargo = examHint.match(/(?:^|\n)\s*CARGO\s*:\s*([^\n]+)/i)?.[1] ?? examHint.split("\n").slice(0, 25).join(" ");
+    const cargo = examHint.match(/(?:^|\n)\s*CARGO\s*:\s*([^\n]+)/i)?.[1] ?? examHint.split("\n").slice(0, 80).join(" ");
     const hint = normalizedMatchText(cargo);
     const hintTokens = new Set(hint.split(" ").map((t) => t.replace(/s$/, "")).filter((t) => t.length >= 4));
     // Agrupa TODAS as matérias de cada cargo e ranqueia os grupos pelo cargo
@@ -243,11 +253,26 @@ export function parseAnswerKey(text: string, examHint = ""): ParsedAnswer[] {
       for (const item of section.answers) if (!seen.has(item.number)) { group.push(item); seen.add(item.number); }
       cargoGroups.set(key, group);
     }
-    const ranked = [...cargoGroups.entries()].map(([name, answers]) => {
+    // TIPO da prova (ex.: "PROVA TIPO A"). Sem ele e com vários TIPOs para o
+    // mesmo cargo, qualquer escolha seria chute — gabarito errado é pior que ausente.
+    const examTipo = (examHint.match(/\bTIPO\s*([A-D])\b/i)?.[1] ?? "").toUpperCase() || null;
+    const tipoOf = (name: string) => name.match(/\(TIPO\s*([A-D])\)\s*$/i)?.[1].toUpperCase() ?? null;
+    const baseOf = (name: string) => name.replace(/\s*\(TIPO\s*[A-D]\)\s*$/i, "").trim();
+    let groupEntries = [...cargoGroups.entries()];
+    if (examTipo) {
+      const matching = groupEntries.filter(([name]) => { const t = tipoOf(name); return t === null || t === examTipo; });
+      if (matching.length) groupEntries = matching;
+    }
+    const ranked = groupEntries.map(([name, answers]) => {
       const tokens = normalizedMatchText(name).split(" ").map((t) => t.replace(/s$/, "")).filter((t) => t.length >= 4);
       const matches = tokens.filter((t) => hintTokens.has(t)).length;
-      return { answers, score: matches * 10 - Math.abs(tokens.length - hintTokens.size) };
+      return { name, answers, score: matches * 10 - Math.abs(tokens.length - hintTokens.size) };
     }).sort((a, b) => b.score - a.score || b.answers.length - a.answers.length);
+    if (ranked[0] && !examTipo) {
+      const topBase = baseOf(ranked[0].name);
+      const tipos = new Set(groupEntries.filter(([name]) => baseOf(name) === topBase).map(([name]) => tipoOf(name)).filter((t) => t !== null));
+      if (tipos.size > 1) return [];
+    }
     if (ranked[0]) return ranked[0].answers;
   }
 
