@@ -7,3 +7,4 @@ uploads/
 *.log
 *.tsbuildinfo
 .DS_Store
+/apps/goapi/mira-goapi

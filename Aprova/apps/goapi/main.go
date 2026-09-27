@@ -84,11 +84,24 @@ var migrations = []string{
 	"ALTER TABLE exams ADD COLUMN logo TEXT",
 }
 
+func exeSibling(dir, sibling string) string {
+	if exe, err := os.Executable(); err == nil {
+		cand := filepath.Join(filepath.Dir(exe), "..", sibling)
+		if st, err := os.Stat(cand); err == nil && st.IsDir() {
+			return cand
+		}
+	}
+	return filepath.Join(dir, "..", sibling)
+}
+
+var dataDirUsed string
+
 func openDB() *sql.DB {
 	dataDir := os.Getenv("MIRA_DATA_DIR")
 	if dataDir == "" {
-		dataDir = filepath.Join("..", "api", "data")
+		dataDir = exeSibling("..", filepath.Join("api", "data"))
 	}
+	dataDirUsed = dataDir
 	if err := os.MkdirAll(dataDir, 0o755); err != nil {
 		log.Fatal(err)
 	}
@@ -96,6 +109,8 @@ func openDB() *sql.DB {
 	if err != nil {
 		log.Fatal(err)
 	}
+	// Conexão única: BEGIN/COMMIT manuais exigem o mesmo handle (igual ao Node).
+	db.SetMaxOpenConns(1)
 	if _, err := db.Exec(schema); err != nil {
 		log.Fatal(err)
 	}
@@ -108,8 +123,27 @@ func openDB() *sql.DB {
 func main() {
 	db := openDB()
 	defer db.Close()
+	gdb = db
+	assetsDir = filepath.Join(dataDirUsed, "exam-assets")
+	pythonDir = os.Getenv("MIRA_PY_DIR")
+	if pythonDir == "" {
+		// Layout padrão: <root>/apps/api/{data,python} — deriva do dataDir.
+		for _, cand := range []string{
+			filepath.Join(filepath.Dir(dataDirUsed), "python"),
+			exeSibling("..", filepath.Join("api", "python")),
+			filepath.Join("..", "api", "python"),
+		} {
+			if st, err := os.Stat(filepath.Join(cand, "pdf_extract.py")); err == nil && !st.IsDir() {
+				pythonDir = cand
+				break
+			}
+		}
+	}
+	if st, err := os.Stat(filepath.Join(pythonDir, "pdf_extract.py")); err != nil || st.IsDir() {
+		log.Fatalf("pdf_extract.py não encontrado (MIRA_PY_DIR=%q)", pythonDir)
+	}
 
-	app := fiber.New(fiber.Config{DisableStartupMessage: true})
+	app := fiber.New(fiber.Config{DisableStartupMessage: true, BodyLimit: 22 * 1024 * 1024})
 	app.Use(cors.New())
 	app.Use(func(c *fiber.Ctx) error {
 		c.Set("Cache-Control", "no-store, no-cache, must-revalidate")
@@ -120,6 +154,8 @@ func main() {
 	app.Get("/api/health", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{"status": "ok", "name": "Mira API"})
 	})
+
+	registerRoutes(app)
 
 	app.Get("/api/exams", func(c *fiber.Ctx) error {
 		rows, err := db.Query(`

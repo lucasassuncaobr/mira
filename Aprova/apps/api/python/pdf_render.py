@@ -23,6 +23,8 @@ def parse_args(argv):
     out_dir = argv[2]
     dpi = 150
     quality = 75
+    fmt = "jpeg"
+    prefix = "page"
     i = 3
     while i < len(argv):
         if argv[i] == "--dpi" and i + 1 < len(argv):
@@ -31,9 +33,15 @@ def parse_args(argv):
         elif argv[i] == "--quality" and i + 1 < len(argv):
             quality = int(argv[i + 1])
             i += 2
+        elif argv[i] == "--format" and i + 1 < len(argv):
+            fmt = argv[i + 1].lower()
+            i += 2
+        elif argv[i] == "--prefix" and i + 1 < len(argv):
+            prefix = argv[i + 1]
+            i += 2
         else:
             i += 1
-    return pdf_path, out_dir, dpi, quality
+    return pdf_path, out_dir, dpi, quality, fmt, prefix
 
 
 def main() -> int:
@@ -45,7 +53,7 @@ def main() -> int:
     except ImportError:
         print("pypdfium2 not installed", file=sys.stderr)
         return 1
-    pdf_path, out_dir, dpi, quality = parse_args(sys.argv)
+    pdf_path, out_dir, dpi, quality, fmt, prefix = parse_args(sys.argv)
     try:
         os.makedirs(out_dir, exist_ok=True)
         pdf = pdfium.PdfDocument(pdf_path)
@@ -53,13 +61,16 @@ def main() -> int:
         for i in range(len(pdf)):
             bitmap = pdf[i].render(scale=scale)
             pil = bitmap.to_pil()
-            if pil.mode in ("RGBA", "LA", "PA"):
-                background = Image.new("RGB", pil.size, (255, 255, 255))
-                background.paste(pil, mask=pil.split()[-1])
-                pil = background
-            elif pil.mode != "RGB":
-                pil = pil.convert("RGB")
-            pil.save(os.path.join(out_dir, "page-%02d.jpg" % (i + 1)), format="JPEG", quality=quality)
+            if fmt == "png":
+                pil.save(os.path.join(out_dir, "%s-%02d.png" % (prefix, i + 1)), format="PNG")
+            else:
+                if pil.mode in ("RGBA", "LA", "PA"):
+                    background = Image.new("RGB", pil.size, (255, 255, 255))
+                    background.paste(pil, mask=pil.split()[-1])
+                    pil = background
+                elif pil.mode != "RGB":
+                    pil = pil.convert("RGB")
+                pil.save(os.path.join(out_dir, "%s-%02d.jpg" % (prefix, i + 1)), format="JPEG", quality=quality)
         print("{\"pages\": %d}" % len(pdf))
         return 0
     except Exception as e:
