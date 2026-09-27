@@ -2,7 +2,7 @@ import cors from "cors";
 import express from "express";
 import multer from "multer";
 import pdf from "pdf-parse/lib/pdf-parse.js";
-import { execFile, spawnSync } from "node:child_process";
+import { execFile } from "node:child_process";
 import { existsSync } from "node:fs";
 import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
@@ -34,6 +34,34 @@ async function extractWithPortugueseOcr(buffer: Buffer): Promise<string> {
     try { for (const [index, image] of images.entries()) { const result = await worker.recognize(path.join(tempDir, image)); pages.push(`[[PAGE:${index + 1}]]\n${result.data.text}`); } } finally { await worker.terminate(); }
     return pages.join("\n").replace(/\n\s*[.·]\s*([A-D])\)/g, "\n$1)").replace(/\n\s*A([A-D])\)/g, "\n$1)");
   } finally { await rm(tempDir, { recursive: true, force: true }); }
+}
+
+type PdfExtractPage = { number: number; width: number; height: number; text: string; words: { x0: number; top: number; x1: number; bottom: number; text: string }[] };
+
+/**
+ * Extração vetorial via pdfplumber (MIT) — substitui `pdftotext -raw/-bbox`.
+ * Assíncrono (execFile): nunca trava o event loop como o spawnSync fazia.
+ * Retorna texto com "\f" entre páginas + palavras com boxes (origem no topo).
+ * Falha → null (o chamador cai no fallback seguinte: pdf-parse, depois OCR).
+ */
+async function extractPdfPages(pdfPath: string): Promise<PdfExtractPage[] | null> {
+  try {
+    const { stdout } = await execFileAsync("python3", [path.join(process.cwd(), "python", "pdf_extract.py"), pdfPath], {
+      timeout: 60_000,
+      maxBuffer: 30 * 1024 * 1024,
+    });
+    const parsed = JSON.parse(stdout) as { pages?: PdfExtractPage[] };
+    if (!Array.isArray(parsed.pages) || !parsed.pages.length) return null;
+    return parsed.pages;
+  } catch (error) {
+    console.warn("[pdf_extract] falhou, usando fallback:", error instanceof Error ? error.message : error);
+    return null;
+  }
+}
+
+/** Texto com "\f" entre páginas (mesmo contrato do `pdftotext -raw`). */
+function extractRawText(pages: PdfExtractPage[]): string {
+  return pages.map((page) => page.text).join("\f");
 }
 
 function editDistance(a: string, b: string): number {
@@ -291,24 +319,14 @@ app.get("/api/exams/:id/pages/:page/text", async (req, res, next) => {
     if (hit) return res.json(hit);
     const source = path.join(examAssets, req.params.id, "source.pdf");
     if (!existsSync(source)) return res.status(404).json({ error: "PDF original não encontrado" });
-    const page = String(Math.max(1, Number(req.params.page)));
-    const { stdout } = await execFileAsync("pdftotext", ["-f", page, "-l", page, "-bbox", source, "-"]);
-    const pageTag = stdout.match(/<page\s+width="([\d.]+)"\s+height="([\d.]+)"/);
-    if (!pageTag) return res.json({ width: 0, height: 0, lines: [] });
-    const width = Number(pageTag[1]);
-    const height = Number(pageTag[2]);
-    const words: { x0: number; y0: number; x1: number; y1: number; text: string }[] = [];
-    const wordRe = /<word\s+xMin="([\d.]+)"\s+yMin="([\d.]+)"\s+xMax="([\d.]+)"\s+yMax="([\d.]+)">([^<]*)<\/word>/g;
-    let match: RegExpExecArray | null;
-    while ((match = wordRe.exec(stdout)) !== null) {
-      words.push({
-        x0: Number(match[1]),
-        y0: Number(match[2]),
-        x1: Number(match[3]),
-        y1: Number(match[4]),
-        text: decodeEntities(match[5]),
-      });
-    }
+    const pageNum = Math.max(1, Number(req.params.page));
+    const pages = await extractPdfPages(source);
+    const found = pages?.find((entry) => entry.number === pageNum);
+    if (!found) return res.json({ width: 0, height: 0, lines: [] });
+    const width = found.width;
+    const height = found.height;
+    const words: { x0: number; y0: number; x1: number; y1: number; text: string }[] =
+      found.words.map((word) => ({ x0: word.x0, y0: word.top, x1: word.x1, y1: word.bottom, text: word.text }));
     // Agrupa palavras em linhas pela proximidade vertical.
     words.sort((a, b) => a.y0 - b.y0 || a.x0 - b.x0);
     const medianH = words.length
@@ -389,9 +407,9 @@ app.post("/api/exams/:id/reprocess", async (req, res, next) => {
     const source = path.join(examAssets, req.params.id, "source.pdf");
     if (!existsSync(source)) return res.status(404).json({ error: "O PDF original desta prova não está disponível" });
     const buffer = await readFile(source);
-    const preciseText = spawnSync("pdftotext", ["-raw", "-", "-"], { input: buffer, encoding: "utf8", maxBuffer: 30 * 1024 * 1024 });
-    if (preciseText.status !== 0 || !preciseText.stdout.trim()) return res.status(422).json({ error: "Não foi possível reler o PDF" });
-    const marked = preciseText.stdout.split("\f").map((pageText, index) => `[[PAGE:${index + 1}]]\n${pageText}`).join("\n");
+    const extractedPages = await extractPdfPages(source);
+    if (!extractedPages || !extractRawText(extractedPages).trim()) return res.status(422).json({ error: "Não foi possível reler o PDF" });
+    const marked = extractRawText(extractedPages).split("\f").map((pageText, index) => `[[PAGE:${index + 1}]]\n${pageText}`).join("\n");
     const nativeQuestions = parseQuestions(marked).filter((question) => question.alternatives.length >= 2);
     const ocrQuestions = parseQuestions(await extractWithPortugueseOcr(buffer)).filter((question) => question.alternatives.length >= 2);
     const questions = adoptOcrQuestions(nativeQuestions, ocrQuestions);
@@ -403,9 +421,10 @@ app.post("/api/exams/:id/reprocess", async (req, res, next) => {
     const answerKeyPath = path.join(examAssets, req.params.id, "answer-key.pdf");
     if (existsSync(answerKeyPath)) {
       try {
-        const keyText = spawnSync("pdftotext", ["-raw", "-", "-"], { input: await readFile(answerKeyPath), encoding: "utf8", maxBuffer: 30 * 1024 * 1024 });
-        if (keyText.status === 0 && keyText.stdout.trim())
-          for (const item of parseAnswerKey(keyText.stdout, marked)) answerMap.set(item.number, item.answer);
+        const keyPages = await extractPdfPages(answerKeyPath);
+        const keyStdout = keyPages ? extractRawText(keyPages) : "";
+        if (keyStdout.trim())
+          for (const item of parseAnswerKey(keyStdout, marked)) answerMap.set(item.number, item.answer);
       } catch (error) { console.warn("Não foi possível reler o gabarito desta prova", error); }
     }
     const existing = db.prepare("SELECT id, number, correct_answer FROM questions WHERE exam_id = ? ORDER BY number, id").all(req.params.id) as { id: number; number: number; correct_answer: string | null }[];
@@ -464,8 +483,15 @@ app.post("/api/exams/import", upload.fields([{ name: "exam", maxCount: 1 }, { na
     const answerFile = files?.answerKey?.[0];
     if (!examFile || !answerFile || examFile.mimetype !== "application/pdf" || answerFile.mimetype !== "application/pdf") return res.status(400).json({ error: "Envie os PDFs da prova e do gabarito" });
     let pageNumber = 0;
-    const preciseText = spawnSync("pdftotext", ["-raw", "-", "-"], { input: examFile.buffer, encoding: "utf8", maxBuffer: 30 * 1024 * 1024 });
-    const precisePages = preciseText.status === 0 && preciseText.stdout.trim() ? preciseText.stdout.split("\f").map((pageText, index) => `[[PAGE:${index + 1}]]\n${pageText}`).join("\n") : "";
+    // pdfplumber via arquivo temporário (async, sem spawnSync): texto com "\f" entre páginas.
+    const examTmp = await mkdtemp(path.join(os.tmpdir(), "aprova-import-"));
+    let precisePages = "";
+    try {
+      await writeFile(path.join(examTmp, "exam.pdf"), examFile.buffer);
+      const examPages = await extractPdfPages(path.join(examTmp, "exam.pdf"));
+      const stdout = examPages ? extractRawText(examPages) : "";
+      precisePages = stdout.trim() ? stdout.split("\f").map((pageText, index) => `[[PAGE:${index + 1}]]\n${pageText}`).join("\n") : "";
+    } finally { await rm(examTmp, { recursive: true, force: true }); }
     const parsePdfWithOptions = pdf as unknown as (buffer: Buffer, options: Record<string, unknown>) => Promise<{ text: string }>;
     const extractedFallback = await parsePdfWithOptions(examFile.buffer, { pagerender: async (page: any) => {
       pageNumber += 1;
@@ -489,8 +515,14 @@ app.post("/api/exams/import", upload.fields([{ name: "exam", maxCount: 1 }, { na
       const ocrQuestions = parseQuestions(ocrText).filter((question) => question.alternatives.length >= 2);
       questions = adoptOcrQuestions(questions, ocrQuestions);
     }
-    const preciseAnswers = spawnSync("pdftotext", ["-raw", "-", "-"], { input: answerFile.buffer, encoding: "utf8", maxBuffer: 30 * 1024 * 1024 });
-    const extractedAnswers = preciseAnswers.status === 0 && preciseAnswers.stdout.trim() ? { text: preciseAnswers.stdout } : await pdf(answerFile.buffer);
+    const keyTmp = await mkdtemp(path.join(os.tmpdir(), "aprova-key-"));
+    let keyStdout = "";
+    try {
+      await writeFile(path.join(keyTmp, "key.pdf"), answerFile.buffer);
+      const keyPages = await extractPdfPages(path.join(keyTmp, "key.pdf"));
+      keyStdout = keyPages ? extractRawText(keyPages) : "";
+    } finally { await rm(keyTmp, { recursive: true, force: true }); }
+    const extractedAnswers = keyStdout.trim() ? { text: keyStdout } : await pdf(answerFile.buffer);
     if (!questions.length) return res.status(422).json({ error: "Nenhuma questão foi identificada. PDFs escaneados precisarão do módulo de OCR." });
     const nativeAnswers = parseAnswerKey(extractedAnswers.text, extracted.text);
     const answerMap = new Map(nativeAnswers.map((item) => [item.number, item.answer]));
@@ -518,9 +550,10 @@ app.post("/api/exams/import", upload.fields([{ name: "exam", maxCount: 1 }, { na
     const sourcePath = path.join(assetDir, "source.pdf");
     await writeFile(sourcePath, examFile.buffer);
     await writeFile(path.join(assetDir, "answer-key.pdf"), answerFile.buffer);
-    // Páginas como JPEG compacto: 150 DPI / qualidade 75 — o frontend só
-    // consome imagem leve via <img loading="lazy">, sem renderizar PDF.
-    try { await execFileAsync("pdftoppm", ["-jpeg", "-r", "150", "-jpegopt", "quality=75", sourcePath, path.join(assetDir, "page")]); } catch (error) { console.warn("Não foi possível renderizar as páginas", error); }
+    // Páginas como JPEG compacto: 150 DPI / qualidade 75 via pypdfium2
+    // (BSD/Apache) — sem poppler (GPL). O frontend só consome imagem leve
+    // via <img loading="lazy">, sem renderizar PDF.
+    try { await execFileAsync("python3", [path.join(process.cwd(), "python", "pdf_render.py"), sourcePath, assetDir], { timeout: 120_000, maxBuffer: 8 * 1024 * 1024 }); } catch (error) { console.warn("Não foi possível renderizar as páginas", error); }
     const missing = missingNumbers(questions.map((question) => question.number));
     if (missing.length) console.warn(`[import] lacunas no parse das questões: ${missing.join(", ")}`);
     res.status(201).json({ id: Number(result.lastInsertRowid), title, board, questionCount: questions.length, missing });

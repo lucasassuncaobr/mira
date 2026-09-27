@@ -11,7 +11,6 @@
     "@capacitor/android": "^8.5.0",
     "@capacitor/cli": "^8.5.0",
     "@capacitor/core": "^8.5.0",
-    "@techstark/opencv-js": "^5.0.0-release.1",
     "@vitejs/plugin-react": "^4.7.0",
     "lucide-react": "^0.539.0",
     "pdf-lib": "^1.17.1",
@@ -20,7 +19,6 @@
     "rawline-webfont": "^5.2.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "tesseract.js": "^7.0.0",
     "typescript": "^5.9.2",
     "vite": "^7.1.2"
   },

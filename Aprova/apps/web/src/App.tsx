@@ -365,6 +365,7 @@ function PageReference({ examId, page, questionNumber, examTitle, focus }: PageR
   const viewport = useRef<HTMLDivElement | null>(null);
   const pagina = useRef<HTMLDivElement | null>(null);
   const faixa = useRef<HTMLDivElement | null>(null);
+  const focoTentativas = useRef(0);
   const [faixaFixa, setFaixaFixa] = useState(false);
   const faixaTimer = useRef<number | undefined>(undefined);
   const drag = useRef<{ x: number; y: number; scrollLeft: number; scrollTop: number } | null>(null);
@@ -389,9 +390,14 @@ function PageReference({ examId, page, questionNumber, examTitle, focus }: PageR
     const elementopagina = pagina.current;
     if (!container || !elementopagina) return;
     if (!elementopagina.clientHeight) {
-      requestAnimationFrame(aplicarFoco);
+      // Teto anti-loop: ~120 frames (≈2s); se o JPEG falhou, desiste em vez de travar o client
+      if (focoTentativas.current < 120) {
+        focoTentativas.current += 1;
+        requestAnimationFrame(aplicarFoco);
+      }
       return;
     }
+    focoTentativas.current = 0;
 
     // Esconde a faixa se não houver dados de foco
     const faixaEl = faixa.current;

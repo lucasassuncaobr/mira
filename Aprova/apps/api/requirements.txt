@@ -1,0 +1,5 @@
+# Dependências Python do pipeline (todas permissivas, sem GPL/AGPL)
+pdfplumber==0.11.10      # MIT — extração de texto + geometria
+pdfminer.six==20260107   # MIT — dependência do pdfplumber
+pypdfium2==5.13.0        # BSD-3-Clause/Apache-2.0 — raster JPEG das páginas
+Pillow>=11.0.0           # MIT-CMU — encode JPEG

@@ -1,0 +1,21 @@
+NOTICE — Dependências de terceiros (licenças permissivas, sem GPL/AGPL)
+============================================================================
+
+Este projeto é licenciado em MIT (ver LICENSE). As dependências abaixo
+permanecem sob suas próprias licenças permissivas, conforme exigido pelos
+termos de atribuição de cada uma:
+
+Apache License 2.0 (requer preservação deste aviso):
+- tesseract.js (+ @tesseract.js-data/por) — OCR de PDFs escaneados (API)
+- pdfjs-dist — leitor de PDF sob intenção explícita (web, PdfModal)
+- TypeScript — apenas ferramenta de build, não embarca no produto
+- pypdfium2 — raster das páginas em JPEG (dual BSD-3-Clause/Apache-2.0)
+- cryptography (dependência transitiva Python) — Apache-2.0 OR BSD-3-Clause
+
+MIT / ISC / BSD / similares (sem obrigação além do aviso de copyright):
+- express, multer, peer, peerjs, zod, tsx, vite, react, react-dom,
+  pdf-parse, pdf-lib, lucide-react (ISC), @capacitor/*,
+  pdfplumber + pdfminer.six (MIT), Pillow (MIT-CMU)
+
+O texto completo da Apache License 2.0 está em:
+https://www.apache.org/licenses/LICENSE-2.0

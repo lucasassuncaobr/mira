@@ -1,5 +1,4 @@
 FROM node:24-alpine AS build
-RUN apk add --no-cache poppler-utils
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY apps/api/package.json apps/api/package.json
@@ -10,11 +9,16 @@ COPY apps/api/tsconfig.json apps/api/tsconfig.json
 RUN npm run build -w apps/api
 
 FROM node:24-alpine
-RUN apk add --no-cache poppler-utils
+# Python + pipeline pdfplumber/pypdfium2 (MIT/BSD/Apache) — sem poppler (GPL).
 WORKDIR /app
+COPY apps/api/requirements.txt /tmp/requirements.txt
+RUN apk add --no-cache python3 py3-pip \
+  && pip install --no-cache --break-system-packages -r /tmp/requirements.txt \
+  && rm /tmp/requirements.txt
 COPY --from=build /app/apps/api/dist apps/api/dist
 COPY --from=build /app/node_modules node_modules
 COPY apps/api/package.json apps/api/
+COPY apps/api/python apps/api/python
 EXPOSE 3333
 VOLUME /app/data
 WORKDIR /app/apps/api

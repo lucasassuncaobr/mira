@@ -10,7 +10,6 @@
 //    que devolve a mesma estrutura normalizada.
 
 import { existsSync } from "node:fs";
-import { spawnSync } from "node:child_process";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -337,11 +336,49 @@ async function focusMapFromPaddle(buffer: Buffer): Promise<Map<number, FocusEntr
  * 1) Vetorial instantâneo via pdftotext -bbox;
  * 2) Se o PDF for escaneado (pouco/no texto), fallback PaddleOCR.
  */
+function escapeXml(value: string): string {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+/** Roda o pdf_extract.py (pdfplumber, MIT) de forma assíncrona; null se falhar. */
+async function extractGeometry(pdfPath: string): Promise<string | null> {
+  try {
+    const { stdout } = await execFileAsync("python3", [path.join(process.cwd(), "python", "pdf_extract.py"), pdfPath], {
+      timeout: 60_000,
+      maxBuffer: 30 * 1024 * 1024,
+    });
+    const parsed = JSON.parse(stdout) as {
+      pages?: { number: number; width: number; height: number; words: { x0: number; top: number; x1: number; bottom: number; text: string }[] }[];
+    };
+    if (!Array.isArray(parsed.pages) || !parsed.pages.length) return null;
+    // Mesmo contrato do `pdftotext -bbox` que parseBboxCandidates/parseBboxLines consomem.
+    let bbox = "";
+    for (const page of parsed.pages) {
+      bbox += `<page width="${page.width}" height="${page.height}">`;
+      for (const word of page.words) {
+        bbox += `<word xMin="${word.x0}" yMin="${word.top}" xMax="${word.x1}" yMax="${word.bottom}">${escapeXml(word.text)}</word>`;
+      }
+    }
+    return bbox;
+  } catch (error) {
+    console.warn("[focus] pdf_extract falhou:", error instanceof Error ? error.message : error);
+    return null;
+  }
+}
+
 export async function buildFocusMap(buffer: Buffer, hints: FocusHint[]): Promise<Map<number, FocusEntry>> {
-  const precise = spawnSync("pdftotext", ["-bbox", "-", "-"], { input: buffer, encoding: "utf8", maxBuffer: 30 * 1024 * 1024 });
+  const tempDir = await mkdtemp(path.join(os.tmpdir(), "aprova-focus-"));
+  let bbox: string | null = null;
+  try {
+    const pdfPath = path.join(tempDir, "source.pdf");
+    await writeFile(pdfPath, buffer);
+    bbox = await extractGeometry(pdfPath);
+  } finally {
+    await rm(tempDir, { recursive: true, force: true });
+  }
   let map = new Map<number, FocusEntry>();
-  if (precise.status === 0 && precise.stdout.trim()) {
-    map = selectEntries(parseBboxCandidates(precise.stdout), parseBboxLines(precise.stdout), hints);
+  if (bbox?.trim()) {
+    map = selectEntries(parseBboxCandidates(bbox), parseBboxLines(bbox), hints);
   }
 
   const expected = hints.length;
