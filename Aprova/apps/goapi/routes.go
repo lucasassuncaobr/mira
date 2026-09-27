@@ -28,6 +28,22 @@ var gdb *sql.DB
 var assetsDir string
 var pythonDir string
 
+// Statements preparados no boot (hot path: responder consome select+insert
+// a cada clique; sem isso cada request reprepara).
+var (
+	stmtCorrect      *sql.Stmt
+	stmtInsertAttempt *sql.Stmt
+)
+
+func prepareHot() error {
+	var err error
+	if stmtCorrect, err = gdb.Prepare("SELECT correct_answer FROM questions WHERE id=?"); err != nil {
+		return err
+	}
+	stmtInsertAttempt, err = gdb.Prepare("INSERT INTO attempts (question_id, answer, is_correct, elapsed_seconds) VALUES (?, ?, ?, ?)")
+	return err
+}
+
 func fail(c *fiber.Ctx) error {
 	return c.Status(500).JSON(fiber.Map{"error": "Não foi possível concluir a operação"})
 }
@@ -1228,7 +1244,7 @@ func registerRoutes(app *fiber.App) {
 			elapsed = *body.ElapsedSeconds
 		}
 		var correct sql.NullString
-		if err := gdb.QueryRow("SELECT correct_answer FROM questions WHERE id=?", c.Params("id")).Scan(&correct); err != nil {
+		if err := stmtCorrect.QueryRow(c.Params("id")).Scan(&correct); err != nil {
 			if err == sql.ErrNoRows {
 				return c.Status(404).JSON(fiber.Map{"error": "Questão não encontrada"})
 			}
@@ -1248,8 +1264,7 @@ func registerRoutes(app *fiber.App) {
 		} else {
 			return c.Status(404).JSON(fiber.Map{"error": "Questão não encontrada"})
 		}
-		if _, err := gdb.Exec("INSERT INTO attempts (question_id, answer, is_correct, elapsed_seconds) VALUES (?, ?, ?, ?)",
-			qid, *body.Answer, isCorrect, elapsed); err != nil {
+		if _, err := stmtInsertAttempt.Exec(qid, *body.Answer, isCorrect, elapsed); err != nil {
 			return fail(c)
 		}
 		var correctOut any

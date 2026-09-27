@@ -111,6 +111,19 @@ func openDB() *sql.DB {
 	}
 	// Conexão única: BEGIN/COMMIT manuais exigem o mesmo handle (igual ao Node).
 	db.SetMaxOpenConns(1)
+	// Leveza: menos fsync (WAL é seguro em NORMAL), espera em lock em vez
+	// de SQLITE_BUSY imediato, cache e mmap generosos para um banco minúsculo.
+	for _, pragma := range []string{
+		"PRAGMA synchronous = NORMAL",
+		"PRAGMA busy_timeout = 5000",
+		"PRAGMA cache_size = -16000",
+		"PRAGMA mmap_size = 67108864",
+		"PRAGMA temp_store = MEMORY",
+	} {
+		if _, err := db.Exec(pragma); err != nil {
+			log.Fatal(err)
+		}
+	}
 	if _, err := db.Exec(schema); err != nil {
 		log.Fatal(err)
 	}
@@ -124,6 +137,9 @@ func main() {
 	db := openDB()
 	defer db.Close()
 	gdb = db
+	if err := prepareHot(); err != nil {
+		log.Fatal(err)
+	}
 	assetsDir = filepath.Join(dataDirUsed, "exam-assets")
 	pythonDir = os.Getenv("MIRA_PY_DIR")
 	if pythonDir == "" {
