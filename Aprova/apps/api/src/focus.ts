@@ -9,7 +9,6 @@
 //  - PDF escaneado (imagem pura) aciona o fallback PaddleOCR (backend Python),
 //    que devolve a mesma estrutura normalizada.
 
-import { existsSync } from "node:fs";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -51,7 +50,6 @@ type BboxLine = {
   pageH: number;
 };
 
-const PADDLE_TIMEOUT_MS = Number(process.env.MIRA_PADDLE_TIMEOUT_MS ?? 180_000);
 const round2 = (value: number) => Math.round(value * 100) / 100;
 
 /** Interpreta a saída do `pdftotext -bbox` e devolve candidatos a início de questão. */
@@ -293,48 +291,10 @@ function selectEntries(candidates: Candidate[], lines: BboxLine[], hints: FocusH
 }
 
 /**
- * Fallback PaddleOCR (backend Python) para PDFs escaneados.
- * Roda `python/ocr_map.py <pdf>` e devolve [{questao, pagina, y_inicio, x_centro}].
- * Qualquer falha (Python/Paddle ausente, timeout) devolve mapa vazio — nunca
- * derruba o import: a prova continua funcionando sem o metadado de foco.
- */
-async function focusMapFromPaddle(buffer: Buffer): Promise<Map<number, FocusEntry>> {
-  const script = path.join(process.cwd(), "python", "ocr_map.py");
-  if (!existsSync(script)) return new Map();
-  const tempDir = await mkdtemp(path.join(os.tmpdir(), "aprova-paddle-"));
-  const pdfPath = path.join(tempDir, "source.pdf");
-  try {
-    await writeFile(pdfPath, buffer);
-    const { stdout } = await execFileAsync("python3", [script, pdfPath], {
-      timeout: PADDLE_TIMEOUT_MS,
-      maxBuffer: 8 * 1024 * 1024,
-      cwd: path.dirname(script),
-    });
-    const rows = JSON.parse(stdout) as Array<{ questao: number; pagina: number; y_inicio: number; x_centro?: number }>;
-    const map = new Map<number, FocusEntry>();
-    for (const row of rows) {
-      if (!Number.isFinite(row.questao) || !Number.isFinite(row.y_inicio)) continue;
-      map.set(row.questao, {
-        page: Math.max(1, Number(row.pagina) || 1),
-        y_inicio: round2(Math.min(100, Math.max(0, row.y_inicio))),
-        x_center: round2(Math.min(100, Math.max(0, row.x_centro ?? 50))),
-        focus_height: 18,
-        focus_scale: 2.2,
-      });
-    }
-    return map;
-  } catch (error) {
-    console.warn("[focus] PaddleOCR indisponível:", error instanceof Error ? error.message : error);
-    return new Map();
-  } finally {
-    await rm(tempDir, { recursive: true, force: true });
-  }
-}
-
-/**
- * Constrói o mapa híbrido de uma prova:
- * 1) Vetorial instantâneo via pdftotext -bbox;
- * 2) Se o PDF for escaneado (pouco/no texto), fallback PaddleOCR.
+ * Constrói o mapa de uma prova via pdf_extract.py (pdfplumber, MIT).
+ * PDF escaneado (sem texto) resulta em mapa vazio — nunca derruba o import:
+ * a prova continua funcionando sem o metadado de foco (o OCR de texto segue
+ * via Tesseract no server.ts).
  */
 function escapeXml(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -381,13 +341,6 @@ export async function buildFocusMap(buffer: Buffer, hints: FocusHint[]): Promise
     map = selectEntries(parseBboxCandidates(bbox), parseBboxLines(bbox), hints);
   }
 
-  const expected = hints.length;
-  const insufficient = map.size < Math.min(3, expected) || (expected >= 3 && map.size < Math.ceil(expected * 0.5));
-  if (expected && insufficient) {
-    console.log("[focus] PDF sem texto vetorizado (escaneado?). Acionando PaddleOCR...");
-    const ocrMap = await focusMapFromPaddle(buffer);
-    for (const [number, entry] of ocrMap) map.set(number, entry);
-  }
   return map;
 }
 
