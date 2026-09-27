@@ -8,3 +8,4 @@ uploads/
 *.tsbuildinfo
 .DS_Store
 /apps/goapi/mira-goapi
+__pycache__/

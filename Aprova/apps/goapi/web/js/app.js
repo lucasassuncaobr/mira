@@ -6,7 +6,7 @@ import { getFocusMap, getPageSrc, hostExam, shutdownP2P } from "./p2p.js";
 import { warmPdfReader, fetchExamInfo, preloadExamPages } from "./pdfcache.js";
 import { PdfModal } from "./pdfmodal.js";
 
-const API = window.__MIRA_API__ || "http://localhost:3333/api";
+const API = window.__MIRA_API__ || (location.protocol.startsWith("http") ? location.origin + "/api" : "http://localhost:3333/api");
 
 function esc(s) {
   return String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");

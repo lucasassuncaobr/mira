@@ -255,7 +255,15 @@ func ocrPortuguese(pdfPath string) (string, error) {
 	}
 	sort.Strings(imgs)
 	_ = imgs
-	bridge := filepath.Join(pythonDir, "..", "ocr-bridge.mjs")
+	bridge := os.Getenv("MIRA_BRIDGE")
+	if bridge == "" {
+		for _, cand := range bridgeCandidates() {
+			if st, err := os.Stat(cand); err == nil && !st.IsDir() {
+				bridge = cand
+				break
+			}
+		}
+	}
 	cmd := exec.Command("node", bridge, tmpDir)
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout

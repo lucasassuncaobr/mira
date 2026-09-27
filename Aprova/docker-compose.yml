@@ -2,13 +2,13 @@ services:
   api:
     build:
       context: .
-      dockerfile: Dockerfile.api
-    image: lucasassuncao/mira-api:latest
-    container_name: mira-api
+      dockerfile: Dockerfile.go
+    image: lucasassuncaobr/mira-go:latest
+    container_name: mira-go
     ports:
       - "3333:3333"
     volumes:
-      - ./data:/app/data
+      - ./apps/api/data:/app/data
     restart: always
     environment:
       - PORT=3333

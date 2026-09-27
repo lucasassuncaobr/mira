@@ -1,7 +1,7 @@
 // Porte vanilla de apps/web/src/pdf-cache.ts — caches de bytes/info/texto.
 // pdf.js carrega sob demanda via importmap ("pdfjs-dist" → /assets/vendor/pdf.mjs).
 
-const API = window.__MIRA_API__ || "http://localhost:3333/api";
+const API = window.__MIRA_API__ || (location.protocol.startsWith("http") ? location.origin + "/api" : "http://localhost:3333/api");
 
 const bytesReady = new Map();
 const bytesPending = new Map();

@@ -3,7 +3,7 @@
 
 import { fetchExamInfo, fetchPageText, prefetchExamPdf, extractExamText } from "./pdfcache.js";
 
-const API = window.__MIRA_API__ || "http://localhost:3333/api";
+const API = window.__MIRA_API__ || (location.protocol.startsWith("http") ? location.origin + "/api" : "http://localhost:3333/api");
 
 const ICONS = {
   x: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',

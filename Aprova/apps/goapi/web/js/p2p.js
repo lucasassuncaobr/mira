@@ -3,7 +3,7 @@
 // O PeerJS (UMD global `Peer`) carrega sob demanda para o bundle inicial
 // permanecer ultraleve.
 
-const API = window.__MIRA_API__ || "http://localhost:3333/api";
+const API = window.__MIRA_API__ || (location.protocol.startsWith("http") ? location.origin + "/api" : "http://localhost:3333/api");
 const HOST_PREFIX = "mira-exam-";
 
 export const P2P_FALLBACK_MS = 3000;
