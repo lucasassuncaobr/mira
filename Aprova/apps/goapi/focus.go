@@ -245,8 +245,8 @@ func estimateQuestionBottom(best candidate, next *candidate, lines []bboxLine) f
 		}
 		return relevant[i].yMin < relevant[j].yMin
 	})
-	startsRe := regexp.MustCompile(`^\s*` + strconv.Itoa(best.number) + `(?:[.)]\s*|\s+)`)
-	nextQRe := regexp.MustCompile(`^\s*\d{1,3}(?:[.)]\s*|\s+)`)
+	startsRe := regexp.MustCompile(`(?i)^\s*(?:quest[aã]o\s*)?` + strconv.Itoa(best.number) + `(?:[.)]\s*|\s+)`)
+	nextQRe := regexp.MustCompile(`(?i)^\s*(?:quest[aã]o\s*)?\d{1,3}(?:[.)]\s*|\s+)`)
 	splitRe := regexp.MustCompile(`[.)\s]`)
 	started := false
 	lastY := best.yMin
@@ -308,7 +308,7 @@ func estimateStatementBottom(best candidate, lines []bboxLine) float64 {
 		}
 	}
 	sort.Slice(relevant, func(i, j int) bool { return relevant[i].yMin < relevant[j].yMin })
-	startsRe := regexp.MustCompile(`^\s*` + strconv.Itoa(best.number) + `(?:[.)]\s*|\s+)`)
+	startsRe := regexp.MustCompile(`(?i)^\s*(?:quest[aã]o\s*)?` + strconv.Itoa(best.number) + `(?:[.)]\s*|\s+)`)
 	started := false
 	lastY := best.yMin
 	var firstAltY *float64
@@ -402,7 +402,27 @@ func selectEntries(candidates []candidate, lines []bboxLine, hints []FocusHint) 
 		// Faixa cobre a questão inteira (igual ao TS atual).
 		bottom := estimateQuestionBottom(best, next, lines)
 		var columnLeft, columnRight float64
-		if best.xMin < best.pageW/2 {
+		spansColumns := false
+		leftAlternative := false
+		rightAlternative := false
+		for _, line := range lines {
+			if line.page != best.page || line.yMin < top || line.yMin > bottom {
+				continue
+			}
+			if !isAlternativeStart(line) {
+				continue
+			}
+			if line.xMin < best.pageW/2 {
+				leftAlternative = true
+			} else {
+				rightAlternative = true
+			}
+		}
+		spansColumns = leftAlternative && rightAlternative
+		if spansColumns {
+			columnLeft = 0
+			columnRight = best.pageW
+		} else if best.xMin < best.pageW/2 {
 			columnLeft = best.xMin - best.pageW*0.03
 			if columnLeft < 0 {
 				columnLeft = 0
@@ -437,10 +457,14 @@ func selectEntries(candidates []candidate, lines []bboxLine, hints []FocusHint) 
 		if fs > 3.2 {
 			fs = 3.2
 		}
+		center := ((best.xMin + best.xMax) / 2 / best.pageW) * 100
+		if spansColumns {
+			center = 50
+		}
 		entries[hint.Number] = FocusEntry{
 			Page:        best.page,
 			YInicio:     round2(top / best.pageH * 100),
-			XCenter:     round2(((best.xMin + best.xMax) / 2 / best.pageW) * 100),
+			XCenter:     round2(center),
 			FocusHeight: round2(fh),
 			FocusScale:  fs,
 		}

@@ -1,5 +1,4 @@
 // Porte vanilla de apps/web/src/PdfModal.tsx — modal "Página inteira".
-// pdf-lib (UMD global `PDFLib`) carrega sob demanda, só ao exportar.
 
 import { fetchExamInfo, fetchPageText, prefetchExamPdf, extractExamText } from "./pdfcache.js";
 
@@ -19,17 +18,6 @@ const ICONS = {
   minimize: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>',
 };
 
-function loadPdfLib() {
-  if (window.PDFLib) return Promise.resolve(window.PDFLib);
-  return new Promise((resolve, reject) => {
-    const s = document.createElement("script");
-    s.src = "/assets/vendor/pdf-lib.min.js";
-    s.onload = () => resolve(window.PDFLib);
-    s.onerror = () => reject(new Error("pdf-lib indisponível"));
-    document.head.appendChild(s);
-  });
-}
-
 export class PdfModal {
   constructor(examId, title, onClose) {
     this.examId = examId;
@@ -39,38 +27,18 @@ export class PdfModal {
     this.loadError = "";
     this.zoom = 1;
     this.current = 1;
-    this.marks = this.loadMarks();
-    this.redactMode = false;
-    this.draft = null;
     this.failedPages = new Set();
     this.query = "";
     this.searching = false;
     this.hits = [];
     this.textLayers = new Map();
-    this.exporting = false;
     this.isFullscreen = false;
     this.pageEls = new Map();
-    this.drawing = null;
     this.cancelled = false;
     this.build();
     this.bindGlobal();
     this.load();
   }
-
-  storageKey() { return `mira:redactions:${this.examId}`; }
-
-  loadMarks() {
-    try {
-      const raw = JSON.parse(localStorage.getItem(this.storageKey()) ?? "[]");
-      return Array.isArray(raw) ? raw.filter((m) => m && typeof m.page === "number") : [];
-    } catch { return []; }
-  }
-
-  saveMarks() {
-    try { localStorage.setItem(this.storageKey(), JSON.stringify(this.marks)); } catch { /* sem armazenamento */ }
-  }
-
-  clamp01(v) { return Math.min(1, Math.max(0, v)); }
 
   build() {
     const el = document.createElement("div");
@@ -104,11 +72,6 @@ export class PdfModal {
             ${ICONS.search}
             <input placeholder="Buscar no PDF…" aria-label="Buscar no PDF" />
           </form>
-          <div class="pdf-reader-group">
-            <button data-act="redact" aria-label="Tarjar trechos" title="Tarjar trechos (arraste sobre a página)">${ICONS.square}<span data-role="redact-label">Tarjar</span></button>
-            <button data-act="clear" aria-label="Remover tarjas" title="Remover todas as tarjas" hidden>${ICONS.trash}</button>
-            <button data-act="export" aria-label="Exportar PDF com tarjas" title="Marque tarjas para exportar" disabled>${ICONS.download}<span data-role="export-label">Exportar</span></button>
-          </div>
         </div>
         <div class="pdf-reader-note" data-role="note" hidden></div>
         <div class="pdf-modal-body pdf-modal-embed-body pdf-reader-scroll">
@@ -126,9 +89,6 @@ export class PdfModal {
     el.querySelector(".pdf-reader-zoom").addEventListener("click", () => { this.zoom = 1; this.renderPages(); });
     el.querySelector(".pdf-reader-search").addEventListener("submit", (e) => this.runSearch(e));
     el.querySelector(".pdf-reader-search input").addEventListener("input", (e) => { this.query = e.target.value; });
-    el.querySelector('[data-act="redact"]').addEventListener("click", () => { this.redactMode = !this.redactMode; this.renderToolbar(); this.renderPages(); });
-    el.querySelector('[data-act="clear"]').addEventListener("click", () => this.clearMarks());
-    el.querySelector('[data-act="export"]').addEventListener("click", () => this.exportRedacted());
     this.el = el;
     this.scroller = el.querySelector(".pdf-modal-body");
     document.body.appendChild(el);
@@ -176,13 +136,6 @@ export class PdfModal {
     q('[data-act="fullscreen"]').innerHTML = this.isFullscreen ? ICONS.minimize : ICONS.expand;
     q(".pdf-reader-counter").textContent = this.totalPages ? `${this.current} de ${this.totalPages}` : "…";
     q(".pdf-reader-zoom").textContent = `${Math.round(this.zoom * 100)}%`;
-    q('[data-act="redact"]').classList.toggle("is-active", this.redactMode);
-    q('[data-role="redact-label"]').textContent = `Tarjar${this.marks.length ? ` (${this.marks.length})` : ""}`;
-    q('[data-act="clear"]').hidden = !this.marks.length;
-    const exp = q('[data-act="export"]');
-    exp.disabled = !this.marks.length || this.exporting;
-    exp.title = this.marks.length ? "Baixar PDF com as tarjas aplicadas" : "Marque tarjas para exportar";
-    q('[data-role="export-label"]').textContent = this.exporting ? "Exportando…" : "Exportar";
     const note = q('[data-role="note"]');
     if (this.searching) {
       note.hidden = false;
@@ -258,11 +211,7 @@ export class PdfModal {
     for (let n = 1; n <= this.totalPages; n++) {
       const pg = document.createElement("div");
       pg.dataset.page = String(n);
-      pg.className = "pdf-reader-page" + (this.redactMode ? " is-marking" : "");
-      pg.addEventListener("pointerdown", (e) => this.onPageDown(n, e));
-      pg.addEventListener("pointermove", (e) => this.onPageMove(e));
-      pg.addEventListener("pointerup", () => this.onPageUp());
-      pg.addEventListener("pointercancel", () => this.onPageUp());
+      pg.className = "pdf-reader-page";
       this.pageEls.set(n, pg);
       if (this.failedPages.has(n)) {
         const f = document.createElement("div");
@@ -292,29 +241,8 @@ export class PdfModal {
         img.addEventListener("error", () => { this.failedPages.add(n); this.renderPages(); this.observePages(); });
         pg.appendChild(img);
       }
-      if (!this.redactMode) {
-        for (const line of this.textLayers.get(n) ?? []) {
-          pg.appendChild(this.textSpan(line));
-        }
-      }
-      for (const m of this.marks.filter((x) => x.page === n)) {
-        const s = document.createElement("span");
-        s.className = "pdf-mark";
-        s.style.left = `${m.x * 100}%`;
-        s.style.top = `${m.y * 100}%`;
-        s.style.width = `${m.w * 100}%`;
-        s.style.height = `${m.h * 100}%`;
-        pg.appendChild(s);
-      }
-      const d = this.draft && this.draft.page === n ? this.draft : null;
-      if (d) {
-        const s = document.createElement("span");
-        s.className = "pdf-draft";
-        s.style.left = `${d.x * 100}%`;
-        s.style.top = `${d.y * 100}%`;
-        s.style.width = `${d.w * 100}%`;
-        s.style.height = `${d.h * 100}%`;
-        pg.appendChild(s);
+      for (const line of this.textLayers.get(n) ?? []) {
+        pg.appendChild(this.textSpan(line));
       }
       const tag = document.createElement("span");
       tag.className = "pdf-page-tag";
@@ -328,7 +256,6 @@ export class PdfModal {
   }
 
   paintTextLayer(pg, n, lines) {
-    if (this.redactMode) return;
     if (!pg.isConnected) return;
     pg.querySelectorAll(".pdf-textline").forEach((el) => el.remove());
     for (const line of lines) {
@@ -390,111 +317,6 @@ export class PdfModal {
     } catch {
       const maximized = this.el.querySelector(".pdf-modal")?.classList.toggle("pdf-modal-maximized") ?? false;
       this.isFullscreen = maximized;
-      this.renderToolbar();
-    }
-  }
-
-  pointOf(pg, event) {
-    const rect = pg.getBoundingClientRect();
-    return {
-      x: this.clamp01((event.clientX - rect.left) / rect.width),
-      y: this.clamp01((event.clientY - rect.top) / rect.height),
-    };
-  }
-
-  onPageDown(n, event) {
-    if (!this.redactMode || (event.button !== undefined && event.button !== 0)) return;
-    event.preventDefault();
-    const pg = this.pageEls.get(n);
-    pg.setPointerCapture(event.pointerId);
-    const p = this.pointOf(pg, event);
-    this.drawing = { page: n, x0: p.x, y0: p.y };
-    this.draft = { id: "", page: n, x: p.x, y: p.y, w: 0, h: 0 };
-    this.renderPages();
-    this.observePages();
-  }
-
-  onPageMove(event) {
-    const d = this.drawing;
-    if (!d) return;
-    const pg = this.pageEls.get(d.page);
-    const p = this.pointOf(pg, event);
-    this.draft = {
-      id: "", page: d.page,
-      x: Math.min(d.x0, p.x), y: Math.min(d.y0, p.y),
-      w: Math.abs(p.x - d.x0), h: Math.abs(p.y - d.y0),
-    };
-    const old = pg.querySelector(".pdf-draft");
-    if (old) old.remove();
-    const s = document.createElement("span");
-    s.className = "pdf-draft";
-    s.style.left = `${this.draft.x * 100}%`;
-    s.style.top = `${this.draft.y * 100}%`;
-    s.style.width = `${this.draft.w * 100}%`;
-    s.style.height = `${this.draft.h * 100}%`;
-    pg.appendChild(s);
-  }
-
-  onPageUp() {
-    const d = this.drawing;
-    const rect = this.draft;
-    this.drawing = null;
-    this.draft = null;
-    if (!d || !rect || rect.w < 0.008 || rect.h < 0.008) { this.renderPages(); this.observePages(); return; }
-    this.marks = [...this.marks, {
-      id: `${Date.now().toString(36)}-${Math.floor(Math.random() * 1e6).toString(36)}`,
-      page: d.page, x: rect.x, y: rect.y, w: rect.w, h: rect.h,
-    }];
-    this.saveMarks();
-    this.renderPages();
-    this.observePages();
-  }
-
-  clearMarks() {
-    if (!this.marks.length) return;
-    if (window.confirm(`Remover as ${this.marks.length} tarjas desta prova?`)) {
-      this.marks = [];
-      this.saveMarks();
-      this.renderToolbar();
-      this.renderPages();
-      this.observePages();
-    }
-  }
-
-  async exportRedacted() {
-    if (!this.marks.length || this.exporting) return;
-    this.exporting = true;
-    this.renderToolbar();
-    try {
-      const { PDFDocument, rgb } = await loadPdfLib();
-      const pdf = await PDFDocument.load((await prefetchExamPdf(this.examId)).slice(0));
-      for (const m of this.marks) {
-        if (m.page < 1 || m.page > pdf.getPageCount()) continue;
-        const pg = pdf.getPage(m.page - 1);
-        const { width, height } = pg.getSize();
-        pg.drawRectangle({
-          x: m.x * width,
-          y: (1 - m.y - m.h) * height,
-          width: m.w * width,
-          height: m.h * height,
-          color: rgb(0, 0, 0),
-          opacity: 1,
-        });
-      }
-      const out = await pdf.save();
-      const blob = new Blob([out.slice()], { type: "application/pdf" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `prova-${this.examId}-tarjado.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.setTimeout(() => URL.revokeObjectURL(url), 10000);
-    } catch {
-      window.alert("Não foi possível exportar o PDF com as tarjas.");
-    } finally {
-      this.exporting = false;
       this.renderToolbar();
     }
   }

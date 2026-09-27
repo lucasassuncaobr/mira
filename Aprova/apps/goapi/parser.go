@@ -172,7 +172,7 @@ func ParseQuestions(text string) []ParsedQuestion {
 	}
 
 	var out []ParsedQuestion
-	for i, match := range ordered {
+	for _, match := range ordered {
 		var pageNumber int = 1
 		for _, pm := range pageMarkerRe.FindAllStringSubmatch(normalized[:match.index], -1) {
 			if n, err := strconv.Atoi(pm[1]); err == nil {
@@ -180,8 +180,11 @@ func ParseQuestions(text string) []ParsedQuestion {
 			}
 		}
 		end := len(normalized)
-		if i+1 < len(ordered) {
-			end = ordered[i+1].index
+		for _, candidate := range matches {
+			if candidate.index > match.index {
+				end = candidate.index
+				break
+			}
 		}
 		block := strings.TrimSpace(normalized[match.end:end])
 		alts := alternativeStartRe.FindAllStringSubmatchIndex(block, -1)
@@ -250,16 +253,20 @@ func stripTrailingOcrNoise(value string) string {
 }
 
 var (
-	cutRe1 = regexp.MustCompile(`(?i)(?:\b(?:TEXTO|QUADRO|TABELA|GR[ÁA]FICO|FIGURA)\s+[IVX\d]+\b|\btextos?[\s-]*base\b|\bdispon[íi]vel\s+em\s*[:：]|\bAcesso\s+em\s*[:：]|\bCONHECIMENTOS\s+[A-ZÁÉÍÓÚÇ ]+|\bCreate\s+table\b|\bselect\s+[A-Z_]+\s*\()`)
-	cutRe2 = regexp.MustCompile(`(?i)(?:https?://|www\.|https?%3A|%2Fwww|\.com(?:\.br)?\b)`)
-	urlFragRe  = regexp.MustCompile(`%[0-9A-Fa-f]{2}|twsrc|twcamp|tweetembed|ref_url`)
-	longFragRe = regexp.MustCompile(`\s+[A-Za-z0-9%_\-]{20,}[^\s]*\s*$`)
+	cutRe1           = regexp.MustCompile(`(?i)(?:\b(?:TEXTO|QUADRO|TABELA|GR[ÁA]FICO|FIGURA)\s+[IVX\d]+\b|\btextos?[\s-]*base\b|\bdispon[íi]vel\s+em\s*[:：]|\bAcesso\s+em\s*[:：]|\bCONHECIMENTOS\s+[A-ZÁÉÍÓÚÇ ]+|\bCreate\s+table\b|\bselect\s+[A-Z_]+\s*\()`)
+	cutRe2           = regexp.MustCompile(`(?i)(?:https?://|www\.|https?%3A|%2Fwww|\.com(?:\.br)?\b)`)
+	embeddedNoiseRe  = regexp.MustCompile(`[A-Za-z0-9+/=_-]{24,}`)
+	mergedQuestionRe = regexp.MustCompile(`(?i)\s+\d{1,3}\s+a\s+\d{1,3}\b.*$`)
+	urlFragRe        = regexp.MustCompile(`%[0-9A-Fa-f]{2}|twsrc|twcamp|tweetembed|ref_url`)
+	longFragRe       = regexp.MustCompile(`\s+[A-Za-z0-9%_\-]{20,}[^\s]*\s*$`)
 )
 
 func cleanAlternativeText(value string) string {
 	cleaned := cleanExtractedText(value)
 	cut := cutRe1.Split(cleaned, 2)[0]
 	cut = cutRe2.Split(cut, 2)[0]
+	cut = embeddedNoiseRe.Split(cut, 2)[0]
+	cut = mergedQuestionRe.ReplaceAllString(cut, "")
 	cut = longFragRe.ReplaceAllStringFunc(cut, func(m string) string {
 		if urlFragRe.MatchString(m) {
 			return ""
@@ -783,10 +790,10 @@ func InferExamTitle(text, filename string) string {
 	return FormatExamTitleFallback(best.line)
 }
 
-// FormatExamTitleFallback — mesmo algoritmo de formatExamTitle (parser.ts).
-// Mantido separado para não acoplar; main.go usa formatExamTitle.
+// FormatExamTitleFallback preserva a capitalização original do texto extraído.
 func FormatExamTitleFallback(title string) string {
-	return formatExamTitle(title)
+	title = strings.ReplaceAll(title, "_", " ")
+	return strings.Join(strings.Fields(title), " ")
 }
 
 func InferExamBoard(text string) string {

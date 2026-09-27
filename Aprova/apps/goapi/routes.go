@@ -1,15 +1,16 @@
 package main
 
-// Rotas restantes da fase 2 — mesmo contrato do Express em server.ts.
-// pythonDir: scripts pdf_extract.py/pdf_render.py (default ../api/python).
+// Rotas restantes da migração Go — mesmo contrato do Express em server.ts.
+// Usamos PDF Oxide e Tesseract como ferramentas nativas do pipeline Go.
+// Sem runtime Python no container final.
 
 import (
-	"bytes"
 	"database/sql"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
+	"image"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -19,6 +20,8 @@ import (
 	"unicode"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/otiai10/gosseract/v2"
+	pdfoxide "github.com/yfedoseev/pdf_oxide/go"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
@@ -26,12 +29,11 @@ import (
 
 var gdb *sql.DB
 var assetsDir string
-var pythonDir string
 
 // Statements preparados no boot (hot path: responder consome select+insert
 // a cada clique; sem isso cada request reprepara).
 var (
-	stmtCorrect      *sql.Stmt
+	stmtCorrect       *sql.Stmt
 	stmtInsertAttempt *sql.Stmt
 )
 
@@ -67,24 +69,73 @@ type pdfPage struct {
 }
 
 func runPdfExtract(pdfPath string) ([]pdfPage, error) {
-	cmd := exec.Command("python3", filepath.Join(pythonDir, "pdf_extract.py"), pdfPath)
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	cmd.WaitDelay = 0
-	if err := cmd.Run(); err != nil {
-		return nil, fmt.Errorf("pdf_extract: %v: %s", err, strings.TrimSpace(stderr.String()))
+	doc, err := pdfoxide.Open(pdfPath)
+	if err != nil {
+		return nil, fmt.Errorf("pdf oxide open: %w", err)
 	}
-	var parsed struct {
-		Pages []pdfPage `json:"pages"`
+	defer doc.Close()
+	count, err := doc.PageCount()
+	if err != nil {
+		return nil, err
 	}
-	if err := json.Unmarshal(stdout.Bytes(), &parsed); err != nil {
-		return nil, fmt.Errorf("pdf_extract json: %v", err)
+	pages := make([]pdfPage, 0, count)
+	for index := 0; index < count; index++ {
+		info, err := doc.PageInfo(index)
+		if err != nil {
+			return nil, err
+		}
+		words, err := doc.ExtractWords(index)
+		if err != nil {
+			return nil, err
+		}
+		page := pdfPage{Number: index + 1, Width: float64(info.Width), Height: float64(info.Height), Words: make([]pdfWord, 0, len(words))}
+		for _, word := range words {
+			page.Words = append(page.Words, pdfWord{X0: float64(word.X), Top: float64(word.Y), X1: float64(word.X + word.Width), Bottom: float64(word.Y + word.Height), Text: word.Text})
+		}
+		page.Text = orderedPageText(page.Words, page.Width, page.Height)
+		pages = append(pages, page)
 	}
-	if len(parsed.Pages) == 0 {
-		return nil, fmt.Errorf("pdf_extract: sem páginas")
+	return pages, nil
+}
+
+// parsePdftoxml mantém compatibilidade com fixtures XML antigos.
+func parsePdftoxml(xmlData []byte) ([]pdfPage, error) {
+	type xmlWord struct {
+		XMin float64 `xml:"xMin,attr"`
+		YMin float64 `xml:"yMin,attr"`
+		XMax float64 `xml:"xMax,attr"`
+		YMax float64 `xml:"yMax,attr"`
+		Text string  `xml:",chardata"`
 	}
-	return parsed.Pages, nil
+	type xmlPage struct {
+		Number int       `xml:"number,attr"`
+		Width  float64   `xml:"width,attr"`
+		Height float64   `xml:"height,attr"`
+		Words  []xmlWord `xml:"word"`
+	}
+	var document struct {
+		Pages []xmlPage `xml:"page"`
+	}
+	if err := xml.Unmarshal(xmlData, &document); err != nil {
+		return nil, err
+	}
+	pages := make([]pdfPage, 0, len(document.Pages))
+	for pageIndex, page := range document.Pages {
+		pageNumber := page.Number
+		if pageNumber == 0 {
+			pageNumber = pageIndex + 1
+		}
+		parsed := pdfPage{Number: pageNumber, Width: page.Width, Height: page.Height, Words: make([]pdfWord, 0, len(page.Words))}
+		for _, word := range page.Words {
+			parsed.Words = append(parsed.Words, pdfWord{X0: word.XMin, Top: word.YMin, X1: word.XMax, Bottom: word.YMax, Text: word.Text})
+		}
+		parsed.Text = orderedPageText(parsed.Words, parsed.Width, parsed.Height)
+		pages = append(pages, parsed)
+	}
+	if len(pages) == 0 {
+		return nil, fmt.Errorf("pdf: sem páginas no XML")
+	}
+	return pages, nil
 }
 
 func rawText(pages []pdfPage) string {
@@ -145,6 +196,15 @@ func questionRow(row map[string]any) (map[string]any, error) {
 	var alts any
 	if err := json.Unmarshal([]byte(s), &alts); err != nil {
 		return nil, err
+	}
+	if list, ok := alts.([]any); ok {
+		for _, item := range list {
+			if alt, ok := item.(map[string]any); ok {
+				if text, ok := alt["text"].(string); ok {
+					alt["text"] = cleanAlternativeText(text)
+				}
+			}
+		}
 	}
 	row["alternatives"] = alts
 	return row, nil
@@ -247,56 +307,139 @@ func loadOrBuildFocusMap(examID string) (map[int]FocusEntry, error) {
 	return m, nil
 }
 
-// ---------- OCR (bridge Node temporária) ----------
+// ---------- OCR ----------
 
 func ocrPortuguese(pdfPath string) (string, error) {
+	text, err := ocrPortugueseAtDPI(pdfPath, 220)
+	if err == nil {
+		return text, nil
+	}
+	return ocrPortugueseAtDPI(pdfPath, 260)
+}
+
+func ocrPortugueseAtDPI(pdfPath string, dpi int) (string, error) {
 	tmpDir, err := os.MkdirTemp("", "aprova-ocr-")
 	if err != nil {
 		return "", err
 	}
 	defer os.RemoveAll(tmpDir)
-	render := exec.Command("python3", filepath.Join(pythonDir, "pdf_render.py"), pdfPath, tmpDir, "--format", "png", "--dpi", "260", "--prefix", "page")
-	if out, err := render.CombinedOutput(); err != nil {
-		return "", fmt.Errorf("render ocr: %v: %s", err, strings.TrimSpace(string(out)))
+
+	doc, err := pdfoxide.Open(pdfPath)
+	if err != nil {
+		return "", fmt.Errorf("pdf oxide open: %w", err)
 	}
-	entries, err := os.ReadDir(tmpDir)
+	defer doc.Close()
+	count, err := doc.PageCount()
 	if err != nil {
 		return "", err
-	 }
-	var imgs []string
-	for _, e := range entries {
-		if matched, _ := filepath.Match("page-[0-9]*.png", e.Name()); matched {
-			imgs = append(imgs, e.Name())
+	}
+	for page := 0; page < count; page++ {
+		image, err := doc.RenderPageZoom(page, float32(dpi)/72.0, 1)
+		if err != nil {
+			return "", fmt.Errorf("pdf oxide render page %d: %w", page+1, err)
+		}
+		path := filepath.Join(tmpDir, fmt.Sprintf("page-%02d.jpg", page+1))
+		if err := image.SaveToFile(path); err != nil {
+			image.Close()
+			return "", err
+		}
+		image.Close()
+	}
+
+	files, err := os.ReadDir(tmpDir)
+	if err != nil {
+		return "", err
+	}
+	var imagePaths []string
+	for _, f := range files {
+		if !f.IsDir() && strings.HasPrefix(f.Name(), "page-") && strings.HasSuffix(f.Name(), ".jpg") {
+			imagePaths = append(imagePaths, filepath.Join(tmpDir, f.Name()))
 		}
 	}
-	sort.Strings(imgs)
-	_ = imgs
-	bridge := os.Getenv("MIRA_BRIDGE")
-	if bridge == "" {
-		for _, cand := range bridgeCandidates() {
-			if st, err := os.Stat(cand); err == nil && !st.IsDir() {
-				bridge = cand
-				break
+	sort.Strings(imagePaths)
+
+	if len(imagePaths) == 0 {
+		return "", fmt.Errorf("nenhuma imagem gerada pelo PDF Oxide")
+	}
+
+	// Run Tesseract OCR on each page
+	var sb strings.Builder
+	for i, imgPath := range imagePaths {
+		client := gosseract.NewClient()
+		client.SetLanguage("por")
+		client.SetPageSegMode(gosseract.PSM_AUTO)
+		client.SetVariable("preserve_interword_spaces", "1")
+		if err := client.SetImage(imgPath); err != nil {
+			client.Close()
+			return "", fmt.Errorf("gosseract na página %d: %w", i+1, err)
+		}
+		boxes, err := client.GetBoundingBoxesVerbose()
+		client.Close()
+		if err != nil {
+			return "", fmt.Errorf("gosseract na página %d: %w", i+1, err)
+		}
+		text := ocrLinesFromBoxes(boxes)
+		if text != "" {
+			if i > 0 {
+				sb.WriteString("\f") // form feed between pages like PDF
 			}
+			sb.WriteString(text)
 		}
 	}
-	cmd := exec.Command("node", bridge, tmpDir)
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	if err := cmd.Run(); err != nil {
-		return "", fmt.Errorf("ocr bridge: %v: %s", err, strings.TrimSpace(stderr.String()))
+	return sb.String(), nil
+}
+
+func ocrLinesFromBoxes(boxes []gosseract.BoundingBox) string {
+	type ocrLine struct {
+		key                       string
+		box                       image.Rectangle
+		words                     []gosseract.BoundingBox
+		blockNum, parNum, lineNum int
 	}
-	var parsed struct {
-		Text string `json:"text"`
+	linesByKey := map[string]*ocrLine{}
+	for _, box := range boxes {
+		if box.Confidence < 20 || strings.TrimSpace(box.Word) == "" {
+			continue
+		}
+		key := fmt.Sprintf("%d:%d:%d", box.BlockNum, box.ParNum, box.LineNum)
+		line := linesByKey[key]
+		if line == nil {
+			line = &ocrLine{key: key, box: box.Box, blockNum: box.BlockNum, parNum: box.ParNum, lineNum: box.LineNum}
+			linesByKey[key] = line
+		}
+		line.words = append(line.words, box)
+		line.box = line.box.Union(box.Box)
 	}
-	if err := json.Unmarshal(stdout.Bytes(), &parsed); err != nil {
-		return "", fmt.Errorf("ocr bridge json: %v", err)
+	lines := make([]*ocrLine, 0, len(linesByKey))
+	for _, line := range linesByKey {
+		sort.SliceStable(line.words, func(i, j int) bool { return line.words[i].Box.Min.X < line.words[j].Box.Min.X })
+		lines = append(lines, line)
 	}
-	text := parsed.Text
-	text = regexp.MustCompile(`\n\s*[.·]\s*([A-D])\)`).ReplaceAllString(text, "\n$1)")
-	text = regexp.MustCompile(`\n\s*A([A-D])\)`).ReplaceAllString(text, "\n$1)")
-	return text, nil
+	sort.SliceStable(lines, func(i, j int) bool {
+		if lines[i].blockNum != lines[j].blockNum {
+			return lines[i].blockNum < lines[j].blockNum
+		}
+		if lines[i].parNum != lines[j].parNum {
+			return lines[i].parNum < lines[j].parNum
+		}
+		if lines[i].lineNum != lines[j].lineNum {
+			return lines[i].lineNum < lines[j].lineNum
+		}
+		return lines[i].box.Min.Y < lines[j].box.Min.Y
+	})
+	var out strings.Builder
+	for i, line := range lines {
+		if i > 0 {
+			out.WriteByte('\n')
+		}
+		for j, word := range line.words {
+			if j > 0 {
+				out.WriteByte(' ')
+			}
+			out.WriteString(strings.TrimSpace(word.Word))
+		}
+	}
+	return strings.TrimSpace(out.String())
 }
 
 // ---------- OCR merge (porte de server.ts) ----------
@@ -360,7 +503,7 @@ func mergeOcrQuestions(native, ocr []ParsedQuestion) []ParsedQuestion {
 				maxLen = 1
 			}
 			sim := 1 - float64(editDistance(cn, co))/float64(maxLen)
-			if sim >= .82 && len(strings.Fields(ocrText)) >= len(strings.Fields(alt.Text))+2 {
+			if sim >= .90 && len(strings.Fields(ocrText)) >= len(strings.Fields(alt.Text))+2 {
 				alts[i] = Alternative{Label: alt.Label, Text: ocrText}
 			} else {
 				alts[i] = alt
@@ -387,14 +530,22 @@ func adoptOcrQuestions(native, ocr []ParsedQuestion) []ParsedQuestion {
 }
 
 type textLine struct {
-	X float64 `json:"x"`
-	Y float64 `json:"y"`
-	W float64 `json:"w"`
-	H float64 `json:"h"`
-	Text string `json:"text"`
+	X    float64 `json:"x"`
+	Y    float64 `json:"y"`
+	W    float64 `json:"w"`
+	H    float64 `json:"h"`
+	Text string  `json:"text"`
 }
 
-var textCache = map[string]map[string]any{}
+type textCacheEntry struct {
+	value map[string]any
+	bytes int
+}
+
+const textCacheLimitBytes = 16 * 1024 * 1024
+
+var textCache = map[string]textCacheEntry{}
+var textCacheBytes int
 var textCacheMu sync.Mutex
 
 func getenv(key, def string) string {
@@ -549,8 +700,13 @@ func registerRoutes(app *fiber.App) {
 				return fail(c)
 			}
 			ext := ".jpg"
-			if fh.Header.Get("Content-Type") == "image/png" {
+			switch fh.Header.Get("Content-Type") {
+			case "image/png":
 				ext = ".png"
+			case "image/webp":
+				ext = ".webp"
+			case "image/gif":
+				ext = ".gif"
 			}
 			if err := c.SaveFile(fh, filepath.Join(logoDir, "logo"+ext)); err != nil {
 				return fail(c)
@@ -593,7 +749,7 @@ func registerRoutes(app *fiber.App) {
 			return c.Status(404).JSON(fiber.Map{"error": "Logo não encontrada"})
 		}
 		logoDir := filepath.Join(assetsDir, c.Params("id"))
-		for _, name := range []string{"logo.png", "logo.jpg"} {
+		for _, name := range []string{"logo.png", "logo.jpg", "logo.webp", "logo.gif"} {
 			p := filepath.Join(logoDir, name)
 			if _, err := os.Stat(p); err == nil {
 				return c.SendFile(p)
@@ -694,7 +850,7 @@ func registerRoutes(app *fiber.App) {
 		textCacheMu.Lock()
 		if hit, ok := textCache[key]; ok {
 			textCacheMu.Unlock()
-			return c.JSON(hit)
+			return c.JSON(hit.value)
 		}
 		textCacheMu.Unlock()
 		source := filepath.Join(assetsDir, c.Params("id"), "source.pdf")
@@ -791,11 +947,26 @@ func registerRoutes(app *fiber.App) {
 			lines = []textLine{}
 		}
 		result := map[string]any{"width": found.Width, "height": found.Height, "lines": lines}
+		encoded, _ := json.Marshal(result)
+		entryBytes := len(encoded)
 		textCacheMu.Lock()
-		if len(textCache) > 500 {
-			textCache = map[string]map[string]any{}
+		if entryBytes > textCacheLimitBytes {
+			textCache = map[string]textCacheEntry{}
+			textCacheBytes = 0
+		} else {
+			for textCacheBytes+entryBytes > textCacheLimitBytes && len(textCache) > 0 {
+				for oldKey, oldEntry := range textCache {
+					delete(textCache, oldKey)
+					textCacheBytes -= oldEntry.bytes
+					break
+				}
+			}
+			if previous, exists := textCache[key]; exists {
+				textCacheBytes -= previous.bytes
+			}
+			textCache[key] = textCacheEntry{value: result, bytes: entryBytes}
+			textCacheBytes += entryBytes
 		}
-		textCache[key] = result
 		textCacheMu.Unlock()
 		return c.JSON(result)
 	})
@@ -869,7 +1040,7 @@ func registerRoutes(app *fiber.App) {
 		nativeQuestions := filterMinAlts(ParseQuestions(marked), 2)
 		ocrText, _ := ocrPortuguese(source)
 		ocrQuestions := filterMinAlts(ParseQuestions(ocrText), 2)
-		questions := adoptOcrQuestions(nativeQuestions, ocrQuestions)
+		questions := selectQuestionSource(nativeQuestions, ocrQuestions)
 		focusMap, err := buildFocusMapFromPDF(examBuf, source, questions)
 		if err != nil {
 			return fail(c)
@@ -1083,7 +1254,9 @@ func registerRoutes(app *fiber.App) {
 			ocrText, err := ocrPortuguese(examPath)
 			if err == nil {
 				ocrQuestions := filterMinAlts(ParseQuestions(ocrText), 2)
-				questions = adoptOcrQuestions(questions, ocrQuestions)
+				if questionQuality(ocrQuestions) > usableRatio && len(ocrQuestions) >= len(questions) {
+					questions = ocrQuestions
+				}
 			}
 		}
 		keyPages, _ := runPdfExtract(answerPath)
@@ -1171,9 +1344,8 @@ func registerRoutes(app *fiber.App) {
 		if err := os.WriteFile(filepath.Join(assetDir, "answer-key.pdf"), answerBuf, 0o644); err != nil {
 			return fail(c)
 		}
-		render := exec.Command("python3", filepath.Join(pythonDir, "pdf_render.py"), sourcePath, assetDir)
-		if out, err := render.CombinedOutput(); err != nil {
-			_ = out
+		if err := renderPdfToJpeg(sourcePath, assetDir); err != nil {
+			_ = err
 		}
 		nums := []int{}
 		for _, q := range questions {
@@ -1281,6 +1453,37 @@ func registerRoutes(app *fiber.App) {
 	app.Static("/api/exam-assets", assetsDir)
 }
 
+// renderPdfToJpeg rende páginas PDF para JPEG usando PDF Oxide.
+// O nome de saída segue o padrão page-NN.jpg (2 dígitos) para compatibilidade
+// com a rota /api/exams/:id/pages/:page no frontend.
+func renderPdfToJpeg(pdfPath, outDir string) error {
+	if err := os.MkdirAll(outDir, 0o755); err != nil {
+		return err
+	}
+	doc, err := pdfoxide.Open(pdfPath)
+	if err != nil {
+		return fmt.Errorf("pdf oxide open: %w", err)
+	}
+	defer doc.Close()
+	count, err := doc.PageCount()
+	if err != nil {
+		return err
+	}
+	for page := 0; page < count; page++ {
+		image, err := doc.RenderPageZoom(page, 150.0/72.0, 1)
+		if err != nil {
+			return fmt.Errorf("pdf oxide render page %d: %w", page+1, err)
+		}
+		path := filepath.Join(outDir, fmt.Sprintf("page-%02d.jpg", page+1))
+		if err := image.SaveToFile(path); err != nil {
+			image.Close()
+			return err
+		}
+		image.Close()
+	}
+	return nil
+}
+
 func pad2(n int) string {
 	if n < 10 {
 		return "0" + strconv.Itoa(n)
@@ -1319,6 +1522,42 @@ func filterMinAlts(qs []ParsedQuestion, min int) []ParsedQuestion {
 	return out
 }
 
+func questionQuality(qs []ParsedQuestion) float64 {
+	if len(qs) == 0 {
+		return 0
+	}
+	usable := 0
+	for _, q := range qs {
+		if len(q.Alternatives) < 4 || strings.TrimSpace(q.Statement) == "" {
+			continue
+		}
+		complete := true
+		for _, alt := range q.Alternatives {
+			if strings.TrimSpace(alt.Text) == "" {
+				complete = false
+				break
+			}
+		}
+		if complete {
+			usable++
+		}
+	}
+	return float64(usable) / float64(len(qs))
+}
+
+func selectQuestionSource(native, ocr []ParsedQuestion) []ParsedQuestion {
+	if len(native) == 0 {
+		return ocr
+	}
+	if len(ocr) == 0 {
+		return native
+	}
+	if questionQuality(ocr) > questionQuality(native) && len(ocr) >= len(native) {
+		return ocr
+	}
+	return native
+}
+
 func buildFocusMapFromPDF(buf []byte, pdfPath string, questions []ParsedQuestion) (map[int]FocusEntry, error) {
 	_ = buf
 	pages, err := runPdfExtract(pdfPath)
@@ -1332,4 +1571,3 @@ func buildFocusMapFromPDF(buf []byte, pdfPath string, questions []ParsedQuestion
 	}
 	return selectEntries(parseBboxCandidates(bboxXML(pages)), parseBboxLines(bboxXML(pages)), hints), nil
 }
-

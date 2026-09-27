@@ -2,7 +2,7 @@ package main
 
 // Porte de apps/api/python/pdf_extract.py (group_lines, find_gutter,
 // reading_order_text) — mesma ordem de leitura, mesmos limiares.
-// O pdftool entrega só palavras brutas; a inteligência mora aqui em Go.
+// O PDF Oxide entrega palavras com geometria; a inteligência mora aqui em Go.
 
 import (
 	"math"
@@ -189,7 +189,7 @@ func readingOrderText(lines [][]rawWord, gutter *float64, pageH float64) string 
 	return strings.Join(out, "\n")
 }
 
-// orderedPageText reconstrói o texto de leitura de uma página do pdftool.
+// orderedPageText reconstrói o texto de leitura de uma página do PDF Oxide.
 func orderedPageText(words []pdfWord, pageW, pageH float64) string {
 	raw := make([]rawWord, 0, len(words))
 	for _, w := range words {

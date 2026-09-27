@@ -167,10 +167,10 @@ label.radio-wrapper-8:hover input:checked + span:after {
 /* Faixa de marca-texto para trechos destacados */
 .faixa-marca-texto{background-color:#fff176!important;padding:2px 0;border-radius:2px;box-shadow:0 0 4px #fff176}
 
-.feedback{margin:0 20px 20px;padding:14px 16px;border-radius:0;display:flex;align-items:center;gap:14px;animation:feedbackSlideIn .4s cubic-bezier(.34,1.56,.64,1);box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.feedback{margin:0 20px 20px;padding:14px 16px;border-radius:0;display:flex;align-items:center;gap:14px;animation:feedbackSlideIn .16s ease-out;box-shadow:0 1px 4px rgba(0,0,0,.06)}
 .feedback.correct{background:linear-gradient(135deg,#D6EFEA 0%,#B8D8D4 100%);border:1px solid #008080}
 .feedback.incorrect{background:linear-gradient(135deg,#FFF0EE 0%,#FFD5D5 100%);border:1px solid #8B0000}
-@keyframes feedbackSlideIn{0%{opacity:0;transform:translateY(20px) scale(.95)}60%{transform:translateY(-3px) scale(1.02)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes feedbackSlideIn{from{opacity:0}to{opacity:1}}
 .feedback-icon{width:36px;height:36px;border-radius:0;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .feedback.correct .feedback-icon{background:#008080;color:#fff}
 .feedback.incorrect .feedback-icon{background:#8B0000;color:#fff}

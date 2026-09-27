@@ -3,9 +3,17 @@ module mira-goapi
 go 1.26.0
 
 require (
+	github.com/gofiber/fiber/v2 v2.52.15
+	github.com/otiai10/gosseract/v2 v2.4.1
+	github.com/yfedoseev/pdf_oxide/go v0.3.78
+	golang.org/x/text v0.42.0
+	modernc.org/sqlite v1.59.0
+)
+
+require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
-	github.com/gofiber/fiber/v2 v2.52.15 // indirect
+	github.com/ebitengine/purego v0.10.2 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/klauspost/compress v1.17.9 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
@@ -18,9 +26,7 @@ require (
 	github.com/valyala/fasthttp v1.51.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	golang.org/x/sys v0.47.0 // indirect
-	golang.org/x/text v0.42.0 // indirect
 	modernc.org/libc v1.75.7 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.12.1 // indirect
-	modernc.org/sqlite v1.59.0 // indirect
 )

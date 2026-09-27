@@ -1,21 +1,22 @@
-NOTICE — Dependências de terceiros (licenças permissivas, sem GPL/AGPL)
-============================================================================
+NOTICE — Dependências do produto Aprova
+=======================================
 
-Este projeto é licenciado em MIT (ver LICENSE). As dependências abaixo
-permanecem sob suas próprias licenças permissivas, conforme exigido pelos
-termos de atribuição de cada uma:
+O produto em produção é o binário Go servido pelo Dockerfile.go. O frontend
+é HTML, CSS, JavaScript e Alpine.js servido diretamente pelo Fiber.
 
-Apache License 2.0 (requer preservação deste aviso):
-- tesseract.js (+ @tesseract.js-data/por) — OCR de PDFs escaneados (API)
-- pdfjs-dist — leitor de PDF sob intenção explícita (web, PdfModal)
-- TypeScript — apenas ferramenta de build, não embarca no produto
-- pypdfium2 — raster das páginas em JPEG (dual BSD-3-Clause/Apache-2.0)
-- cryptography (dependência transitiva Python) — Apache-2.0 OR BSD-3-Clause
+Dependências embarcadas no frontend:
+- Alpine.js — MIT
+- PDF.js — Apache-2.0
+- PeerJS — MIT
 
-MIT / ISC / BSD / similares (sem obrigação além do aviso de copyright):
-- express, multer, peer, peerjs, zod, tsx, vite, react, react-dom,
-  pdf-parse, pdf-lib, lucide-react (ISC), @capacitor/*,
-  pdfplumber + pdfminer.six (MIT), Pillow (MIT-CMU)
+Dependência de PDF do backend:
+- PDF Oxide — MIT / Apache-2.0, com núcleo Rust distribuído como biblioteca
+  nativa e integrado ao binário Go via CGO.
 
-O texto completo da Apache License 2.0 está em:
-https://www.apache.org/licenses/LICENSE-2.0
+Dependências Go e ferramentas nativas devem permanecer documentadas por seus
+avisos originais. Este arquivo não autoriza a inclusão de GPL, AGPL ou outra
+licença copyleft no artefato de produção.
+
+Os componentes legados fora do produto Aprova ainda precisam ser removidos ou
+isolados antes de o repositório inteiro poder ser declarado conforme: Agente
+(Python), fórum (PHP/Composer) e os fontes da API TypeScript/Python.

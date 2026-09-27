@@ -1407,6 +1407,81 @@ body,
     flex:1;
   }
 }
+.view-exams .github-calendar { padding: 16px 14px; }
+.view-exams .github-grid {
+  grid-template-columns: repeat(53, 8px);
+  grid-template-rows: repeat(7, 8px);
+  grid-auto-flow: column;
+  gap: 2px;
+  width: max-content;
+}
+.view-exams .github-grid i { width: 8px; height: 8px; }
+.view-exams .github-months {
+  display: flex;
+  justify-content: space-between;
+  width: 528px;
+  margin: 0 0 5px 0;
+  color: #6C7480;
+  font-size: 10px;
+}
+.view-exams .github-calendar .heatmap-scroll { overflow-x: auto; padding-top: 8px; }
+.view-exams .github-calendar .github-grid {
+  display: grid !important;
+  grid-template-columns: repeat(53, 8px) !important;
+  grid-template-rows: repeat(7, 8px) !important;
+  grid-auto-flow: column !important;
+  gap: 2px !important;
+  width: max-content !important;
+}
+
+/* Dashboard: hierarquia e espaçamento consistentes para estudo */
+.view-exams main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-left: 32px;
+  padding-right: 32px;
+}
+.view-exams .stats {
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.view-exams .dashboard-study-grid {
+  grid-template-columns: minmax(0, 1fr) 304px;
+  gap: 24px;
+  align-items: start;
+}
+.view-exams .dashboard-study-main,
+.view-exams .dashboard-side {
+  min-width: 0;
+}
+.view-exams .dashboard-side { gap: 16px; }
+.view-exams .dashboard-study-create {
+  min-height: 132px;
+  padding: 24px 28px;
+  margin-bottom: 28px;
+}
+.view-exams .dashboard-study-create h2 { margin: 7px 0 6px; }
+.view-exams .dashboard-study-create p { max-width: 620px; }
+.view-exams .section-head { margin-bottom: 14px; }
+.view-exams .section-head h3 { margin: 5px 0 0; }
+.view-exams .exam-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+.view-exams .exam-card-v2 { width: 100%; }
+.view-exams .side-card { padding: 20px; }
+@media (max-width: 1100px) {
+  .view-exams .dashboard-study-grid { grid-template-columns: 1fr; }
+  .view-exams .dashboard-side { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 700px) {
+  .view-exams main { padding-left: 16px; padding-right: 16px; }
+  .view-exams .exam-list,
+  .view-exams .dashboard-side { grid-template-columns: 1fr; }
+  .view-exams .dashboard-study-create { padding: 20px; }
+}
 
 /* Provas: stronger data hierarchy and compact exam scanning. */
 .view-exams .stats{
@@ -3722,6 +3797,7 @@ body,
   border-radius: 0;
   overflow: hidden;
   cursor: pointer;
+  min-height: 0;
   transition: box-shadow 500ms cubic-bezier(.175,.885,.32,1.275), transform 200ms ease;
 }
 .exam-card-v2:hover { box-shadow: 0 20px 40px rgba(0,128,128,.12); transform: translateY(-2px); }
@@ -3731,16 +3807,16 @@ body,
 .exam-card-visual {
   position: relative;
   width: 100%;
-  height: 140px;
+  height: 115px;
   background: var(--card-slate-100);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: height 500ms cubic-bezier(.175,.885,.32,1.275);
+  transition: height 260ms ease, box-shadow 260ms ease;
   z-index: 1;
   overflow: hidden;
 }
-.exam-card-v2:hover .exam-card-visual { height: 150px; }
+.exam-card-v2:hover .exam-card-visual { height: 125px; }
 
 .exam-card-icon {
   width: 72px;
@@ -3753,6 +3829,13 @@ body,
   color: #fff;
   box-shadow: 0 8px 24px rgba(0,128,128,.3);
   transition: box-shadow 500ms cubic-bezier(.175,.885,.32,1.275);
+}
+.exam-card-logo {
+  max-width: 150px;
+  max-height: 78px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
 }
 .exam-card-v2:hover .exam-card-icon { box-shadow: 0 12px 32px rgba(0,128,128,.4); }
 
@@ -3773,6 +3856,10 @@ body,
   align-items: center;
   gap: 12px;
   padding: 12px 14px 8px;
+  height: 203px;
+  min-height: 0;
+  box-sizing: border-box;
+  align-items: flex-start;
 }
 .exam-card-header-text { flex: 1; min-width: 0; }
 .exam-card-header-text h3 {
@@ -3780,9 +3867,143 @@ body,
   color: var(--card-slate-900);
   margin: 0;
   line-height: 1.3;
+  min-height: 62px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
   transition: color 400ms ease, letter-spacing 400ms ease;
 }
-.exam-card-v2:hover .exam-card-header-text h3 { color: var(--card-blue); letter-spacing: -0.3px; }
+
+.view-exams .library-main { grid-template-rows: auto auto; }
+.view-exams .content-library { height: auto; min-height: 0; }
+
+/* Cartões compactos no padrão de catálogo de guias. */
+.view-exams .exam-card-v2 {
+  min-height: 282px;
+  height: 282px;
+  border: 1px solid #D9DEE3;
+  border-radius: 0;
+  overflow: visible;
+  box-shadow: none;
+  transform: none;
+}
+.view-exams .exam-card-v2:hover {
+  box-shadow: 0 5px 12px rgba(0,0,0,.08);
+  transform: translateY(-3px) scale(1.015);
+}
+.view-exams .exam-card-visual {
+  height: 84px;
+  padding: 10px 14px;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 14px;
+  background: #fff;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.view-exams .exam-card-v2:hover .exam-card-visual { height: 92px; }
+.view-exams .exam-card-icon {
+  flex: 0 0 58px !important;
+  width: 58px !important;
+  min-width: 58px !important;
+  height: 58px !important;
+  min-height: 58px !important;
+  box-shadow: none !important;
+}
+.view-exams .exam-card-logo {
+  flex: 0 0 auto;
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100px;
+  max-height: 62px;
+  object-fit: contain;
+  object-position: center;
+  overflow: hidden;
+  box-shadow: none !important;
+}
+.view-exams .exam-card-visual-title { min-width: 0; text-align: left; }
+.view-exams .exam-card-visual-title h3 {
+  margin: 0;
+  color: #292d37;
+  font-size: 18px;
+  line-height: 22px;
+  font-weight: 700;
+  text-transform: none !important;
+  white-space: normal;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.view-exams .exam-card-visual-title span {
+  display: block;
+  margin-top: 2px;
+  color: #858892;
+  font-size: 13px;
+  line-height: 20px;
+  font-family: var(--font-number);
+  font-variant-numeric: tabular-nums;
+}
+.view-exams .exam-card-content-inner { padding: 0 14px; }
+.view-exams .exam-card-content { height: 83px; }
+.view-exams .exam-card-header {
+  height: 80px;
+  min-height: 80px;
+  padding: 0;
+  align-items: flex-start;
+}
+.view-exams .exam-card-header-text h3 {
+  min-height: 0;
+  max-height: 42px;
+  font-size: 16px;
+  line-height: 21px;
+  white-space: normal;
+  text-overflow: ellipsis;
+  text-transform: none !important;
+}
+.view-exams .exam-card-board { font-size: 12px; line-height: 18px; }
+.view-exams .exam-card-info-box {
+  display: grid;
+  gap: 7px;
+  margin-top: 6px;
+  padding: 8px 12px;
+  height: 52px;
+  min-height: 52px;
+  box-sizing: border-box;
+  background: #F1F3F4;
+  color: #858892;
+  font-size: 13px;
+  line-height: 1.25;
+  text-align: left;
+}
+.view-exams .exam-card-v2:hover .exam-card-info-box { background: #F1F3F4; }
+.view-exams .exam-card-info-box b { font-weight: 500; }
+.view-exams .exam-card-info-box .card-number,
+.view-exams .exam-card-progress-text strong,
+.view-exams .exam-card-progress-text .progress-total {
+  font-family: var(--font-number) !important;
+  font-variant-numeric: tabular-nums;
+}
+.view-exams .exam-card-content { height: auto; }
+.view-exams .exam-card-stats { display: none; }
+.view-exams .exam-card-footer {
+  display: flex;
+  min-height: 46px;
+  box-sizing: border-box;
+  padding-bottom: 10px;
+}
+.view-exams .exam-card-progress-area { display: block; }
+.view-exams .exam-card-progress-area { margin: 0 14px; }
+.view-exams .exam-card-progress-area { border-top: none; }
+.view-exams .exam-card-progress-area,
+.view-exams .exam-card-footer {
+  position: relative;
+  top: 12px;
+}
+.view-exams .exam-card-stats { margin: 0 14px; }
+.view-exams .exam-card-v2:hover .exam-card-header-text h3 { color: inherit; letter-spacing: normal; }
 .exam-card-board {
   font-size: 12px;
   color: var(--card-slate-400);
@@ -3818,7 +4039,7 @@ body,
 /* Progress Area */
 .exam-card-progress-area {
   margin: 0 14px;
-  padding: 10px 0;
+  padding: 8px 0;
   border-top: 1px solid var(--card-slate-100);
 }
 .exam-card-progress-top {
@@ -3828,7 +4049,7 @@ body,
   margin-bottom: 8px;
 }
 .exam-card-progress-text {
-  font-size: 12px;
+  font-size: 15px;
   color: var(--card-slate-500);
   line-height: 1.3;
 }
@@ -3842,7 +4063,7 @@ body,
 }
 .exam-card-progress-text small {
   display: block;
-  font-size: 10px;
+  font-size: 13px;
   color: var(--card-slate-400);
   margin-top: 2px;
 }
@@ -3850,7 +4071,7 @@ body,
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 10px;
+  font-size: 13px;
   color: var(--card-slate-400);
   white-space: nowrap;
   font-weight: 500;
@@ -3868,6 +4089,9 @@ body,
   border-radius: 0;
   transition: width 500ms cubic-bezier(.4,0,.2,1);
 }
+.view-exams .exam-card-v2.is-completed .exam-card-progress-bar i {
+  background: var(--card-green);
+}
 
 /* Stats */
 .exam-card-stats {
@@ -3875,7 +4099,7 @@ body,
   grid-template-columns: 1fr 1fr 1fr;
   gap: 0;
   margin: 0 14px;
-  padding: 10px 0;
+  padding: 8px 0;
   background: var(--card-slate-50);
   border-radius: 0;
   transition: background-color 400ms ease;
@@ -3923,7 +4147,7 @@ body,
 .exam-card-footer {
   position: relative;
   z-index: 2;
-  padding: 8px 14px;
+  padding: 6px 14px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -4430,4 +4654,288 @@ select,
 .num,.number,.numeric{
   font-family:var(--font-number);
   font-variant-numeric:tabular-nums;
+}
+
+/* Final dashboard layout overrides */
+.view-exams main{max-width:1400px;margin:0 auto;padding-left:32px;padding-right:32px}
+.view-exams .stats{gap:16px;margin-bottom:24px}
+.view-exams .dashboard-study-grid{grid-template-columns:minmax(0,1fr) 304px;gap:24px;align-items:start}
+.view-exams .dashboard-study-main,.view-exams .dashboard-side{min-width:0}
+.view-exams .dashboard-side{gap:16px}
+.view-exams .dashboard-study-create{min-height:132px;padding:24px 28px;margin-bottom:28px}
+.view-exams .section-head{margin-bottom:14px}
+.view-exams .exam-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
+.view-exams .exam-card-v2{width:100%}
+.view-exams .side-card{padding:20px}
+@media(max-width:1100px){.view-exams .dashboard-study-grid{grid-template-columns:1fr}.view-exams .dashboard-side{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.view-exams main{padding-left:16px;padding-right:16px}.view-exams .exam-list,.view-exams .dashboard-side{grid-template-columns:1fr}.view-exams .dashboard-study-create{padding:20px}}
+.view-exams .github-calendar .heatmap-scroll{display:block!important;min-height:86px;overflow-x:auto!important;overflow-y:hidden!important;padding:8px 0 4px!important}
+.view-exams .github-calendar .github-months{display:flex!important;width:528px!important;margin:0 0 6px!important}
+.view-exams .github-calendar .github-grid{display:grid!important;grid-template-columns:none!important;grid-template-rows:repeat(7,8px)!important;grid-auto-flow:column!important;grid-auto-columns:8px!important;gap:2px!important;width:max-content!important;margin:0!important}
+.view-exams .github-calendar .github-grid i{display:block!important;width:8px!important;height:8px!important;border-radius:1px!important;background:#E8E8E8!important;border:1px solid #E0E0E0!important;box-shadow:none!important}
+.view-exams .github-calendar .github-grid i.level-1{background:#D6EFEA!important;border-color:#B8D8D4!important}
+.view-exams .github-calendar .github-grid i.level-2{background:#6EC4BE!important;border-color:#5BB8B1!important}
+.view-exams .github-calendar .github-grid i.level-3,.view-exams .github-calendar .github-grid i.level-4{background:#008080!important;border-color:#008080!important}
+
+/* Dashboard compacto: uma única grade, sem cantos arredondados */
+.view-exams main{max-width:1320px;padding:24px 28px 40px}
+.view-exams main>header{height:auto;margin:0 0 18px}
+.view-exams main>header h1{font-size:22px;margin:0}
+.view-exams .stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0 0 20px}
+.view-exams .stat,.view-exams .study-create,.view-exams .side-card,.view-exams .exam-card-v2{border-radius:0!important}
+.view-exams .dashboard-study-grid{display:block}
+.view-exams .dashboard-study-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start}
+.view-exams .dashboard-study-main,.view-exams .dashboard-side{display:contents}
+.view-exams .dashboard-study-create,.view-exams .dashboard-study-main>.section-head{display:none}
+.view-exams .dashboard-side .modern-heatmap{grid-column:1;grid-row:1}
+.view-exams .dashboard-side .glance-performance{grid-column:2;grid-row:1}
+.view-exams .exam-list{grid-column:1 / -1;grid-row:2;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:16px}
+.view-exams .dashboard-side .side-card{min-width:0}
+.view-exams .github-calendar .heatmap-scroll{min-height:86px}
+@media(max-width:1000px){.view-exams .dashboard-study-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.view-exams .exam-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:680px){.view-exams main{padding:18px 14px 28px}.view-exams .stats,.view-exams .exam-list,.view-exams .dashboard-side{grid-template-columns:1fr}.view-exams .stats{gap:8px}.view-exams .dashboard-study-grid{grid-template-columns:1fr}.view-exams .dashboard-side .modern-heatmap,.view-exams .dashboard-side .glance-performance,.view-exams .exam-list{grid-column:1;grid-row:auto}}
+.view-exams .dashboard-study-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important}
+.view-exams .dashboard-study-main,.view-exams .dashboard-side{display:contents!important}
+.view-exams .dashboard-side .modern-heatmap{grid-column:1 / -1!important;grid-row:1!important}
+.view-exams .dashboard-study-create{display:flex!important;grid-column:1 / -1!important;grid-row:2!important;margin:0!important}
+.view-exams .exam-list{grid-column:1 / -1!important;grid-row:3!important}
+.view-exams .dashboard-side .glance-performance{grid-column:1 / -1!important;grid-row:4!important}
+@media(max-width:680px){.view-exams .dashboard-study-grid{grid-template-columns:1fr!important}.view-exams .dashboard-side .modern-heatmap,.view-exams .dashboard-study-create,.view-exams .exam-list,.view-exams .dashboard-side .glance-performance{grid-column:1!important}}
+.view-exams .stats{display:none!important}
+.view-exams .dashboard-study-grid{display:flex!important;flex-direction:column!important;gap:14px!important}
+.view-exams .dashboard-study-main,.view-exams .dashboard-side{display:contents!important}
+.view-exams .dashboard-side .modern-heatmap{order:1;width:100%!important;box-sizing:border-box}
+.view-exams .dashboard-study-create{order:2;width:100%!important;box-sizing:border-box}
+.view-exams .exam-list{order:3;width:100%!important}
+.view-exams .dashboard-side .glance-performance{order:4;width:100%!important;box-sizing:border-box}
+
+/* MIRA corporate system: graphite, teal and square geometry */
+:root{
+  --bg-main:#F4F5F7;
+  --color-graphite:#20242C;
+  --color-graphite-light:#2D323E;
+  --color-teal:#008080;
+  --color-teal-hover:#006666;
+  --color-teal-light:#EEF4F3;
+  --border-color:#E2E4E8;
+  --text-primary:#1F2329;
+  --text-secondary:#606873;
+  --font-corporate:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+.view-exams,.view-exams body{background:var(--bg-main);color:var(--text-primary)}
+.view-exams .topbar{height:64px;background:var(--color-graphite);border-bottom:3px solid var(--color-teal);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.view-exams .topbar-inner{height:64px;padding:0 24px;max-width:none}
+.view-exams .brand{height:64px;min-width:132px;background:transparent;padding:0}
+.view-exams .brand-name{font-family:var(--font-corporate);font-size:20px;font-weight:700;letter-spacing:-.5px;color:#fff}
+.view-exams .brand-lockup small{font-family:var(--font-corporate);color:var(--color-teal);font-weight:800}
+.view-exams .nav{height:64px;padding:0 16px;color:#CED4DA;background:transparent;font-family:var(--font-corporate);font-size:14px}
+.view-exams .nav:hover,.view-exams .nav.active{color:#fff;background:var(--color-graphite-light);box-shadow:inset 0 -4px var(--color-teal)}
+.view-exams .top-import{height:38px;background:var(--color-teal);color:#fff;box-shadow:none}
+.view-exams .top-import:hover{background:var(--color-teal-hover)}
+.view-exams .profile{height:64px;color:#fff;border-left:1px solid #515966;padding-left:20px;font-family:var(--font-corporate)}
+.view-exams main{background:var(--bg-main);font-family:var(--font-corporate)}
+.view-exams .dashboard-study-grid{max-width:1440px;margin:32px auto;padding:0 24px;gap:24px}
+.view-exams .dashboard-study-create{background:#fff;border-left:4px solid var(--color-teal);border-top:1px solid var(--border-color);border-right:1px solid var(--border-color);border-bottom:1px solid var(--border-color);box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.view-exams .side-card,.view-exams .exam-card-v2{background:#fff;border:1px solid var(--border-color)!important;border-radius:0!important;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.view-exams .exam-card-v2:hover{border-color:#B2D8D8!important;box-shadow:0 8px 24px rgba(32,36,44,.08)}
+.view-exams .exam-card-visual{background:#FAFAFA;border-bottom:1px solid var(--border-color)}
+.view-exams .exam-card-progress-bar,.view-exams .exam-card-progress-bar i,.view-exams button{border-radius:0!important}
+.view-exams .exam-card-progress-bar i{background:var(--color-teal)!important}
+.view-exams .site-footer{background:var(--color-graphite);color:#8A92A6;border-top:1px solid var(--color-graphite-light);max-width:none;margin:64px -28px -40px;padding:24px 48px;font-family:var(--font-corporate)}
+.view-exams .topbar{height:64px;background:#008080;border-bottom:0;box-shadow:none}
+.view-exams .topbar-inner{height:64px}
+.view-exams .brand{height:64px;background:#008080}
+.view-exams .brand-name{color:#fff}
+.view-exams .brand-lockup small{color:#B8E4E0}
+.view-exams .nav{height:64px;color:#D6EFEA}
+.view-exams .nav:hover,.view-exams .nav.active{color:#fff;background:#149292;box-shadow:inset 0 -3px #D6A12A}
+.view-exams .top-import{background:#008080;color:#fff}
+.view-exams .profile{height:64px;color:#fff;border-left-color:#149292}
+.view-exams,.view-exams main{background:#F4F5F7!important}
+#root > .topbar{height:64px!important;background:#008080!important;border-bottom:0!important;box-shadow:none!important}
+#root > .topbar .topbar-inner{height:64px!important;background:#008080!important}
+#root > .topbar .brand{height:64px!important;background:#008080!important}
+#root > .topbar .nav{height:64px!important;background:transparent!important;color:#D6EFEA!important}
+#root > .topbar .nav.active,#root > .topbar .nav:hover{background:#149292!important;color:#fff!important;box-shadow:inset 0 -3px #D6A12A!important}
+#root > .topbar .top-import{background:#008080!important;color:#fff!important}
+/* Header restored from the last approved Git version */
+.app-shell .topbar{height:54px!important;background:#008080!important;border-top:0!important;border-bottom:2px solid #006666!important;box-shadow:none!important}
+.app-shell .topbar-inner{height:54px!important;padding:0 20px!important;gap:16px!important}
+.app-shell .brand{height:54px!important;min-width:105px!important;background:transparent!important;padding:0!important}
+.app-shell .brand-name{font-size:21px!important;line-height:19px!important;color:#fff!important}
+.app-shell .brand-lockup small{color:#B8E4E0!important}
+.app-shell .topbar nav{gap:2px!important;align-self:stretch}
+.app-shell .nav{height:34px!important;padding:0 9px!important;color:#D0E8E4!important;background:transparent!important;gap:6px;position:relative;font-size:13px}
+.app-shell .nav:hover{background:rgba(255,255,255,.08)!important;color:#fff!important}
+.app-shell .nav.active{background:rgba(255,255,255,.1)!important;color:#fff!important;box-shadow:none!important}
+.app-shell .nav.active:after{content:"";position:absolute;height:2px;left:9px;right:9px;bottom:-6px;background:#D6A12A}
+.app-shell .top-import{height:36px!important;background:#008080!important;color:#fff!important}
+.app-shell .profile{height:54px!important;margin-left:auto;padding-left:16px;color:#fff!important;border-color:rgba(255,255,255,.2)!important}
+.app-shell .profile strong{color:#fff!important}
+.app-shell .profile svg{color:#B8E4E0!important}
+.app-shell .profile .avatar{background:#fff!important;color:#008080!important}
+.app-shell .topbar{height:54px!important;background:#008080!important;border-top:3px solid #D6A12A!important;border-bottom:1px solid #006666!important}
+/* Barra superior restaurada do último estado versionado */
+.app-shell .topbar,
+.app-shell .topbar-inner{height:54px!important}
+.app-shell .topbar{background:#008080!important;border-top:3px solid #D6A12A!important;border-bottom:1px solid #006666!important;box-shadow:none!important}
+.app-shell .topbar-inner{padding:0 20px!important;gap:16px!important}
+.app-shell .brand{min-width:105px!important;height:54px!important;background:transparent!important;padding:0!important}
+.app-shell .brand-name{font-size:21px!important;line-height:19px!important;color:#fff!important}
+.app-shell .brand-lockup small{color:#B8E4E0!important}
+.app-shell .topbar nav{height:54px!important;gap:2px!important;align-self:stretch!important}
+.app-shell .nav{height:34px!important;padding:0 9px!important;color:#D0E8E4!important;background:transparent!important}
+.app-shell .nav:hover{background:rgba(255,255,255,.08)!important;color:#fff!important}
+.app-shell .nav.active{background:rgba(255,255,255,.1)!important;color:#fff!important;box-shadow:none!important}
+.app-shell .nav.active:after{content:"";position:absolute;height:2px;left:9px;right:9px;bottom:-6px;background:#D6A12A}
+.app-shell .top-import{display:none!important}
+.app-shell .profile{height:54px!important;margin-left:auto!important;padding-left:12px!important;color:#fff!important;border-color:rgba(255,255,255,.2)!important}
+.app-shell .profile strong{color:#fff!important}
+.app-shell .profile svg{color:#B8E4E0!important}
+.app-shell .profile .avatar{background:#fff!important;color:#008080!important}
+.app-shell .topbar{border-top:0!important}
+#root > .topbar .nav.active:after{display:none!important}
+#root > .topbar .nav,
+#root > .topbar .nav svg{transition:none!important;transform:none!important}
+#root > .topbar .nav:hover{transform:none!important}
+#root > .topbar .nav:hover svg{transform:none!important}
+.view-exams .topbar{height:68px!important;border-bottom:0!important;background:#008080!important}
+.view-exams .topbar-inner{height:68px!important}
+.view-exams .topbar nav{height:68px!important;display:flex!important;align-items:center!important;gap:4px!important}
+.view-exams .topbar .nav,
+.view-exams .topbar .nav.active,
+.view-exams .topbar .nav:hover{height:54px!important;min-height:54px!important;margin:0!important;transform:none!important;box-shadow:none!important}
+.view-exams .topbar .nav.active{background:transparent!important}
+.view-exams .topbar .nav{position:static!important;top:auto!important;bottom:auto!important;left:auto!important;right:auto!important;align-self:center!important;transform:none!important;animation:none!important}
+.view-exams .topbar .nav.active:before,.view-exams .topbar .nav.active:after{display:none!important;content:none!important}
+.view-exams .topbar .nav.active{border:0!important;outline:0!important;box-shadow:none!important}
+.view-exams .topbar{height:64px;background:#384047;border-bottom:1px solid #2E353B}
+.view-exams .topbar-inner{height:64px;max-width:1496px;margin:0 auto;padding:0 28px;gap:26px}
+.view-exams .brand{height:64px;min-width:132px;background:transparent;padding:0}
+.view-exams .brand-name{color:#fff;font-size:24px}
+.view-exams .brand-lockup small{color:#D6DADF}
+.view-exams .nav{height:64px;padding:0 16px;color:#D6DADF;background:transparent}
+.view-exams .nav.active{color:#fff;background:#2E353B;box-shadow:inset 0 -3px #D6A12A}
+.view-exams .top-import{margin-left:auto;height:38px;background:#D6A12A;color:#2E333D}
+.view-exams .profile{height:64px;color:#fff;border-left:1px solid #657078;padding-left:20px}
+.view-exams main{background:#F7F6F2}
+.view-exams .site-footer{display:flex;justify-content:space-between;align-items:center;gap:18px;max-width:1320px;margin:28px auto 0;padding:18px 28px;border-top:1px solid #D9DEE3;color:#6C7480;font-size:11px;letter-spacing:.02em}
+.view-exams .site-footer span:first-child{color:#008080;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.view-exams .stat,.view-exams .study-create,.view-exams .side-card,.view-exams .exam-card-v2{border:1px solid #D9DEE3;box-shadow:0 1px 0 rgba(46,51,61,.03)}
+.view-exams .exam-card-v2:hover{border-color:#008080;box-shadow:0 10px 24px rgba(46,51,61,.10);transform:translateY(-2px)}
+.view-exams .github-calendar .github-grid i{transition:transform 120ms ease,filter 120ms ease}
+.view-exams .github-calendar .github-grid i:hover{transform:scale(1.35);filter:brightness(.92)}
+.view-exams .dashboard-study-create{border-left:4px solid #008080}
+@media(max-width:680px){.view-exams .site-footer{align-items:flex-start;flex-direction:column;padding:16px}}
+
+/* Mira Open Source: acabamento geral da plataforma, preservando os cards de provas */
+.view-exams{background:#F7F6F2;color:#252B35}
+.view-exams .topbar{height:68px;background:#0F6868;border-bottom:3px solid #D6A12A}
+.view-exams .topbar-inner{height:68px;padding:0 34px;gap:30px}
+.view-exams .brand{height:68px;min-width:150px}
+.view-exams .brand-name{font-size:26px;letter-spacing:-.06em}
+.view-exams .brand-lockup small{font-size:8px;letter-spacing:.28em;color:#B8E4E0}
+.view-exams nav{height:68px;display:flex;align-items:stretch;gap:4px}
+.view-exams .nav{height:68px;padding:0 18px;border-left:1px solid transparent;border-right:1px solid transparent;font-size:14px}
+.view-exams .nav.active{background:#0B5B5B;box-shadow:inset 0 -3px #D6A12A}
+.view-exams .top-import{height:40px;margin-left:auto;background:#D6A12A;color:#25333A;font-weight:800;box-shadow:none}
+.view-exams .top-import:hover{background:#E5B437}
+.view-exams .profile{height:68px;padding-left:24px;gap:10px;border-left:1px solid rgba(255,255,255,.2)}
+.view-exams .profile .avatar{background:#F7F6F2;color:#0F6868;font-weight:800}
+.view-exams main{max-width:1280px;padding:30px 36px 44px;background:#F7F6F2}
+.view-exams main>header{margin-bottom:24px}
+.view-exams main>header .eyebrow{font-size:10px;letter-spacing:.18em;color:#75808C}
+.view-exams main>header h1{font-size:28px;letter-spacing:-.045em;color:#252B35}
+.view-exams .dashboard-study-grid{gap:18px!important}
+.view-exams .dashboard-study-create{min-height:128px!important;padding:24px 30px!important;background:#fff;border:1px solid #D9DEE3!important;border-left:4px solid #0F8683!important}
+.view-exams .dashboard-study-create .eyebrow{color:#0F8683;letter-spacing:.16em}
+.view-exams .dashboard-study-create h2{font-size:22px;color:#252B35;letter-spacing:-.035em}
+.view-exams .dashboard-study-create p{font-size:13px;color:#75808C}
+.view-exams .notebook-actions button{height:42px;padding:0 20px;font-size:12px}
+.view-exams .notebook-actions .secondary{border:1px solid #B8D8D4;color:#0F6868;background:#fff}
+.view-exams .notebook-actions .primary{background:#0F8683}
+.view-exams .dashboard-side .side-card{background:#fff;border:1px solid #D9DEE3!important;padding:22px!important}
+.view-exams .dashboard-side .side-title{margin-bottom:18px}
+.view-exams .dashboard-side .side-title h3{font-size:19px;color:#252B35;letter-spacing:-.035em}
+.view-exams .dashboard-side .eyebrow{font-size:10px;letter-spacing:.16em;color:#0F8683!important}
+.view-exams .github-calendar .activity-total{color:#0F8683;font-weight:800}
+.view-exams .github-calendar .heatmap-scroll{min-height:112px;padding:10px 0 8px!important}
+.view-exams .github-calendar .github-months{color:#89929D;font-size:10px}
+.view-exams .github-calendar .heatmap-footer{margin-top:12px;color:#75808C;font-size:11px}
+.view-exams .glance-performance>strong{font-size:52px;color:#0F8683;letter-spacing:-.08em}
+.view-exams .glance-performance>span{font-size:12px;color:#75808C}
+.view-exams .glance-performance small{display:block;margin-top:12px;color:#89929D;font-size:11px}
+.view-exams .quick-track{height:6px;background:#E6E9EB;margin-top:16px}
+.view-exams .quick-track i{background:#D6A12A}
+.view-exams .site-footer{max-width:1280px;padding:20px 36px;margin-top:30px}
+@media(max-width:900px){.view-exams .topbar-inner{padding:0 18px}.view-exams main{padding:24px 20px 36px}.view-exams .top-import{display:none}}
+
+/* Barra principal: geometria fixa e navegação sem deslocamento */
+#root > .topbar,
+#root > .topbar .topbar-inner,
+#root > .topbar nav,
+#root > .topbar .nav {
+  box-sizing: border-box !important;
+}
+
+#root > .topbar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  height: 64px !important;
+  padding: 0 24px !important;
+  background-color: #007777 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+#root > .topbar .topbar-inner {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  max-width: none !important;
+  height: 64px !important;
+  padding: 0 !important;
+  gap: 0 !important;
+}
+
+#root > .topbar nav {
+  display: flex !important;
+  align-items: center !important;
+  height: 100% !important;
+  gap: 0 !important;
+}
+
+#root > .topbar .nav,
+#root > .topbar .nav:hover,
+#root > .topbar .nav.active {
+  display: flex !important;
+  align-items: center !important;
+  height: 64px !important;
+  min-height: 64px !important;
+  margin: 0 !important;
+  padding: 0 20px !important;
+  color: #fff !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-bottom: 3px solid transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+#root > .topbar .nav.active {
+  background-color: #005f5f !important;
+  border-bottom-color: #f59e0b !important;
+}
+
+#root > .topbar .nav::before,
+#root > .topbar .nav::after,
+#root > .topbar .nav.active::before,
+#root > .topbar .nav.active::after {
+  display: none !important;
+  content: none !important;
 }

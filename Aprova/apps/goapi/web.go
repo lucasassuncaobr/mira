@@ -38,17 +38,6 @@ func hasIndex(dir string) bool {
 	return err == nil && !st.IsDir()
 }
 
-func bridgeCandidates() []string {
-	var out []string
-	if exe, err := os.Executable(); err == nil {
-		out = append(out, filepath.Join(filepath.Dir(exe), "bridge", "ocr-bridge.mjs"))
-	}
-	return append(out,
-		filepath.Join("apps", "goapi", "bridge", "ocr-bridge.mjs"),
-		filepath.Join("bridge", "ocr-bridge.mjs"),
-	)
-}
-
 func registerWeb(app *fiber.App) {
 	webDir = resolveWebDir()
 	if webDir == "" {

@@ -1,8 +1,7 @@
-// Mira API — casca Go/Fiber (fase 1 da migração).
+// Mira API — versão Go pura (sem Python).
 //
-// Mesmo contrato JSON da API Node (apps/api/src/server.ts). Nesta fase:
-// GET /api/health e GET /api/exams, lendo o mesmo SQLite (data/aprova.db).
-// Demais rotas (import, foco, OCR, P2P) continuam no Node até as próximas fases.
+// Mesma API do Express (apps/api/src/server.ts), usando PDF Oxide
+// e tesseract-ocr como binários CLI nativos. Sem runtime Python ou Node.
 package main
 
 import (
@@ -10,39 +9,11 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strings"
-	"unicode"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	_ "modernc.org/sqlite"
 )
-
-var minorWords = map[string]bool{
-	"a": true, "as": true, "o": true, "os": true, "da": true,
-	"das": true, "de": true, "do": true, "dos": true, "e": true,
-	"em": true, "para": true,
-}
-
-// formatExamTitle — porte fiel de parser.ts: minúsculas, mantém minúsculas
-// fracas (exceto a primeira palavra), inicial maiúscula nas demais.
-func formatExamTitle(title string) string {
-	t := strings.ReplaceAll(title, "_", " ")
-	t = strings.Join(strings.Fields(t), " ")
-	t = strings.ToLower(t)
-	words := strings.Split(t, " ")
-	for i, w := range words {
-		if i > 0 && minorWords[w] {
-			continue
-		}
-		r := []rune(w)
-		if len(r) > 0 {
-			r[0] = unicode.ToUpper(r[0])
-			words[i] = string(r)
-		}
-	}
-	return strings.Join(words, " ")
-}
 
 const schema = `
   PRAGMA journal_mode = WAL;
@@ -141,23 +112,6 @@ func main() {
 		log.Fatal(err)
 	}
 	assetsDir = filepath.Join(dataDirUsed, "exam-assets")
-	pythonDir = os.Getenv("MIRA_PY_DIR")
-	if pythonDir == "" {
-		// Layout padrão: <root>/apps/api/{data,python} — deriva do dataDir.
-		for _, cand := range []string{
-			filepath.Join(filepath.Dir(dataDirUsed), "python"),
-			exeSibling("..", filepath.Join("api", "python")),
-			filepath.Join("..", "api", "python"),
-		} {
-			if st, err := os.Stat(filepath.Join(cand, "pdf_extract.py")); err == nil && !st.IsDir() {
-				pythonDir = cand
-				break
-			}
-		}
-	}
-	if st, err := os.Stat(filepath.Join(pythonDir, "pdf_extract.py")); err != nil || st.IsDir() {
-		log.Fatalf("pdf_extract.py não encontrado (MIRA_PY_DIR=%q)", pythonDir)
-	}
 
 	app := fiber.New(fiber.Config{DisableStartupMessage: true, BodyLimit: 22 * 1024 * 1024})
 	app.Use(cors.New())
@@ -202,7 +156,7 @@ func main() {
 				return c.Status(500).JSON(fiber.Map{"error": "Não foi possível concluir a operação"})
 			}
 			item := fiber.Map{
-				"id": id, "title": formatExamTitle(title), "filename": filename,
+				"id": id, "title": title, "filename": filename,
 				"created_at": createdAt, "question_count": qc, "study_seconds": study,
 			}
 			if logo.Valid {

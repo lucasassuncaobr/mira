@@ -1,25 +1,23 @@
-FROM node:24-alpine AS build
-WORKDIR /app
-COPY package.json package-lock.json ./
-COPY apps/api/package.json apps/api/package.json
-COPY apps/web/package.json apps/web/package.json
-RUN npm ci
-COPY apps/api/src apps/api/src
-COPY apps/api/tsconfig.json apps/api/tsconfig.json
-RUN npm run build -w apps/api
+# Compatibilidade com integrações que ainda referenciam Dockerfile.api.
+# O backend oficial é o binário Go servido pelo Dockerfile.go.
+FROM golang:1.26-bookworm AS build
+WORKDIR /src
+COPY apps/goapi/go.mod apps/goapi/go.sum apps/goapi/
+RUN cd apps/goapi && go mod download
+RUN apt-get update && apt-get install -y --no-install-recommends libtesseract-dev libleptonica-dev && rm -rf /var/lib/apt/lists/*
+COPY apps/goapi/*.go apps/goapi/
+RUN go run github.com/yfedoseev/pdf_oxide/go/cmd/install@v0.3.78 -dir /opt/pdf-oxide
+RUN cd apps/goapi && CGO_ENABLED=1 CGO_CFLAGS="-I/opt/pdf-oxide/include" CGO_LDFLAGS="-L/opt/pdf-oxide/lib/linux_amd64 -lpdf_oxide -lm -lpthread -ldl -lrt -lgcc_s -lutil" go build -o /out/mira-goapi .
+RUN du -h /out/mira-goapi && du -sh apps/goapi/web
 
-FROM node:24-alpine
-# Python + pipeline pdfplumber/pypdfium2 (MIT/BSD/Apache) — sem poppler (GPL).
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends libtesseract5 liblept5 tesseract-ocr tesseract-ocr-por ca-certificates && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-COPY apps/api/requirements.txt /tmp/requirements.txt
-RUN apk add --no-cache python3 py3-pip \
-  && pip install --no-cache --break-system-packages -r /tmp/requirements.txt \
-  && rm /tmp/requirements.txt
-COPY --from=build /app/apps/api/dist apps/api/dist
-COPY --from=build /app/node_modules node_modules
-COPY apps/api/package.json apps/api/
-COPY apps/api/python apps/api/python
+COPY --from=build /out/mira-goapi ./mira-goapi
+COPY apps/goapi/web ./web
+ENV PORT=3333
+ENV MIRA_DATA_DIR=/app/data
+ENV MIRA_WEB_DIR=/app/web
 EXPOSE 3333
 VOLUME /app/data
-WORKDIR /app/apps/api
-CMD ["node", "dist/server.js"]
+ENTRYPOINT ["./mira-goapi"]

@@ -12,6 +12,11 @@ function esc(s) {
   return String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
+function assetURL(path) {
+  const value = String(path ?? "");
+  return value.startsWith("/") ? `${location.origin}${value}` : `${API}/${value}`;
+}
+
 function formatStudyTime(seconds) {
   seconds = Number(seconds ?? 0);
   if (seconds < 60) return "0min";
@@ -140,25 +145,6 @@ Alpine.store("app", {
     },
   });
 
-  // ---- relógio isolado (tick de 1s num único span) ----
-  window.__clockTimer = null;
-  function stopClock() {
-    if (window.__clockTimer) { window.clearInterval(window.__clockTimer); window.__clockTimer = null; }
-  }
-  Alpine.data("examClock", () => ({
-    time: "00:00:00",
-    elapsed: 0,
-    init() {
-      stopClock();
-      const tick = () => {
-        this.elapsed += 1;
-        this.time = formatTimer(this.elapsed);
-      };
-      tick();
-      window.__clockTimer = window.setInterval(tick, 1000);
-    },
-  }));
-
   // ---- dashboard ----
   // NOTA Alpine: dentro de handlers x-on:click, this.$el/$refs resolvem para
   // o elemento clicado — por isso cada componente captura a raiz no init()
@@ -173,7 +159,7 @@ Alpine.store("app", {
     get studyTime() { return formatStudyTime(this.studySeconds); },
     init() {
       this.root = this.$el;
-      this.renderCards();
+      this.$nextTick(() => this.renderCards());
       this.$watch(() => Alpine.store("app").exams, () => this.renderCards());
     },
     renderCards() {
@@ -191,11 +177,11 @@ Alpine.store("app", {
     async init() {
       let activity = [];
       try { activity = await fetch(`${API}/activity`).then((r) => r.json()); } catch { activity = []; }
-      const visible = activity.slice(-84);
-      const cells = [...Array(Math.max(0, 84 - visible.length)).fill(null), ...visible].slice(-84);
+      const visible = activity.slice(-371);
+      const cells = [...Array(Math.max(0, 371 - visible.length)).fill(null), ...visible].slice(-371);
       const activeDays = visible.filter((d) => d.count > 0).length;
       const total = visible.reduce((s, d) => s + d.count, 0);
-      this.html = `<section class="side-card consistency modern-heatmap"><div class="side-title"><div><span class="eyebrow">CONSTÂNCIA</span><h3>Ritmo de estudo</h3></div><span class="activity-total">${total} questões</span></div><div class="heatmap-scroll"><div class="consistency-grid compact-heatmap">${cells.map((day, i) => `<i key="${day?.date ?? `empty-${i}`}" class="level-${Math.min(4, day?.count ?? 0)}" title="${day ? `${esc(day.label)}: ${day.count} ${day.count === 1 ? "questão" : "questões"}` : "Sem registro"}"></i>`).join("")}</div></div><div class="heatmap-footer"><span>${activeDays} dias ativos</span><div><small>Menos</small>${[0, 1, 2, 3, 4].map((l) => `<i class="level-${l}"></i>`).join("")}<small>Mais</small></div></div></section>`;
+      this.html = `<section class="side-card consistency modern-heatmap github-calendar"><div class="side-title"><div><span class="eyebrow">CONSTÂNCIA</span><h3>Ritmo de estudo</h3></div><span class="activity-total">${total} questões</span></div><div class="heatmap-scroll"><div class="github-months"><span>Jan</span><span>Mar</span><span>Mai</span><span>Jul</span><span>Set</span><span>Nov</span></div><div class="consistency-grid compact-heatmap github-grid">${cells.map((day, i) => `<i key="${day?.date ?? `empty-${i}`}" class="level-${Math.min(4, day?.count ?? 0)}" title="${day ? `${esc(day.label)}: ${day.count} ${day.count === 1 ? "questão" : "questões"}` : "Sem registro"}"></i>`).join("")}</div></div><div class="heatmap-footer"><span>${activeDays} dias ativos</span><div><small>Menos</small>${[0, 1, 2, 3, 4].map((l) => `<i class="level-${l}"></i>`).join("")}<small>Mais</small></div></div></section>`;
     },
   }));
 
@@ -260,8 +246,10 @@ Alpine.store("app", {
     init() {
       this.$watch(() => Alpine.store("app").loading, (v) => {
         if (v) {
-          this.secs = 0;
-          this.timer = window.setInterval(() => (this.secs += 1), 1000);
+          const startedAt = performance.now();
+          const tick = () => { this.secs = Math.floor((performance.now() - startedAt) / 1000); };
+          tick();
+          this.timer = window.setInterval(tick, 250);
         } else {
           this.secs = 0;
           if (this.timer) window.clearInterval(this.timer);
@@ -594,6 +582,19 @@ Alpine.store("app", {
         const alturaFaixa = Math.min(pagina.clientHeight - Math.max(0, alvo - 4), base + 12);
         faixaEl.style.top = `${Math.max(0, alvo - 4)}px`;
         faixaEl.style.height = `${alturaFaixa}px`;
+        if (Number.isFinite(focus.x_center)) {
+          if (focus.x_center > 45 && focus.x_center < 55) {
+            faixaEl.style.left = "0";
+            faixaEl.style.right = "0";
+          } else {
+            const ladoEsquerdo = focus.x_center < 50;
+            faixaEl.style.left = ladoEsquerdo ? "0" : "50%";
+            faixaEl.style.right = ladoEsquerdo ? "50%" : "0";
+          }
+        } else {
+          faixaEl.style.left = "0";
+          faixaEl.style.right = "0";
+        }
         const rot = ((this.questionNumber * 13) % 7 - 3) * 0.09;
         faixaEl.style.setProperty("--faixa-rotate", `${rot.toFixed(2)}deg`);
         window.clearTimeout(this.faixaTimer);
@@ -649,19 +650,18 @@ Alpine.store("app", {
     },
   }));
 
-  // ---- relógio ----
+  function stopClock() {}
   Alpine.data("examClock", () => ({
     time: "00:00:00",
-    elapsed: 0,
+    startedAt: 0,
+    timer: null,
     init() {
       const el = this.$el;
-      const tick = () => {
-        this.elapsed += 1;
-        this.time = formatTimer(this.elapsed);
-      };
+      this.startedAt = performance.now();
+      const tick = () => { this.time = formatTimer(Math.floor((performance.now() - this.startedAt) / 1000)); };
       tick();
-      const id = window.setInterval(tick, 1000);
-      el._clockTimer = id;
+      const id = window.setInterval(tick, 250);
+      this.timer = id;
       const obs = new MutationObserver(() => {
         if (!document.contains(el)) {
           window.clearInterval(id);
@@ -669,6 +669,7 @@ Alpine.store("app", {
         }
       });
       obs.observe(document.body, { childList: true, subtree: true });
+      el._clockCleanup = () => { window.clearInterval(id); obs.disconnect(); };
     },
   }));
 Alpine.start();
@@ -680,16 +681,21 @@ function examCardHtml(item) {
   const wrong = Number(item.wrong_count ?? 0);
   const total = Number(item.question_count ?? 0);
   const progress = total ? Math.min(100, Math.round((answered / total) * 100)) : 0;
+  const completed = total > 0 && answered >= total;
   return `
-    <article class="exam-card-v2" data-id="${item.id}">
-      <div class="exam-card-visual"><div class="exam-card-icon ecv2-teal">${ICONS.fileText}</div></div>
+    <article class="exam-card-v2${completed ? " is-completed" : ""}" data-id="${item.id}">
+      <div class="exam-card-visual">
+        ${item.logo ? `<img class="exam-card-logo" src="${assetURL(item.logo)}" alt="" />` : `<div class="exam-card-icon ecv2-teal">${ICONS.fileText}</div>`}
+        <div class="exam-card-visual-title"><h3>${esc(item.title)}</h3><span>${item.cargo_count ? `${item.cargo_count} cargos` : ""}</span></div>
+      </div>
       <div class="exam-card-content"><div class="exam-card-content-inner">
-        <div class="exam-card-header"><div class="exam-card-header-text"><h3>${esc(item.title)}</h3>
-        ${item.board ? `<span class="exam-card-board">${esc(item.board)}</span>` : ""}</div>
-        <button class="exam-card-chevron" data-act="expand" aria-label="Expandir">${ICONS.chevR}</button></div>
+        <div class="exam-card-info-box">
+          ${item.created_at ? `<span><b>Prova:</b> <strong class="card-number">${new Date(item.created_at).toLocaleDateString("pt-BR")}</strong></span>` : ""}
+          ${item.board ? `<span><b>Banca:</b> ${esc(item.board)}</span>` : ""}
+        </div>
         <div class="exam-card-progress-area"><div class="exam-card-progress-top">
           <span class="exam-card-progress-text"><strong>${answered}</strong> de <span class="progress-total">${total}</span> <small>resolvidas</small></span>
-          <span class="exam-card-status">${answered ? "Concluído" : "Aguardando respostas"}</span></div>
+          <span class="exam-card-status">${completed ? "Concluído" : "Em andamento"}</span></div>
           <div class="exam-card-progress-bar"><i style="width: ${progress}%"></i></div></div>
         <div class="exam-card-stats">
           <div class="exam-card-stat"><div class="exam-card-stat-icon ecv2-teal">${ICONS.clipboard}</div><div class="exam-card-stat-info"><strong>${answered}</strong><span>Resolvidas</span></div></div>
@@ -720,19 +726,12 @@ function wireExamCards(box) {
       await app.removeExam(id);
       return;
     }
-    if (act === "expand") {
-      e.stopPropagation();
-      card.classList.toggle("exam-card-expanded");
-      card.querySelector(".exam-card-chevron")?.classList.toggle("expanded");
-      card.querySelector(".exam-card-details")?.toggleAttribute("hidden");
-      return;
-    }
     if (act === "edit") {
       e.stopPropagation();
       openEditModal(id);
       return;
     }
-    if (e.target.closest(".exam-card-actions") || e.target.closest(".exam-card-chevron")) return;
+    if (e.target.closest(".exam-card-actions")) return;
     app.openExam(id, "solve");
   };
 }
@@ -750,7 +749,7 @@ function openEditModal(id) {
         <div class="exam-edit-field"><label>Título</label><input type="text" data-f="title" value="${esc(item.title)}" /></div>
         <div class="exam-edit-field"><label>Banca</label><input type="text" data-f="board" value="${esc(item.board ?? "")}" placeholder="Ex: FCC, CESPE, VUNESP..." /></div>
         <div class="exam-edit-field"><label>Logo da prova</label><div class="exam-edit-logo-area">
-          <img data-role="preview" ${item.logo ? `src="${API}${item.logo}"` : "hidden"} alt="Logo" class="exam-edit-logo-preview" />
+          <img data-role="preview" ${item.logo ? `src="${assetURL(item.logo)}"` : "hidden"} alt="Logo" class="exam-edit-logo-preview" />
           <label class="exam-edit-upload"><input type="file" accept="image/*" hidden /><span>Selecionar imagem</span></label>
         </div></div>
       </div>
