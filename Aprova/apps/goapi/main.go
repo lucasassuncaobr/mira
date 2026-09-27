@@ -156,6 +156,7 @@ func main() {
 	})
 
 	registerRoutes(app)
+	registerWeb(app)
 
 	app.Get("/api/exams", func(c *fiber.Ctx) error {
 		rows, err := db.Query(`

@@ -1,0 +1,12 @@
+/* Fórum Flarum — subpasta /forum */
+.forum-page { display: grid; gap: 16px; }
+.forum-toolbar { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid var(--line, #E8E8E8); padding: 16px 20px; border-radius: 12px; }
+.forum-toolbar h3 { margin: 4px 0 0; font: 700 18px var(--font-primary, sans-serif); }
+.forum-toolbar .secondary.small { padding: 8px 12px; font-size: 13px; }
+.forum-frame-wrap { background: #fff; border: 1px solid #E8E8E8; border-radius: 12px; overflow: hidden; height: calc(100vh - 240px); min-height: 520px; }
+.forum-frame-wrap iframe { width: 100%; height: 100%; border: 0; display: block; background: #fff; }
+.forum-card { background: #fff; border: 1px solid #E8E8E8; border-radius: 12px; padding: 18px 20px; }
+.forum-card h3 { margin: 0 0 10px; font: 700 16px var(--font-primary, sans-serif); }
+.forum-card ol { margin: 0; padding-left: 18px; color: #4A5060; line-height: 1.7; font-size: 13px; }
+.forum-card code { background: #F1F2F4; padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+.forum-empty { padding: 24px; text-align: center; color: #6C7480; }
