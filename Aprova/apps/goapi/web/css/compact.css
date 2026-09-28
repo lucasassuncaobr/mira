@@ -3154,9 +3154,8 @@ body,
   grid-template-columns:none!important;
   gap:4px!important;
   width:max-content!important;
-  margin:0 0 0 58px!important;
-  transform:rotateX(56deg) rotateZ(-32deg)!important;
-  transform-origin:left top!important;
+  margin:0!important;
+  transform:none!important;
 }
 .view-exams .modern-heatmap .compact-heatmap i{
   width:8px!important;
@@ -3330,12 +3329,11 @@ body,
   perspective:620px!important;
 }
 .view-exams .modern-heatmap .compact-heatmap{
-  transform:rotateX(54deg) rotateZ(-32deg) translateX(24px) translateY(2px)!important;
-  transform-origin:left top!important;
+  transform:none!important;
   gap:4px!important;
   grid-template-rows:repeat(7,8px)!important;
   grid-auto-columns:8px!important;
-  margin:0 0 8px 22px!important;
+  margin:0!important;
 }
 .view-exams .modern-heatmap .compact-heatmap i{
   width:8px!important;
@@ -3798,10 +3796,7 @@ body,
   overflow: hidden;
   cursor: pointer;
   min-height: 0;
-  transition: box-shadow 500ms cubic-bezier(.175,.885,.32,1.275), transform 200ms ease;
 }
-.exam-card-v2:hover { box-shadow: 0 20px 40px rgba(79, 70, 229,.12); transform: translateY(-2px); }
-.exam-card-v2:active { transform: translateY(0); }
 
 /* Visual Area (Icon/Logo) */
 .exam-card-visual {
@@ -3812,11 +3807,9 @@ body,
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: height 260ms ease, box-shadow 260ms ease;
   z-index: 1;
   overflow: hidden;
 }
-.exam-card-v2:hover .exam-card-visual { height: 125px; }
 
 .exam-card-icon {
   width: 72px;
@@ -3828,7 +3821,6 @@ body,
   background: linear-gradient(135deg, var(--card-blue) 0%, var(--navy-deep) 100%);
   color: #fff;
   box-shadow: 0 8px 24px rgba(79, 70, 229,.3);
-  transition: box-shadow 500ms cubic-bezier(.175,.885,.32,1.275);
 }
 .exam-card-logo {
   max-width: 150px;
@@ -3837,8 +3829,6 @@ body,
   height: auto;
   object-fit: contain;
 }
-.exam-card-v2:hover .exam-card-icon { box-shadow: 0 12px 32px rgba(79, 70, 229,.4); }
-
 /* Content Area */
 .exam-card-content {
   position: relative;
@@ -3872,7 +3862,6 @@ body,
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   overflow: hidden;
-  transition: color 400ms ease, letter-spacing 400ms ease;
 }
 
 .view-exams .library-main { grid-template-rows: auto auto; }
@@ -3888,10 +3877,6 @@ body,
   box-shadow: none;
   transform: none;
 }
-.view-exams .exam-card-v2:hover {
-  box-shadow: 0 5px 12px rgba(0,0,0,.08);
-  transform: translateY(-3px) scale(1.015);
-}
 .view-exams .exam-card-visual {
   height: 84px;
   padding: 10px 14px;
@@ -3902,7 +3887,6 @@ body,
   box-sizing: border-box;
   overflow: hidden;
 }
-.view-exams .exam-card-v2:hover .exam-card-visual { height: 92px; }
 .view-exams .exam-card-icon {
   flex: 0 0 58px !important;
   width: 58px !important;
@@ -3978,7 +3962,6 @@ body,
   line-height: 1.25;
   text-align: left;
 }
-.view-exams .exam-card-v2:hover .exam-card-info-box { background: #F1F3F4; }
 .view-exams .exam-card-info-box b { font-weight: 500; }
 .view-exams .exam-card-info-box .card-number,
 .view-exams .exam-card-progress-text strong,
@@ -4003,15 +3986,12 @@ body,
   top: 12px;
 }
 .view-exams .exam-card-stats { margin: 0 14px; }
-.view-exams .exam-card-v2:hover .exam-card-header-text h3 { color: inherit; letter-spacing: normal; }
 .exam-card-board {
   font-size: 12px;
   color: var(--card-slate-400);
   margin-top: 2px;
   display: block;
-  transition: color 300ms ease;
 }
-.exam-card-v2:hover .exam-card-board { color: var(--card-slate-500); }
 .exam-card-chevron {
   flex-shrink: 0;
   width: 28px;
@@ -4104,8 +4084,6 @@ body,
   border-radius: 0;
   transition: background-color 400ms ease;
 }
-.exam-card-v2:hover .exam-card-stats { background: #e0e7ff; }
-
 .exam-card-stat {
   display: flex;
   align-items: center;
@@ -4737,7 +4715,7 @@ select,
 .view-exams .dashboard-study-grid{max-width:1440px;margin:32px auto;padding:0 24px;gap:24px}
 .view-exams .dashboard-study-create{background:#fff;border-left:4px solid var(--color-teal);border-top:1px solid var(--border-color);border-right:1px solid var(--border-color);border-bottom:1px solid var(--border-color);box-shadow:0 1px 3px rgba(0,0,0,.05)}
 .view-exams .side-card,.view-exams .exam-card-v2{background:#fff;border:1px solid var(--border-color)!important;border-radius:0!important;box-shadow:0 1px 3px rgba(0,0,0,.05)}
-.view-exams .exam-card-v2:hover{border-color:#c7d2fe!important;box-shadow:0 8px 24px rgba(32,36,44,.08)}
+
 .view-exams .exam-card-visual{background:#FAFAFA;border-bottom:1px solid var(--border-color)}
 .view-exams .exam-card-progress-bar,.view-exams .exam-card-progress-bar i,.view-exams button{border-radius:0!important}
 .view-exams .exam-card-progress-bar i{background:var(--color-teal)!important}
@@ -4822,7 +4800,7 @@ select,
 .view-exams .site-footer{display:flex;justify-content:space-between;align-items:center;gap:18px;max-width:1320px;margin:28px auto 0;padding:18px 28px;border-top:1px solid #D9DEE3;color:#6C7480;font-size:11px;letter-spacing:.02em}
 .view-exams .site-footer span:first-child{color:#4f46e5;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
 .view-exams .stat,.view-exams .study-create,.view-exams .side-card,.view-exams .exam-card-v2{border:1px solid #D9DEE3;box-shadow:0 1px 0 rgba(46,51,61,.03)}
-.view-exams .exam-card-v2:hover{border-color:#4f46e5;box-shadow:0 10px 24px rgba(46,51,61,.10);transform:translateY(-2px)}
+
 .view-exams .github-calendar .github-grid i{transition:transform 120ms ease,filter 120ms ease}
 .view-exams .github-calendar .github-grid i:hover{transform:scale(1.35);filter:brightness(.92)}
 .view-exams .dashboard-study-create{border-left:4px solid #4f46e5}
