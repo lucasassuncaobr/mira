@@ -6,6 +6,7 @@ COPY apps/goapi/go.mod apps/goapi/go.sum apps/goapi/
 RUN cd apps/goapi && go mod download
 RUN apt-get update && apt-get install -y --no-install-recommends libtesseract-dev libleptonica-dev && rm -rf /var/lib/apt/lists/*
 COPY apps/goapi/*.go apps/goapi/
+COPY apps/goapi/web apps/goapi/web/
 RUN go run github.com/yfedoseev/pdf_oxide/go/cmd/install@v0.3.78 -dir /opt/pdf-oxide
 RUN cd apps/goapi && CGO_ENABLED=1 CGO_CFLAGS="-I/opt/pdf-oxide/include" CGO_LDFLAGS="-L/opt/pdf-oxide/lib/linux_amd64 -lpdf_oxide -lm -lpthread -ldl -lrt -lgcc_s -lutil" go build -o /out/mira-goapi .
 RUN du -h /out/mira-goapi && du -sh apps/goapi/web

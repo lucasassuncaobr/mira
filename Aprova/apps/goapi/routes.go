@@ -5,7 +5,9 @@ package main
 // Sem runtime Python no container final.
 
 import (
+	"crypto/sha256"
 	"database/sql"
+	"encoding/hex"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
@@ -1214,6 +1216,13 @@ func registerRoutes(app *fiber.App) {
 		if err != nil {
 			return fail(c)
 		}
+		// Dedupe por conteúdo: o mesmo PDF não gera duas provas.
+		examSum := sha256.Sum256(examBuf)
+		examHash := hex.EncodeToString(examSum[:])
+		var dupeID int64
+		if err := gdb.QueryRow("SELECT id FROM exams WHERE sha256 = ?", examHash).Scan(&dupeID); err == nil {
+			return c.Status(409).JSON(fiber.Map{"error": "Esta prova já foi importada", "id": dupeID})
+		}
 		examPages, err := runPdfExtract(examPath)
 		precisePages := ""
 		if err == nil {
@@ -1309,7 +1318,7 @@ func registerRoutes(app *fiber.App) {
 		if err != nil {
 			return fail(c)
 		}
-		res, err := gdb.Exec("INSERT INTO exams (title, filename, board) VALUES (?, ?, ?)", title, examFh.Filename, boardVal)
+		res, err := gdb.Exec("INSERT INTO exams (title, filename, board, sha256) VALUES (?, ?, ?, ?)", title, examFh.Filename, boardVal, examHash)
 		if err != nil {
 			return fail(c)
 		}

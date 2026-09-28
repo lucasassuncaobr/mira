@@ -158,6 +158,9 @@ Alpine.store("app", {
     filtersOpen: false,
     page: 1,
     perPage: 12,
+    icons: ICONS,
+    editing: null,
+    editSaving: false,
     get exams() { return Alpine.store("app").exams; },
     get answered() { return this.exams.reduce((s, i) => s + Number(i.answered_count ?? 0), 0); },
     get correct() { return this.exams.reduce((s, i) => s + Number(i.correct_count ?? 0), 0); },
@@ -213,9 +216,72 @@ Alpine.store("app", {
       push(total);
       return out;
     },
+    pad2(n) { return n === 0 ? "0" : String(n).padStart(2, "0"); },
+    fmtDate(s) { return s ? new Date(s).toLocaleDateString("pt-BR") : ""; },
+    logoURL(logo) { return assetURL(logo); },
+    // Card mostra o título curto ("Órgão/Banca"); o título completo
+    // aparece no banner da prova e no tooltip. Vale para toda prova
+    // importada, pois o padrão "Órgão - Cargo" vem do inferExamTitle.
+    shortTitle(t) {
+      const full = String(t ?? "").trim().replace(/\s+/g, " ");
+      if (!full) return "";
+      let s = full.split(" - ")[0].trim() || full;
+      const MAX = 42;
+      if (s.length > MAX) {
+        const cut = s.slice(0, MAX);
+        const i = cut.lastIndexOf(" ");
+        s = (i > 20 ? cut.slice(0, i) : cut).trimEnd() + "…";
+      }
+      return s;
+    },
+    statsOf(item) {
+      const a = Number(item.answered_count ?? 0);
+      const c = Number(item.correct_count ?? 0);
+      const w = Number(item.wrong_count ?? 0);
+      const t = Number(item.question_count ?? 0);
+      return { a, c, w, t, p: t ? Math.min(100, Math.round((a / t) * 100)) : 0, done: t > 0 && a >= t };
+    },
+    openCard(id) { Alpine.store("app").openExam(id, "solve"); },
+    async removeCard(id) { await Alpine.store("app").removeExam(id); },
+    startEdit(item) {
+      this.editing = {
+        id: item.id,
+        title: item.title ?? "",
+        board: item.board ?? "",
+        preview: item.logo ? assetURL(item.logo) : "",
+        file: null,
+      };
+      this.editSaving = false;
+    },
+    cancelEdit() { this.editing = null; },
+    onLogoFile(e) {
+      const f = e.target.files?.[0];
+      if (!f || !this.editing) return;
+      this.editing.file = f;
+      const reader = new FileReader();
+      reader.onload = (ev) => { if (this.editing) this.editing.preview = ev.target?.result ?? ""; };
+      reader.readAsDataURL(f);
+    },
+    async saveEdit() {
+      if (!this.editing || !this.editing.title.trim() || this.editSaving) return;
+      this.editSaving = true;
+      try {
+        const fd = new FormData();
+        fd.append("title", this.editing.title);
+        fd.append("board", this.editing.board);
+        if (this.editing.file) fd.append("logo", this.editing.file);
+        const response = await fetch(`${API}/exams/${this.editing.id}`, { method: "PUT", body: fd });
+        if (!response.ok) throw new Error("Erro ao salvar");
+        this.editing = null;
+        await Alpine.store("app").refresh();
+      } catch {
+        alert("Erro ao salvar alterações");
+      } finally {
+        this.editSaving = false;
+      }
+    },
     setPage(n) {
       this.page = Math.min(this.totalPages, Math.max(1, n));
-      this.renderCards();
       const head = document.querySelector(".gran-list-head");
       if (head) {
         const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -224,17 +290,8 @@ Alpine.store("app", {
     },
     clearFilters() { this.q = ""; this.fBoard = ""; this.fStatus = ""; this.fYear = ""; this.fSort = "recent"; },
     init() {
-      this.root = this.$el;
-      this.$nextTick(() => this.renderCards());
-      this.$watch(() => Alpine.store("app").exams, () => this.renderCards());
-      this.$watch(() => [this.q, this.fBoard, this.fStatus, this.fYear, this.fSort].join("|"), () => { this.page = 1; this.renderCards(); });
-    },
-    renderCards() {
-      const box = this.root.querySelector(".dashboard-exams");
-      if (!box) return;
-      if (this.page > this.totalPages) this.page = Math.max(1, this.totalPages);
-      box.innerHTML = this.paged.map((item) => examCardHtml(item)).join("");
-      wireExamCards(box);
+      this.$watch(() => [this.q, this.fBoard, this.fStatus, this.fYear, this.fSort].join("|"), () => { this.page = 1; });
+      this.$watch(() => this.filtered.length, () => { if (this.page > this.totalPages) this.page = this.totalPages; });
     },
   }));
 
@@ -333,8 +390,16 @@ Alpine.store("app", {
       body.append("answerKey", this.answerFile);
       try {
         const response = await fetch(`${API}/exams/import`, { method: "POST", body });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error);
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          // 409 = PDF já importado: abre a prova existente em vez de duplicar.
+          if (response.status === 409 && data.id) {
+            await app.refresh();
+            await app.openExam(data.id, "review");
+            return;
+          }
+          throw new Error(data.error || "Não foi possível importar");
+        }
         await app.refresh();
         await app.openExam(data.id, "review");
       } catch (e) {
@@ -740,137 +805,3 @@ Alpine.store("app", {
     },
   }));
 Alpine.start();
-
-// ---- exam card (HTML + wiring, estado local por cartão) ----
-function examCardHtml(item) {
-  const answered = Number(item.answered_count ?? 0);
-  const correct = Number(item.correct_count ?? 0);
-  const wrong = Number(item.wrong_count ?? 0);
-  const total = Number(item.question_count ?? 0);
-  const progress = total ? Math.min(100, Math.round((answered / total) * 100)) : 0;
-  const completed = total > 0 && answered >= total;
-  return `
-    <article class="exam-card-v2${completed ? " is-completed" : ""}" data-id="${item.id}">
-      <div class="exam-card-visual">
-        ${item.logo ? `<img class="exam-card-logo" src="${assetURL(item.logo)}" alt="" />` : `<div class="exam-card-icon ecv2-teal">${ICONS.fileText}</div>`}
-        <div class="exam-card-visual-title"><h3>${esc(item.title)}</h3><span>${item.cargo_count ? `${item.cargo_count} cargos` : ""}</span></div>
-      </div>
-      <div class="exam-card-content"><div class="exam-card-content-inner">
-        <div class="exam-card-info-box">
-          ${item.created_at ? `<span><b>Prova:</b> <strong class="card-number">${new Date(item.created_at).toLocaleDateString("pt-BR")}</strong></span>` : ""}
-          ${item.board ? `<span><b>Banca:</b> ${esc(item.board)}</span>` : ""}
-        </div>
-        <div class="exam-card-progress-area"><div class="exam-card-progress-top">
-          <span class="exam-card-progress-text"><strong>${answered === 0 ? "0" : String(answered).padStart(2, "0")}</strong> de <span class="progress-total">${total === 0 ? "0" : String(total).padStart(2, "0")}</span> <small>resolvidas</small></span>
-          <span class="exam-card-status">${completed ? "Concluído" : "Em andamento"}</span></div>
-          <div class="exam-card-progress-bar"><i style="width: ${progress}%"></i></div></div>
-        <div class="exam-card-stats">
-          <div class="exam-card-stat"><div class="exam-card-stat-icon ecv2-teal">${ICONS.clipboard}</div><div class="exam-card-stat-info"><strong>${answered}</strong><span>Resolvidas</span></div></div>
-          <div class="exam-card-stat"><div class="exam-card-stat-icon ecv2-green">${ICONS.check}</div><div class="exam-card-stat-info"><strong>${correct}</strong><span>Acertos</span></div></div>
-          <div class="exam-card-stat"><div class="exam-card-stat-icon ecv2-red">${ICONS.x}</div><div class="exam-card-stat-info"><strong>${wrong}</strong><span>Erros</span></div></div>
-        </div></div>
-        <div class="exam-card-details" hidden>
-          ${item.board ? `<div class="exam-card-detail"><strong>Banca:</strong> ${esc(item.board)}</div>` : ""}
-          ${item.created_at ? `<div class="exam-card-detail"><strong>Prova:</strong> ${new Date(item.created_at).toLocaleDateString("pt-BR")}</div>` : ""}
-        </div>
-      </div>
-      <footer class="exam-card-footer"><div class="exam-card-actions">
-        <button class="exam-card-edit" aria-label="Editar" data-act="edit">${ICONS.pencil}</button>
-        <button class="exam-card-remove" aria-label="Remover" data-act="remove">${ICONS.trash}</button>
-      </div><button class="exam-card-cta" data-act="open">Resolver</button></footer>
-    </article>`;
-}
-
-function wireExamCards(box) {
-  box.onclick = async (e) => {
-    const card = e.target.closest(".exam-card-v2");
-    if (!card) return;
-    const id = Number(card.dataset.id);
-    const app = Alpine.store("app");
-    const act = e.target.closest("[data-act]")?.dataset.act;
-    if (act === "remove") {
-      e.stopPropagation();
-      await app.removeExam(id);
-      return;
-    }
-    if (act === "edit") {
-      e.stopPropagation();
-      openEditModal(id);
-      return;
-    }
-    if (act === "open") {
-      app.openExam(id, "solve");
-      return;
-    }
-    if (e.target.closest(".exam-card-actions")) return;
-    app.openExam(id, "solve");
-  };
-}
-
-function openEditModal(id) {
-  const app = Alpine.store("app");
-  const item = app.exams.find((x) => x.id === id);
-  if (!item) return;
-  const overlay = document.createElement("div");
-  overlay.className = "exam-edit-overlay";
-  overlay.innerHTML = `
-    <div class="exam-edit-modal">
-      <div class="exam-edit-header"><h3>Editar prova</h3><button class="exam-edit-close" aria-label="Fechar">${ICONS.x}</button></div>
-      <div class="exam-edit-body">
-        <div class="exam-edit-field"><label>Título</label><input type="text" data-f="title" value="${esc(item.title)}" /></div>
-        <div class="exam-edit-field"><label>Banca</label><input type="text" data-f="board" value="${esc(item.board ?? "")}" placeholder="Ex: FCC, CESPE, VUNESP..." /></div>
-        <div class="exam-edit-field"><label>Logo da prova</label><div class="exam-edit-logo-area">
-          <img data-role="preview" ${item.logo ? `src="${assetURL(item.logo)}"` : "hidden"} alt="Logo" class="exam-edit-logo-preview" />
-          <label class="exam-edit-upload"><input type="file" accept="image/*" hidden /><span>Selecionar imagem</span></label>
-        </div></div>
-      </div>
-      <div class="exam-edit-footer"><button class="exam-edit-cancel">Cancelar</button><button class="exam-edit-save">Salvar</button></div>
-    </div>`;
-  let logoFile = null;
-  const close = () => overlay.remove();
-  overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
-  overlay.querySelector(".exam-edit-close").onclick = close;
-  overlay.querySelector(".exam-edit-cancel").onclick = close;
-  const fileInput = overlay.querySelector('input[type="file"]');
-  fileInput.onchange = () => {
-    const f = fileInput.files?.[0];
-    if (!f) return;
-    logoFile = f;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const img = overlay.querySelector('[data-role="preview"]');
-      img.src = ev.target?.result;
-      img.hidden = false;
-      overlay.querySelector(".exam-edit-upload span").textContent = "Trocar imagem";
-    };
-    reader.readAsDataURL(f);
-  };
-  const saveBtn = overlay.querySelector(".exam-edit-save");
-  const syncSave = () => {
-    const title = overlay.querySelector('[data-f="title"]').value;
-    saveBtn.disabled = !title.trim() || saveBtn.dataset.busy === "1";
-  };
-  overlay.querySelector('[data-f="title"]').oninput = syncSave;
-  saveBtn.onclick = async () => {
-    saveBtn.dataset.busy = "1";
-    saveBtn.textContent = "Salvando...";
-    syncSave();
-    try {
-      const fd = new FormData();
-      fd.append("title", overlay.querySelector('[data-f="title"]').value);
-      fd.append("board", overlay.querySelector('[data-f="board"]').value);
-      if (logoFile) fd.append("logo", logoFile);
-      const response = await fetch(`${API}/exams/${id}`, { method: "PUT", body: fd });
-      if (!response.ok) throw new Error("Erro ao salvar");
-      close();
-      await app.refresh();
-    } catch {
-      alert("Erro ao salvar alterações");
-    } finally {
-      saveBtn.dataset.busy = "";
-      saveBtn.textContent = "Salvar";
-      syncSave();
-    }
-  };
-  document.body.appendChild(overlay);
-}

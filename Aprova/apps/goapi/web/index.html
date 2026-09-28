@@ -12,16 +12,16 @@
     <link rel="stylesheet" href="/assets/css/styles.css?v=6" />
     <link rel="stylesheet" href="/assets/css/theme.css?v=6" />
     <link rel="stylesheet" href="/assets/css/theme-polish.css?v=6" />
-    <link rel="stylesheet" href="/assets/css/compact.css?v=6" />
+    <link rel="stylesheet" href="/assets/css/compact.css?v=8" />
     <link rel="stylesheet" href="/assets/css/pdf-modal.css?v=6" />
     <link rel="stylesheet" href="/assets/css/focus.css?v=2" />
     <link rel="stylesheet" href="/assets/css/mobile.css" />
     <link rel="stylesheet" href="/assets/css/navbar.css?v=6" />
-    <link rel="stylesheet" href="/assets/css/gran.css?v=38" />
+    <link rel="stylesheet" href="/assets/css/gran.css?v=44" />
     <script type="importmap">
       { "imports": { "pdfjs-dist": "/assets/vendor/pdf.mjs", "alpinejs": "/assets/vendor/alpine.module.mjs" } }
     </script>
-    <script type="module" src="/assets/js/app.js?v=12"></script>
+    <script type="module" src="/assets/js/app.js?v=18"></script>
   </head>
   <body class="notranslate">
     <div id="root" class="notranslate" translate="no" x-data :class="'app-shell view-' + $store.app.view">
@@ -93,7 +93,62 @@
               </aside>
               <div class="gran-main">
                 <div class="gran-list-head"><div><span class="eyebrow">BIBLIOTECA</span><h3>Suas provas</h3></div><div class="gran-list-side"><span class="gran-count" x-text="filtered.length === 1 ? '1 prova encontrada' : filtered.length + ' provas encontradas'"></span><template x-if="resume"><button class="gran-continue" x-on:click="$store.app.openExam(resume.id, 'solve')">Continuar <b x-text="resume.title"></b> · <span x-text="resume.answered_count + '/' + resume.question_count"></span> ›</button></template></div></div>
-                <div class="exam-list gran-list dashboard-exams"></div>
+                <div class="exam-list gran-list dashboard-exams">
+                  <template x-for="exam in paged" :key="exam.id">
+                    <article class="exam-card-v2" :class="statsOf(exam).done && 'is-completed'" x-on:click="openCard(exam.id)" x-on:keydown.enter="openCard(exam.id)" tabindex="0">
+                      <div class="exam-card-visual">
+                        <template x-if="exam.logo">
+                          <img class="exam-card-logo" :src="logoURL(exam.logo)" alt="" />
+                        </template>
+                        <template x-if="!exam.logo">
+                          <div class="exam-card-icon ecv2-teal" x-html="icons.fileText"></div>
+                        </template>
+                        <div class="exam-card-visual-title"><h3 x-text="shortTitle(exam.title)" :title="exam.title"></h3></div>
+                      </div>
+                      <div class="exam-card-content"><div class="exam-card-content-inner">
+                        <div class="exam-card-info-box">
+                          <template x-if="exam.created_at">
+                            <span><b>Prova:</b> <strong class="card-number" x-text="fmtDate(exam.created_at)"></strong></span>
+                          </template>
+                          <template x-if="exam.board">
+                            <span><b>Banca:</b> <span x-text="exam.board"></span></span>
+                          </template>
+                        </div>
+                        <div class="exam-card-progress-area"><div class="exam-card-progress-top">
+                          <span class="exam-card-progress-text"><strong x-text="pad2(statsOf(exam).a)"></strong> de <span class="progress-total" x-text="pad2(statsOf(exam).t)"></span> <small>resolvidas</small></span>
+                          <span class="exam-card-status" x-text="statsOf(exam).done ? 'Concluído' : 'Em andamento'"></span></div>
+                          <div class="exam-card-progress-bar"><i :style="'width: ' + statsOf(exam).p + '%'"></i></div></div>
+                        <div class="exam-card-stats">
+                          <div class="exam-card-stat"><div class="exam-card-stat-icon ecv2-teal" x-html="icons.clipboard"></div><div class="exam-card-stat-info"><strong x-text="statsOf(exam).a"></strong><span>Resolvidas</span></div></div>
+                          <div class="exam-card-stat"><div class="exam-card-stat-icon ecv2-green" x-html="icons.check"></div><div class="exam-card-stat-info"><strong x-text="statsOf(exam).c"></strong><span>Acertos</span></div></div>
+                          <div class="exam-card-stat"><div class="exam-card-stat-icon ecv2-red" x-html="icons.x"></div><div class="exam-card-stat-info"><strong x-text="statsOf(exam).w"></strong><span>Erros</span></div></div>
+                        </div></div>
+                      </div>
+                      <footer class="exam-card-footer"><div class="exam-card-actions">
+                        <button class="exam-card-edit" aria-label="Editar" x-on:click.stop="startEdit(exam)" x-html="icons.pencil"></button>
+                        <button class="exam-card-remove" aria-label="Remover" x-on:click.stop="removeCard(exam.id)" x-html="icons.trash"></button>
+                      </div><button class="exam-card-cta" x-on:click.stop="openCard(exam.id)">Resolver</button></footer>
+                    </article>
+                  </template>
+                </div>
+                <template x-if="editing">
+                  <div class="exam-edit-overlay" x-on:click.self="cancelEdit()" x-on:keydown.escape.window="cancelEdit()">
+                    <div class="exam-edit-modal">
+                      <div class="exam-edit-header"><h3>Editar prova</h3><button class="exam-edit-close" aria-label="Fechar" x-on:click="cancelEdit()" x-html="icons.x"></button></div>
+                      <div class="exam-edit-body">
+                        <div class="exam-edit-field"><label>Título</label><input type="text" x-model="editing.title" /></div>
+                        <div class="exam-edit-field"><label>Banca</label><input type="text" x-model="editing.board" placeholder="Ex: FCC, CESPE, VUNESP..." /></div>
+                        <div class="exam-edit-field"><label>Logo da prova</label><div class="exam-edit-logo-area">
+                          <template x-if="editing.preview">
+                            <img :src="editing.preview" alt="Logo" class="exam-edit-logo-preview" />
+                          </template>
+                          <label class="exam-edit-upload"><input type="file" accept="image/*" hidden x-on:change="onLogoFile($event)" /><span x-text="editing.preview ? 'Trocar imagem' : 'Selecionar imagem'"></span></label>
+                        </div></div>
+                      </div>
+                      <div class="exam-edit-footer"><button class="exam-edit-cancel" x-on:click="cancelEdit()">Cancelar</button><button class="exam-edit-save" x-on:click="saveEdit()" :disabled="!editing.title.trim() || editSaving" x-text="editSaving ? 'Salvando...' : 'Salvar'"></button></div>
+                    </div>
+                  </div>
+                </template>
                 <template x-if="filtered.length > 0">
                   <nav class="gran-pagination" aria-label="Paginação das provas">
                     <button class="gran-page-nav" x-on:click="setPage(page - 1)" :disabled="page <= 1" aria-label="Página anterior">
@@ -115,18 +170,18 @@
                 <template x-if="exams.length && !filtered.length">
                   <div class="empty"><div class="empty-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><h3>Nenhuma prova encontrada</h3><p>Nenhuma prova corresponde aos filtros aplicados.</p><button class="secondary" x-on:click="clearFilters()">Limpar filtros</button></div>
                 </template>
+              <div class="gran-ritmo">
+                <div x-data="heatmapComponent()" x-init="init()" x-html="html"></div>
               </div>
-            <div class="gran-ritmo">
-              <div x-data="heatmapComponent()" x-init="init()" x-html="html"></div>
-            </div>
-            <footer class="gran-footer">
-              <div class="gran-footer-grid">
-                <div><strong class="gran-footer-brand">Mira <span>estudos</span></strong><p>Suas provas, questões e desempenho em um só lugar. Dados salvos localmente.</p></div>
-                <nav aria-label="Estudar"><strong>Estudar</strong><button x-on:click="$store.app.setView('exams')">Provas</button><button x-on:click="$store.app.setView('performance')">Desempenho</button><button x-on:click="$store.app.setView('import')">Importar</button></nav>
-                <div><strong>Sobre</strong><p>Plataforma de estudos com cadernos de questões interativos.</p></div>
+              <footer class="gran-footer">
+                <div class="gran-footer-grid">
+                  <div><strong class="gran-footer-brand">Mira <span>estudos</span></strong><p>Suas provas, questões e desempenho em um só lugar. Dados salvos localmente.</p></div>
+                  <nav aria-label="Estudar"><strong>Estudar</strong><button x-on:click="$store.app.setView('exams')">Provas</button><button x-on:click="$store.app.setView('performance')">Desempenho</button><button x-on:click="$store.app.setView('import')">Importar</button></nav>
+                  <div><strong>Sobre</strong><p>Plataforma de estudos com cadernos de questões interativos.</p></div>
+                </div>
+                <small>© Mira Estudos — uso local</small>
+              </footer>
               </div>
-              <small>© Mira Estudos — uso local</small>
-            </footer>
             </div>
           </section>
         </template>

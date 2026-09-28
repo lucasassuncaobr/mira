@@ -182,8 +182,55 @@
   background: #F1F2F4; border: 1px solid #E4E4E4; border-radius: 0;
   padding: 18px; position: static;
 }
-/* Sidebar (filtros + desempenho) fixa na rolagem */
-.gran-side { display: grid; gap: 14px; align-content: start; position: sticky; top: 104px; }
+/* Sidebar no fluxo; sticky mantém no fluxo do documento enquanto rola junto.
+   Evita overlay e saltos de layout causados por position:fixed. */
+.gran-side { display: grid; gap: 14px; align-content: start; position: sticky; top: 104px; max-height: calc(100vh - 120px); overflow-y: auto; scrollbar-width: thin; }
+.gran-cols > .gran-main { grid-column: 2; }
+/* ---- Shell de viewport (desktop): página não rola. Banner, filtros e
+   desempenho ficam fixos; só a coluna da biblioteca rola, com scrollbar
+   invisível. Assim nada "anda" quando o usuário rola a lista. ---- */
+@media (min-width: 901px) and (min-height: 641px) {
+  #root.view-exams, #root.view-dashboard { height: 100vh; overflow: hidden; }
+  #root.view-exams > main, #root.view-dashboard > main {
+    height: calc(100vh - 80px);
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 0;
+  }
+  .view-exams .gran-provas, .view-dashboard .gran-provas {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .gran-hero { flex: 0 0 auto; }
+  .gran-provas .stats { flex: 0 0 auto; margin: 18px 0 0; }
+  .gran-cols {
+    flex: 1 1 auto;
+    min-height: 0;
+    margin-top: 18px;
+    grid-template-rows: minmax(0, 1fr);
+    align-items: stretch;
+  }
+  .gran-side {
+    position: static;
+    align-self: stretch;
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .gran-side::-webkit-scrollbar { width: 0; height: 0; }
+  .gran-cols > .gran-main {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .gran-cols > .gran-main::-webkit-scrollbar { width: 0; height: 0; }
+}
 .gran-filters-head { display: flex; align-items: center; justify-content: space-between; }
 .gran-filters-head h3 { margin: 0; font: 800 16px var(--font-primary); color: #3730a3; }
 .gran-filters-head > div { display: flex; gap: 10px; align-items: center; }
@@ -271,7 +318,8 @@
   .gran-hero-inner { padding: 20px 22px 32px; }
   .gran-hero-row { flex-wrap: wrap; }
   .gran-cols { grid-template-columns: 1fr; }
-  .gran-side { position: static; }
+  .gran-side { position: static; width: auto; max-height: none; overflow: visible; z-index: auto; }
+  .gran-cols > .gran-main { grid-column: auto; }
   .gran-filters { position: static; }
   .gran-filters-toggle { display: inline-block; }
   .gran-filters .gran-filters-body { display: none; }

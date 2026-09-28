@@ -749,6 +749,10 @@ func InferExamTitle(text, filename string) string {
 		}
 	}
 	ignored := regexp.MustCompile(`(?i)^(p[aá]gina|quest[aã]o|instru[cç][oõ]es|leia|nome|assinatura|dura[cç][aã]o|marque|aguarde)\b`)
+	// Corpo de edital/prova nunca é título: sem isso, um item normativo com
+	// a palavra "concurso" ("7.16 e 7.17 do edital...") vence a linha do
+	// órgão por score e vira título-lixo em toda importação.
+	antiTitle := regexp.MustCompile(`(?i)^\d+(\.\d+)+|edital|art\.|artigo|par[aá]grafo|inciso|al[ií]nea|disposto|descumprimento|deferid|recurso|gabarito|resposta`)
 	signals := regexp.MustCompile(`(?i)\b(prefeitura|munic[ií]pio|estado|tribunal|universidade|instituto|concurso|processo seletivo|vestibular|gurupi|palmas|cargo|analista|professor|t[eé]cnico|agente)\b`)
 	type cand struct {
 		line  string
@@ -757,6 +761,9 @@ func InferExamTitle(text, filename string) string {
 	var best *cand
 	for i, line := range filtered {
 		if ignored.MatchString(line) {
+			continue
+		}
+		if antiTitle.MatchString(line) {
 			continue
 		}
 		score := 0

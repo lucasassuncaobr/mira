@@ -5,10 +5,14 @@
 package main
 
 import (
+	"crypto/sha256"
 	"database/sql"
+	"encoding/hex"
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -23,6 +27,7 @@ const schema = `
     filename TEXT NOT NULL,
     board TEXT,
     status TEXT NOT NULL DEFAULT 'review',
+    sha256 TEXT,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
   CREATE TABLE IF NOT EXISTS questions (
@@ -53,6 +58,8 @@ var migrations = []string{
 	"ALTER TABLE questions ADD COLUMN focus_scale REAL",
 	"ALTER TABLE exams ADD COLUMN board TEXT",
 	"ALTER TABLE exams ADD COLUMN logo TEXT",
+	"ALTER TABLE exams ADD COLUMN sha256 TEXT",
+	"CREATE UNIQUE INDEX IF NOT EXISTS idx_exams_sha256 ON exams(sha256)",
 }
 
 func exeSibling(dir, sibling string) string {
@@ -101,12 +108,48 @@ func openDB() *sql.DB {
 	for _, m := range migrations {
 		_, _ = db.Exec(m) // coluna já existe → ignora
 	}
+	// Backfill do sha256 para provas importadas antes da coluna existir.
+	if rows, err := db.Query("SELECT id FROM exams WHERE sha256 IS NULL OR sha256 = ''"); err == nil {
+		var ids []int64
+		for rows.Next() {
+			var id int64
+			if err := rows.Scan(&id); err == nil {
+				ids = append(ids, id)
+			}
+		}
+		rows.Close()
+		for _, id := range ids {
+			buf, err := os.ReadFile(filepath.Join(dataDir, "exam-assets", strconv.FormatInt(id, 10), "source.pdf"))
+			if err != nil || len(buf) == 0 {
+				continue
+			}
+			sum := sha256.Sum256(buf)
+			_, _ = db.Exec("UPDATE exams SET sha256 = ? WHERE id = ?", hex.EncodeToString(sum[:]), id)
+		}
+	}
 	return db
+}
+
+// Checkpoint periódico do WAL: devolve as páginas ao db principal e impede
+// o arquivo -wal de crescer sem limite em uso contínuo. Conexão única, então
+// nunca concorre com outra escrita (busy_timeout cobre o resto).
+func periodicCheckpoint(db *sql.DB) {
+	ticker := time.NewTicker(5 * time.Minute)
+	defer ticker.Stop()
+	for range ticker.C {
+		if _, err := db.Exec("PRAGMA wal_checkpoint(TRUNCATE)"); err != nil {
+			log.Printf("wal checkpoint: %v", err)
+		}
+	}
 }
 
 func main() {
 	db := openDB()
 	defer db.Close()
+	if _, err := db.Exec("PRAGMA wal_checkpoint(TRUNCATE)"); err != nil {
+		log.Printf("wal checkpoint inicial: %v", err)
+	}
+	go periodicCheckpoint(db)
 	gdb = db
 	if err := prepareHot(); err != nil {
 		log.Fatal(err)
