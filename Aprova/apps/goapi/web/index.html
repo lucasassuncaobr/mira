@@ -8,36 +8,39 @@
     <title>Mira</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23008080'/%3E%3Ctext x='16' y='22' font-family='sans-serif' font-size='16' font-weight='bold' fill='white' text-anchor='middle'%3EM%3C/text%3E%3C/svg%3E" />
-    <link rel="stylesheet" href="/assets/css/styles.css" />
-    <link rel="stylesheet" href="/assets/css/theme.css" />
-    <link rel="stylesheet" href="/assets/css/theme-polish.css" />
-    <link rel="stylesheet" href="/assets/css/compact.css" />
-    <link rel="stylesheet" href="/assets/css/pdf-modal.css" />
-    <link rel="stylesheet" href="/assets/css/focus.css" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%234f46e5'/%3E%3Ctext x='16' y='22' font-family='sans-serif' font-size='16' font-weight='bold' fill='white' text-anchor='middle'%3EM%3C/text%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="/assets/css/styles.css?v=6" />
+    <link rel="stylesheet" href="/assets/css/theme.css?v=6" />
+    <link rel="stylesheet" href="/assets/css/theme-polish.css?v=6" />
+    <link rel="stylesheet" href="/assets/css/compact.css?v=6" />
+    <link rel="stylesheet" href="/assets/css/pdf-modal.css?v=6" />
+    <link rel="stylesheet" href="/assets/css/focus.css?v=2" />
     <link rel="stylesheet" href="/assets/css/mobile.css" />
+    <link rel="stylesheet" href="/assets/css/navbar.css?v=6" />
+    <link rel="stylesheet" href="/assets/css/gran.css?v=38" />
     <script type="importmap">
       { "imports": { "pdfjs-dist": "/assets/vendor/pdf.mjs", "alpinejs": "/assets/vendor/alpine.module.mjs" } }
     </script>
-    <script type="module" src="/assets/js/app.js"></script>
+    <script type="module" src="/assets/js/app.js?v=12"></script>
   </head>
   <body class="notranslate">
     <div id="root" class="notranslate" translate="no" x-data :class="'app-shell view-' + $store.app.view">
-      <div class="topbar"><div class="topbar-inner">
-        <div class="brand"><div class="brand-lockup"><span class="brand-name">Mira</span><small>estudos</small></div></div>
-        <nav>
-          <button :class="$store.app.view === 'exams' ? 'nav active' : 'nav'" x-on:click="$store.app.setView('exams')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span>Provas</span>
-          </button>
-          <button :class="$store.app.view === 'performance' ? 'nav active' : 'nav'" x-on:click="$store.app.setView('performance')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="5" width="3" height="13"/></svg><span>Desempenho</span>
-          </button>
-        </nav>
-        <button class="primary compact top-import" x-on:click="$store.app.setView('import')">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 16l-4-4-4 4"/><path d="M12 12v9"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg> Importar prova
+      <div class="topbar" x-data="{ navOpen: false }" x-on:keydown.escape.window="navOpen = false" x-on:click.away="navOpen = false" :class="{ 'nav-open': navOpen }"><div class="topbar-inner">
+        <button class="nav-toggle" type="button" aria-label="Abrir menu de navegação" :aria-expanded="navOpen" :class="{ 'open': navOpen }" x-on:click="navOpen = !navOpen">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path x-show="navOpen" fill-rule="evenodd" clip-rule="evenodd" d="M18.278 16.864a1 1 0 0 1-1.414 1.414l-4.829-4.828-4.828 4.828a1 1 0 0 1-1.414-1.414l4.828-4.829-4.828-4.828a1 1 0 0 1 1.414-1.414l4.829 4.828 4.828-4.828a1 1 0 1 1 1.414 1.414l-4.828 4.829 4.828 4.828z" />
+            <path x-show="!navOpen" fill-rule="evenodd" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z" />
+          </svg>
         </button>
+        <div class="brand"><div class="brand-lockup"><span class="brand-name">Mira</span><small>estudos</small></div></div>
+        <div class="nav-menu" :class="{ 'open': navOpen }">
+        <nav>
+          <button :class="$store.app.view === 'exams' ? 'nav active' : 'nav'" x-on:click="navOpen = false; $store.app.setView('exams')"><span>Provas</span></button>
+          <button :class="$store.app.view === 'performance' ? 'nav active' : 'nav'" x-on:click="navOpen = false; $store.app.setView('performance')"><span>Desempenho</span></button>
+          <button :class="$store.app.view === 'import' ? 'nav active' : 'nav'" x-on:click="navOpen = false; $store.app.setView('import')"><span>Importar</span></button>
+        </nav>
         <div class="profile"><div class="avatar">LA</div><div><strong>Lucas</strong></div>
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </div>
         </div>
       </div></div>
       <main>
@@ -46,28 +49,85 @@
           <div class="alert"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span x-text="$store.app.error"></span></div>
         </template>
 
-        <!-- DASHBOARD / PROVAS -->
+        <!-- DASHBOARD / PROVAS (estilo Gran: hero + filtros + lista) -->
         <template x-if="$store.app.view === 'dashboard' || $store.app.view === 'exams'">
-          <section x-data="dashboardComponent()" x-init="init()">
+          <section class="gran-provas" x-data="dashboardComponent()" x-init="init()">
+            <div class="gran-hero"><div class="gran-hero-inner">
+              <nav class="gran-crumbs" aria-label="Navegação estrutural"><button x-on:click="$store.app.setView('exams')">Início</button><span aria-hidden="true">/</span><strong>Provas</strong></nav>
+              <div class="gran-hero-row">
+                <h2>Provas de Concursos</h2>
+                <div class="gran-hero-action">
+                  <p>A ferramenta definitiva e sem custo nenhum para você subir provas com gabarito e ver sua evolução.</p>
+                  <button class="gran-hero-cta" x-on:click="$store.app.setView('import')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="M9 15l3-3 3 3"/></svg>
+                    Enviar prova e gabarito
+                  </button>
+                </div>
+              </div>
+            </div></div>
             <div class="stats">
               <div class="stat stat-blue"><div class="stat-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><strong x-text="exams.length"></strong><span>Provas importadas</span></div></div>
               <div class="stat stat-green"><div class="stat-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><div><strong x-text="answered"></strong><span>Questões resolvidas</span></div></div>
               <div class="stat stat-neutral"><div class="stat-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><strong x-text="studyTime"></strong><span>Tempo de estudo</span></div></div>
               <div class="stat" :class="'stat-' + tone"><div class="stat-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="5" width="3" height="13"/></svg></div><div><strong x-text="answered ? accuracy + '%' : '—'"></strong><span>Taxa de acerto</span></div></div>
             </div>
-            <div class="dashboard-study-grid"><div class="dashboard-study-main">
-              <div class="study-create dashboard-study-create"><div><span class="eyebrow">MEUS ESTUDOS</span><h2>Prova</h2><p>Resolva questões, acompanhe seu desempenho e continue exatamente de onde parou.</p></div><div class="notebook-actions"><button class="secondary" x-on:click="exams[0] && $store.app.openExam(exams[0].id, 'solve')" :disabled="!exams.length">Continuar estudo</button><button class="primary" x-on:click="$store.app.setView('import')">Criar nova prova</button></div></div>
-              <div class="section-head"><div><span class="eyebrow">BIBLIOTECA</span><h3>Provas recentes</h3></div></div>
-              <template x-if="!exams.length">
-                <div class="empty provas-empty"><div class="empty-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><h3>Nenhuma prova ainda</h3><p>Importe uma prova com gabarito para criar seu primeiro caderno e começar a acompanhar desempenho.</p><button class="primary" x-on:click="$store.app.setView('import')">Importar primeira prova</button></div>
-              </template>
-              <template x-if="exams.length">
-                <div class="exam-list dashboard-exams"></div>
-              </template>
-            </div><aside class="dashboard-side">
-              <div x-data="heatmapComponent()" x-init="init()" x-html="html"></div>
+            <div class="gran-cols">
+              <aside class="gran-side">
+              <div class="gran-filters" :class="{ 'open': filtersOpen }">
+                <div class="gran-filters-head">
+                  <h3>Filtros</h3>
+                  <div>
+                    <button class="gran-filters-toggle" x-on:click="filtersOpen = !filtersOpen" :aria-expanded="filtersOpen" x-text="filtersOpen ? 'Ocultar' : 'Exibir'"></button>
+                    <button class="gran-clear" x-on:click="clearFilters()">Limpar</button>
+                  </div>
+                </div>
+                <div class="gran-filters-body">
+                  <label class="gran-field"><span>Palavra-chave</span><input type="search" placeholder="Buscar prova..." x-model="q" /></label>
+                  <label class="gran-field"><span>Banca</span><select x-model="fBoard"><option value="">Todas</option><template x-for="b in boards" :key="b"><option :value="b" x-text="b"></option></template></select></label>
+                  <label class="gran-field"><span>Situação</span><select x-model="fStatus"><option value="">Todas</option><option value="todo">Não iniciadas</option><option value="doing">Em andamento</option><option value="done">Concluídas</option></select></label>
+                  <label class="gran-field"><span>Ano</span><select x-model="fYear"><option value="">Todos</option><template x-for="y in years" :key="y"><option :value="y" x-text="y"></option></template></select></label>
+                  <label class="gran-field"><span>Ordenar por</span><select x-model="fSort"><option value="recent">Mais recentes</option><option value="progress">Mais progresso</option><option value="name">Nome (A–Z)</option></select></label>
+                </div>
+              </div>
               <section class="side-card quick-performance glance-performance"><div class="side-title"><div><span class="eyebrow">DESEMPENHO</span><h3>Resumo atual</h3></div></div><strong x-text="answered ? accuracy + '%' : '—'"></strong><span>Aproveitamento geral</span><div class="quick-track"><i :style="'width: ' + accuracy + '%'"></i></div><small x-text="correct + ' acertos em ' + answered + ' resoluções'"></small></section>
-            </aside></div>
+              </aside>
+              <div class="gran-main">
+                <div class="gran-list-head"><div><span class="eyebrow">BIBLIOTECA</span><h3>Suas provas</h3></div><div class="gran-list-side"><span class="gran-count" x-text="filtered.length === 1 ? '1 prova encontrada' : filtered.length + ' provas encontradas'"></span><template x-if="resume"><button class="gran-continue" x-on:click="$store.app.openExam(resume.id, 'solve')">Continuar <b x-text="resume.title"></b> · <span x-text="resume.answered_count + '/' + resume.question_count"></span> ›</button></template></div></div>
+                <div class="exam-list gran-list dashboard-exams"></div>
+                <template x-if="filtered.length > 0">
+                  <nav class="gran-pagination" aria-label="Paginação das provas">
+                    <button class="gran-page-nav" x-on:click="setPage(page - 1)" :disabled="page <= 1" aria-label="Página anterior">
+                      <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" /></svg>
+                      <span>Anterior</span>
+                    </button>
+                    <template x-for="p in pages" :key="p.key">
+                      <button :class="p.num === page ? 'gran-page on' : 'gran-page'" :disabled="p.dots" x-on:click="!p.dots && setPage(p.num)" x-text="p.dots ? '…' : p.num" :aria-label="p.dots ? 'Mais páginas' : 'Página ' + p.num" :aria-current="p.num === page && 'page'"></button>
+                    </template>
+                    <button class="gran-page-nav" x-on:click="setPage(page + 1)" :disabled="page >= totalPages" aria-label="Próxima página">
+                      <span>Próxima</span>
+                      <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" /></svg>
+                    </button>
+                  </nav>
+                </template>
+                <template x-if="!exams.length">
+                  <div class="empty provas-empty"><div class="empty-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><h3>Nenhuma prova ainda</h3><p>Importe uma prova com gabarito para criar seu primeiro caderno e começar a acompanhar desempenho.</p><button class="primary" x-on:click="$store.app.setView('import')">Importar primeira prova</button></div>
+                </template>
+                <template x-if="exams.length && !filtered.length">
+                  <div class="empty"><div class="empty-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><h3>Nenhuma prova encontrada</h3><p>Nenhuma prova corresponde aos filtros aplicados.</p><button class="secondary" x-on:click="clearFilters()">Limpar filtros</button></div>
+                </template>
+              </div>
+            <div class="gran-ritmo">
+              <div x-data="heatmapComponent()" x-init="init()" x-html="html"></div>
+            </div>
+            <footer class="gran-footer">
+              <div class="gran-footer-grid">
+                <div><strong class="gran-footer-brand">Mira <span>estudos</span></strong><p>Suas provas, questões e desempenho em um só lugar. Dados salvos localmente.</p></div>
+                <nav aria-label="Estudar"><strong>Estudar</strong><button x-on:click="$store.app.setView('exams')">Provas</button><button x-on:click="$store.app.setView('performance')">Desempenho</button><button x-on:click="$store.app.setView('import')">Importar</button></nav>
+                <div><strong>Sobre</strong><p>Plataforma de estudos com cadernos de questões interativos.</p></div>
+              </div>
+              <small>© Mira Estudos — uso local</small>
+            </footer>
+            </div>
           </section>
         </template>
 
@@ -106,6 +166,12 @@
         </template>
 
         <!-- RESOLVER -->
+        <template x-if="$store.app.view === 'solve' && $store.app.exam">
+          <div class="solve-banner"><div class="solve-banner-inner">
+            <nav class="solve-crumbs" aria-label="Navegação estrutural"><button x-on:click="$store.app.setView('exams')">Início</button><span aria-hidden="true">/</span><button x-on:click="$store.app.setView('exams')">Provas</button></nav>
+            <h2 x-text="$store.app.exam.title"></h2>
+          </div></div>
+        </template>
         <template x-if="$store.app.view === 'solve'">
           <template x-if="$store.app.exam">
             <div class="solve notranslate" translate="no" x-data="solveComponent()" x-init="init()">
@@ -113,7 +179,6 @@
                 <aside class="pdf-column">
                   <template x-if="currentPage">
                     <figure class="page-reference" x-data="pageRef()" x-init="init()">
-                      <figcaption class="image-title"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> <span x-text="'Questão ' + questionNumber + ' no PDF'"></span></figcaption>
                       <div x-ref="viewport" :class="dragging ? 'image-viewport dragging' : 'image-viewport'" x-on:pointerdown="pointerDown($event)" x-on:pointermove="pointerMove($event)" x-on:pointerup="pointerUp($event)" x-on:pointercancel="pointerUp($event)">
                         <div class="pagina-pdf" x-ref="pagina" :style="'--pdf-zoom-percent: ' + (zoom * 100) + '%; --pdf-zoom-width: ' + Math.round(960 * zoom) + 'px;'">
                           <img draggable="false" loading="lazy" decoding="async" x-bind:src="src" :alt="'Página ' + page + ' do PDF original'" x-on:load="requestAnimationFrame(() => aplicarFoco())" />

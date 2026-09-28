@@ -48,7 +48,9 @@ func registerWeb(app *fiber.App) {
 		return c.SendFile(filepath.Join(webDir, "index.html"))
 	})
 	assets := app.Group("/assets", func(c *fiber.Ctx) error {
-		c.Set("Cache-Control", "public, max-age=86400, immutable")
+		// Front local: revalida sempre (sem immutable) para o navegador
+		// buscar HTML/CSS/JS novos com F5 comum após cada deploy.
+		c.Set("Cache-Control", "no-cache, must-revalidate")
 		return c.Next()
 	})
 	assets.Static("/", webDir)

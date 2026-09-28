@@ -3,7 +3,7 @@
 // Alpine via ESM + start() manual: sem corrida com alpine:init.
 import Alpine from "alpinejs";
 import { getFocusMap, getPageSrc, hostExam, shutdownP2P } from "./p2p.js";
-import { warmPdfReader, fetchExamInfo, preloadExamPages } from "./pdfcache.js";
+import { warmPdfReader, preloadExamPages } from "./pdfcache.js";
 import { PdfModal } from "./pdfmodal.js";
 
 const API = window.__MIRA_API__ || (location.protocol.startsWith("http") ? location.origin + "/api" : "http://localhost:3333/api");
@@ -150,6 +150,14 @@ Alpine.store("app", {
   // o elemento clicado — por isso cada componente captura a raiz no init()
   // e usa this.root / refs capturadas em todos os métodos.
   Alpine.data("dashboardComponent", () => ({
+    q: "",
+    fBoard: "",
+    fStatus: "",
+    fYear: "",
+    fSort: "recent",
+    filtersOpen: false,
+    page: 1,
+    perPage: 12,
     get exams() { return Alpine.store("app").exams; },
     get answered() { return this.exams.reduce((s, i) => s + Number(i.answered_count ?? 0), 0); },
     get correct() { return this.exams.reduce((s, i) => s + Number(i.correct_count ?? 0), 0); },
@@ -157,16 +165,75 @@ Alpine.store("app", {
     get accuracy() { return this.answered ? Math.round((this.correct / this.answered) * 100) : 0; },
     get tone() { return this.accuracy >= 70 ? "green" : this.accuracy >= 50 ? "amber" : "red"; },
     get studyTime() { return formatStudyTime(this.studySeconds); },
+    get boards() {
+      return [...new Set(this.exams.map((e) => e.board).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
+    },
+    get years() {
+      return [...new Set(this.exams.map((e) => (e.created_at ? String(new Date(e.created_at).getFullYear()) : "")).filter(Boolean))].sort().reverse();
+    },
+    statusOf(item) {
+      const answered = Number(item.answered_count ?? 0);
+      const total = Number(item.question_count ?? 0);
+      if (total > 0 && answered >= total) return "done";
+      if (answered > 0) return "doing";
+      return "todo";
+    },
+    get filtered() {
+      const q = this.q.trim().toLowerCase();
+      const list = this.exams.filter((item) => {
+        if (q && !String(item.title ?? "").toLowerCase().includes(q)) return false;
+        if (this.fBoard && (item.board ?? "") !== this.fBoard) return false;
+        if (this.fStatus && this.statusOf(item) !== this.fStatus) return false;
+        if (this.fYear && (item.created_at ? String(new Date(item.created_at).getFullYear()) : "") !== this.fYear) return false;
+        return true;
+      });
+      const progress = (e) => { const t = Number(e.question_count ?? 0); return t ? Number(e.answered_count ?? 0) / t : 0; };
+      return [...list].sort((a, b) => {
+        if (this.fSort === "name") return String(a.title ?? "").localeCompare(String(b.title ?? ""), "pt-BR");
+        if (this.fSort === "progress") return progress(b) - progress(a);
+        return String(b.created_at ?? "").localeCompare(String(a.created_at ?? ""));
+      });
+    },
+    get resume() {
+      return this.exams.find((e) => { const t = Number(e.question_count ?? 0); const a = Number(e.answered_count ?? 0); return t > 0 && a > 0 && a < t; }) ?? null;
+    },
+    get totalPages() { return Math.max(1, Math.ceil(this.filtered.length / this.perPage)); },
+    get paged() {
+      const start = (this.page - 1) * this.perPage;
+      return this.filtered.slice(start, start + this.perPage);
+    },
+    get pages() {
+      const total = this.totalPages, cur = this.page, out = [];
+      const push = (num) => out.push({ num, key: `p${num}` });
+      if (total <= 7) { for (let i = 1; i <= total; i++) push(i); return out; }
+      push(1);
+      if (cur > 3) out.push({ dots: true, key: "d1" });
+      for (let i = Math.max(2, cur - 1); i <= Math.min(total - 1, cur + 1); i++) push(i);
+      if (cur < total - 2) out.push({ dots: true, key: "d2" });
+      push(total);
+      return out;
+    },
+    setPage(n) {
+      this.page = Math.min(this.totalPages, Math.max(1, n));
+      this.renderCards();
+      const head = document.querySelector(".gran-list-head");
+      if (head) {
+        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        window.scrollTo({ top: head.getBoundingClientRect().top + window.scrollY - 96, behavior: reduce ? "auto" : "smooth" });
+      }
+    },
+    clearFilters() { this.q = ""; this.fBoard = ""; this.fStatus = ""; this.fYear = ""; this.fSort = "recent"; },
     init() {
       this.root = this.$el;
       this.$nextTick(() => this.renderCards());
       this.$watch(() => Alpine.store("app").exams, () => this.renderCards());
+      this.$watch(() => [this.q, this.fBoard, this.fStatus, this.fYear, this.fSort].join("|"), () => { this.page = 1; this.renderCards(); });
     },
     renderCards() {
       const box = this.root.querySelector(".dashboard-exams");
       if (!box) return;
-      if (!this.exams.length) return;
-      box.innerHTML = this.exams.map((item) => examCardHtml(item)).join("");
+      if (this.page > this.totalPages) this.page = Math.max(1, this.totalPages);
+      box.innerHTML = this.paged.map((item) => examCardHtml(item)).join("");
       wireExamCards(box);
     },
   }));
@@ -694,7 +761,7 @@ function examCardHtml(item) {
           ${item.board ? `<span><b>Banca:</b> ${esc(item.board)}</span>` : ""}
         </div>
         <div class="exam-card-progress-area"><div class="exam-card-progress-top">
-          <span class="exam-card-progress-text"><strong>${answered}</strong> de <span class="progress-total">${total}</span> <small>resolvidas</small></span>
+          <span class="exam-card-progress-text"><strong>${answered === 0 ? "0" : String(answered).padStart(2, "0")}</strong> de <span class="progress-total">${total === 0 ? "0" : String(total).padStart(2, "0")}</span> <small>resolvidas</small></span>
           <span class="exam-card-status">${completed ? "Concluído" : "Em andamento"}</span></div>
           <div class="exam-card-progress-bar"><i style="width: ${progress}%"></i></div></div>
         <div class="exam-card-stats">
@@ -710,7 +777,7 @@ function examCardHtml(item) {
       <footer class="exam-card-footer"><div class="exam-card-actions">
         <button class="exam-card-edit" aria-label="Editar" data-act="edit">${ICONS.pencil}</button>
         <button class="exam-card-remove" aria-label="Remover" data-act="remove">${ICONS.trash}</button>
-      </div></footer>
+      </div><button class="exam-card-cta" data-act="open">Resolver</button></footer>
     </article>`;
 }
 
@@ -729,6 +796,10 @@ function wireExamCards(box) {
     if (act === "edit") {
       e.stopPropagation();
       openEditModal(id);
+      return;
+    }
+    if (act === "open") {
+      app.openExam(id, "solve");
       return;
     }
     if (e.target.closest(".exam-card-actions")) return;

@@ -86,8 +86,8 @@
   right: 0;
   width: auto;
   height: 0;
-  background: linear-gradient(90deg, rgba(214,239,234,0.96) 0%, rgba(214,239,234,0.92) 68%, rgba(214,239,234,0.62) 84%, rgba(214,239,234,0) 100%);
-  background-color: rgba(214,239,234,0.92);
+  background: linear-gradient(90deg, rgba(224,231,255,0.96) 0%, rgba(224,231,255,0.92) 68%, rgba(224,231,255,0.62) 84%, rgba(224,231,255,0) 100%);
+  background-color: rgba(224,231,255,0.92);
   mix-blend-mode: multiply;
   border-left: none;
   border-radius: 0;

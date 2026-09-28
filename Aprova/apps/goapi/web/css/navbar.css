@@ -1,0 +1,142 @@
+/* Mira — navbar responsiva (Alpine: navOpen + ESC + click.away).
+   Desktop: layout atual preservado (.nav-menu vira container flexível).
+   Mobile (<=900px): hambúrguer + painel dropdown sobre o conteúdo.
+   NOTA: seletores com #root e !important para prevalecer sobre os
+   overrides com !important acumulados no final de compact.css. */
+
+.nav-toggle {
+  display: none;
+  border: 1px solid rgba(255, 255, 255, .25);
+  background: transparent;
+  color: #fff;
+  width: 40px;
+  height: 40px;
+  border-radius: 9px;
+  place-items: center;
+  cursor: pointer;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.nav-toggle:hover { background: rgba(255, 255, 255, .1); }
+.nav-toggle:focus-visible { outline: 2px solid #D6A12A; outline-offset: 2px; }
+.nav-toggle svg { transition: transform 160ms ease; }
+.nav-toggle.open {
+  background: rgba(255, 255, 255, .12);
+  border-color: #D6A12A;
+}
+.nav-toggle.open svg { transform: rotate(90deg); }
+
+/* Desktop: o menu é só um agrupador flexível — mantém brand | nav | importar | perfil */
+.nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Exemplo original trocava o bg da nav ao abrir (indigo/gray):
+   aqui o teal institucional escurece (#4f46e5 -> #3730a3) */
+#root > .topbar.nav-open,
+#root > .topbar.nav-open .topbar-inner,
+#root > .topbar.nav-open .brand { background: #3730a3 !important; }
+
+/* Polish visível no desktop: profundidade + foco acessível */
+#root > .topbar { box-shadow: 0 8px 24px rgba(55, 48, 163, .25) !important; }
+#root > .topbar .nav:focus-visible {
+  outline: 2px solid #D6A12A !important;
+  outline-offset: -2px;
+}
+
+@media (max-width: 900px) {
+  #root > .topbar .topbar-inner { flex-wrap: nowrap !important; align-items: center; }
+
+  .nav-toggle { display: grid; }
+
+  /* Painel dropdown: papel branco do tema, abre com transição */
+  #root > .topbar .nav-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 4px !important;
+    height: auto !important;
+    background: var(--paper) !important;
+    border-bottom: 1px solid var(--rule) !important;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, .18);
+    padding: 10px 14px 14px !important;
+    transform-origin: top center;
+    transform: translateY(-8px) scaleY(.98);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: transform 180ms ease, opacity 180ms ease, visibility 0s linear 180ms;
+    z-index: 30;
+  }
+  #root > .topbar .nav-menu.open {
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: transform 180ms ease, opacity 180ms ease;
+  }
+
+  #root > .topbar .nav-menu nav {
+    order: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    align-self: auto !important;
+    gap: 2px !important;
+    margin-top: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+  }
+  #root > .topbar .nav-menu .nav,
+  #root > .topbar .nav-menu .nav:hover,
+  #root > .topbar .nav-menu .nav.active {
+    width: 100% !important;
+    height: 46px !important;
+    min-height: 0 !important;
+    justify-content: flex-start !important;
+    padding: 0 12px !important;
+    margin: 0 !important;
+    font-size: 14px !important;
+    color: var(--ink) !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-bottom: 0 !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+  #root > .topbar .nav-menu .nav:hover { background: var(--paper-deep) !important; }
+  #root > .topbar .nav-menu .nav.active {
+    background: #e0e7ff !important;
+    color: #3730a3 !important;
+    box-shadow: inset 3px 0 #D6A12A !important;
+  }
+  #root > .topbar .nav-menu .nav::before,
+  #root > .topbar .nav-menu .nav::after { display: none !important; content: none !important; }
+  #root > .topbar .nav-menu .nav svg { width: 18px !important; height: 18px !important; }
+
+  #root > .topbar .nav-menu .profile {
+    display: flex !important;
+    height: auto !important;
+    margin: 6px 0 0 !important;
+    padding: 12px 4px 2px !important;
+    border-left: 0 !important;
+    border-top: 1px solid var(--rule) !important;
+    color: var(--ink) !important;
+  }
+  #root > .topbar .nav-menu .profile strong { color: var(--ink) !important; }
+  #root > .topbar .nav-menu .profile svg { color: var(--ink-soft) !important; }
+  #root > .topbar .nav-menu .profile .avatar { background: #4f46e5 !important; color: #fff !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #root > .topbar .nav-menu, .nav-toggle svg { transition: none; }
+}

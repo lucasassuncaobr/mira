@@ -1,0 +1,364 @@
+/* Mira — página principal estilo Gran Questões (/provas), identidade Mira.
+   Ordem: este arquivo vem por último; usa #root para prevalecer sobre
+   os !important acumulados. A view solve fica de fora (workspace intacto). */
+
+#root.view-exams main { padding-top: 0 !important; }
+#root.view-exams main > header { display: none; }
+
+/* ---- Topbar clone da questoes-navbar (Gran), identidade Mira ----
+   UMA topbar para todas as abas (menos solve): 80px, branca, sem filetes,
+   links só-texto 14px, ativo = bloco menta quadrado, cantos retos. */
+#root > .topbar {
+  background: #fff !important;
+  border: 0 !important;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .06) !important;
+}
+/* Altura unificada nas abas; no solve o workspace mantém a sua */
+/* Topbar fixa global: 80px desktop, 64px mobile, idêntica em toda aba (inclui solve) */
+#root > .topbar {
+  position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; z-index: 60 !important;
+  height: 80px !important;
+}
+#root > .topbar .topbar-inner { height: 80px !important; }
+#root:not(.view-solve) > main { margin-top: 80px; }
+#root.view-solve main { margin-top: 80px; }
+#root > .topbar .topbar-inner {
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 24px !important;
+  gap: 28px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  background: #fff !important;
+}
+/* Neutraliza o bloco "Barra principal" do compact: geometria é do gran */
+#root > .topbar { padding: 0 !important; justify-content: flex-start !important; }
+#root > .topbar .topbar-inner { width: auto !important; flex: 1 1 auto !important; }
+#root > .topbar nav { gap: 4px !important; }
+#root > .topbar .brand {
+  height: auto !important;
+  min-width: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+/* LOGO ÚNICA do projeto: todas as propriedades travadas, vale em toda aba */
+#root > .topbar .brand .brand-lockup { display: grid !important; align-content: center !important; }
+#root > .topbar .brand .brand-lockup .brand-name {
+  font-family: var(--font-primary) !important;
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  font-style: normal !important;
+  line-height: 1 !important;
+  letter-spacing: -.02em !important;
+  text-transform: none !important;
+  color: #3730a3 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+#root > .topbar .brand .brand-lockup small {
+  font-family: var(--font-primary) !important;
+  font-size: 8px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: .24em !important;
+  text-transform: uppercase !important;
+  color: #6C7480 !important;
+  margin: 3px 0 0 2px !important;
+}
+#root > .topbar nav {
+  height: auto !important;
+  align-self: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  overflow: visible !important;
+}
+#root > .topbar .nav {
+  height: 44px !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 16px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  font-size: 14px !important;
+  font-weight: 500;
+  color: #343A40 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+  white-space: nowrap;
+}
+#root > .topbar .nav span { font-size: 14px !important; }
+/* Mesma especificidade (1,3,0) nos 3 estados: vence o bloco do compact por ordem */
+#root > .topbar .nav,
+#root > .topbar .nav:hover,
+#root > .topbar .nav.active {
+  box-shadow: none !important;
+  height: 44px !important;
+  min-height: 0 !important;
+  padding: 0 16px !important;
+  display: inline-flex !important;
+  border: 0 !important;
+  border-bottom: 0 !important;
+}
+#root > .topbar .nav:hover { background: transparent !important; color: #4f46e5 !important; }
+#root > .topbar .nav.active {
+  background: transparent !important;
+  color: #4f46e5 !important;
+  font-weight: 700;
+}
+#root > .topbar .nav.active::after,
+#root > .topbar .nav.active::before { display: none !important; content: none !important; }
+#root > .topbar .profile {
+  height: auto !important;
+  margin-left: auto !important;
+  padding: 0 0 0 20px !important;
+  border: 0 !important;
+  border-left: 1px solid #E9ECEF !important;
+  color: #212529 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+#root > .topbar .profile strong { color: #212529 !important; font-size: 14px; }
+#root > .topbar .profile .avatar {
+  width: 36px !important; height: 36px !important; font-size: 12px;
+  background: #4f46e5 !important; color: #fff !important; border-radius: 0 !important;
+}
+#root > .topbar.nav-open,
+#root > .topbar.nav-open .topbar-inner,
+#root > .topbar.nav-open .brand { background: #fff !important; }
+.nav-toggle { color: #3730a3; border-color: #c7d2fe; border-radius: 0; }
+.nav-toggle:hover { background: #e0e7ff; }
+.nav-toggle.open { background: #e0e7ff; border-color: #4f46e5; }
+
+/* ---- Cantos retos: identidade institucional ---- */
+.gran-provas *, .gran-provas *::before, .gran-provas *::after { border-radius: 0 !important; }
+#root > .topbar .nav-menu .nav { border-radius: 0 !important; }
+
+/* ---- Hero idêntico ao page-heading do Gran (/aluno/filtro/provas) ----
+   Faixa navy #1e1b4b full-bleed, crumbs + H1 à esquerda, texto + CTA à direita. */
+.gran-hero {
+  margin: 0 calc(50% - 50vw);
+  background: #1e1b4b;
+  border: 0;
+  color: #fff;
+}
+.gran-hero-inner { max-width: 1280px; margin: 0 auto; padding: 20px 36px 40px; }
+.gran-crumbs { display: flex; align-items: center; justify-content: flex-start; gap: 8px; height: auto !important; font-size: 13px; color: rgba(255, 255, 255, .65); margin-bottom: 12px; }
+.gran-crumbs button { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; }
+.gran-crumbs button:hover { color: #fff; text-decoration: underline; }
+.gran-crumbs span[aria-hidden] { color: rgba(255, 255, 255, .4); }
+.gran-crumbs strong { color: #fff; font-weight: 600; }
+.gran-hero-row { display: flex; flex-direction: row; align-items: center; justify-content: space-between; text-align: left; gap: 32px; }
+.gran-hero-row h2 { margin: 0; font: 800 30px/1.2 var(--font-primary); letter-spacing: -.02em; color: #fff; white-space: nowrap; }
+.gran-hero-action { display: flex; flex-direction: row; align-items: center; gap: 20px; max-width: 560px; }
+.gran-hero-action p { text-align: left; }
+.gran-hero-action p { margin: 0; font-size: 14px; line-height: 1.5; color: #fff; }
+.gran-hero-cta {
+  display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0;
+  background: transparent; color: #fff;
+  border: 1px solid rgba(255, 255, 255, .35); border-radius: 0;
+  padding: 12px 15px; font-weight: 700; font-size: 14px;
+  cursor: pointer; white-space: nowrap;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+.gran-hero-cta:hover { background: #fff; color: #1e1b4b; border-color: #fff; }
+.gran-hero-cta:focus-visible { outline: 2px solid #D6A12A; outline-offset: 2px; }
+
+/* ---- Stats / resume ---- */
+.gran-provas .stats { margin: 24px 0 22px; }
+/* ---- Colunas: filtros + lista ---- */
+.gran-cols { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 20px; align-items: start; margin-top: 24px; }
+.gran-filters {
+  background: #F1F2F4; border: 1px solid #E4E4E4; border-radius: 0;
+  padding: 18px; position: static;
+}
+/* Sidebar (filtros + desempenho) fixa na rolagem */
+.gran-side { display: grid; gap: 14px; align-content: start; position: sticky; top: 104px; }
+.gran-filters-head { display: flex; align-items: center; justify-content: space-between; }
+.gran-filters-head h3 { margin: 0; font: 800 16px var(--font-primary); color: #3730a3; }
+.gran-filters-head > div { display: flex; gap: 10px; align-items: center; }
+.gran-clear { border: 0; background: transparent; color: #4f46e5; font-weight: 700; font-size: 12px; cursor: pointer; padding: 4px 0; }
+.gran-clear:hover { text-decoration: underline; }
+.gran-filters-toggle { display: none; border: 1px solid #E8E8E8; background: #F7F5F0; border-radius: 7px; padding: 6px 10px; font-size: 12px; font-weight: 700; color: #4A5060; cursor: pointer; }
+.gran-field { display: block; margin-top: 12px; }
+.gran-field span { display: block; font-size: 11px; font-weight: 800; color: #6C7480; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .06em; }
+.gran-field input, .gran-field select {
+  width: 100%; height: 42px; border: 1px solid #E8E8E8; border-radius: 0;
+  background: #fff; padding: 0 12px; font-size: 14px; color: #2E333D; outline: none;
+}
+.gran-field input:focus, .gran-field select:focus { border-color: #4f46e5; background: #fff; }
+/* Mata o anel azul padrão do navegador no clique; teclado mantém o índigo via :focus-visible */
+.gran-field input:focus:not(:focus-visible), .gran-field select:focus:not(:focus-visible) { outline: none; }
+
+.gran-list-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.gran-list-head h3 { margin: 6px 0 0; font: 700 21px var(--font-primary); }
+.gran-count { font-size: 12px; color: #6C7480; white-space: nowrap; }
+.gran-list-side { display: grid; gap: 6px; justify-items: end; }
+.gran-continue { border: 0; background: transparent; color: #3730a3; font-weight: 700; font-size: 13px; cursor: pointer; padding: 0; white-space: nowrap; }
+.gran-continue:hover { text-decoration: underline; }
+.gran-continue b { font-weight: 800; }
+
+/* Grade de provas 3x4: 3 colunas travadas no desktop */
+.view-exams .exam-list.dashboard-exams {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+  align-items: stretch !important;
+}
+@media (max-width: 1100px) {
+  .view-exams .exam-list.dashboard-exams { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
+@media (max-width: 600px) {
+  .view-exams .exam-list.dashboard-exams { grid-template-columns: 1fr !important; }
+}
+
+/* Cards: modelo anterior do projeto preservado (grade vertical original) */
+/* Faixa da logo + título do card sempre branca */
+.exam-card-v2 .exam-card-visual { background: #fff !important; }
+/* Ações (editar/remover) à esquerda e CTA Resolver à direita no rodapé do card */
+.view-exams .exam-card-v2 .exam-card-footer { justify-content: space-between; align-items: center; }
+/* Barra de progresso alinhada às margens do conteúdo (sem recuo duplo) */
+.view-exams .exam-card-v2 .exam-card-progress-area { margin: 0; }
+/* Metadados do card (Prova/Banca) em corpo menor */
+.view-exams .exam-card-v2 .exam-card-info-box { font-size: 11px; }
+.exam-card-cta {
+  height: 32px; padding: 0 14px;
+  display: inline-flex; align-items: center;
+  background: transparent; color: #4A5060;
+  border: 1px solid var(--card-slate-200, #E4E4E4); border-radius: 0;
+  font-weight: 800; font-size: 12px; letter-spacing: .04em;
+  cursor: pointer; white-space: nowrap;
+}
+.exam-card-cta:hover { color: #4f46e5; background: #F1F2F4; }
+/* Sem traço de divisão sob a faixa da logo */
+.view-exams .exam-card-v2 .exam-card-visual { border-bottom: 0 !important; }
+
+/* ---- Ritmo + footer ---- */
+.gran-ritmo { display: grid; grid-template-columns: 1fr; gap: 18px; margin-top: 22px; align-items: start; }
+/* Ritmo e rodapé ocupam a largura total dentro da grade (sidebar fixa percorre a página inteira) */
+.gran-cols > .gran-ritmo, .gran-cols > .gran-footer { grid-column: 1 / -1; min-width: 0; }
+.gran-cols > .gran-footer { position: relative; z-index: 5; }
+.gran-footer { margin-top: 30px; background: #1e1b4b; color: #eef2ff; border-radius: 16px; padding: 28px 30px 20px; }
+.gran-footer-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 24px; }
+.gran-footer strong { color: #fff; display: block; margin-bottom: 10px; font-size: 13px; text-transform: uppercase; letter-spacing: .08em; }
+.gran-footer-brand { font-size: 20px !important; text-transform: none !important; letter-spacing: 0 !important; }
+.gran-footer-brand span { color: #D6A12A; font-size: 12px; }
+.gran-footer p { font-size: 13px; line-height: 1.6; margin: 8px 0 0; color: #a5b4fc; }
+.gran-footer nav { display: grid; gap: 8px; align-content: start; height: auto; }
+.gran-footer nav button { border: 0; background: transparent; color: #eef2ff; text-align: left; padding: 0; cursor: pointer; font-size: 13px; }
+.gran-footer nav button:hover { color: #fff; text-decoration: underline; }
+.gran-footer > small { display: block; margin-top: 20px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, .15); font-size: 11px; color: #a5b4fc; }
+
+/* ---- Responsivo ---- */
+@media (max-width: 1100px) {
+  .gran-ritmo { grid-template-columns: 1fr; }
+}
+@media (max-width: 900px) {
+  #root > .topbar, #root > .topbar .topbar-inner { height: 64px !important; }
+  #root:not(.view-solve) > main, #root.view-solve main { margin-top: 64px; }
+  #root > .topbar .topbar-inner { padding: 0 18px !important; gap: 14px !important; }
+  #root > .topbar .nav-toggle { margin-left: 0 !important; }
+  .gran-hero-inner { padding: 20px 22px 32px; }
+  .gran-hero-row { flex-wrap: wrap; }
+  .gran-cols { grid-template-columns: 1fr; }
+  .gran-side { position: static; }
+  .gran-filters { position: static; }
+  .gran-filters-toggle { display: inline-block; }
+  .gran-filters .gran-filters-body { display: none; }
+  .gran-filters.open .gran-filters-body { display: block; }
+  .gran-footer-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 700px) {
+  .gran-hero-inner { padding: 20px 20px 32px; }
+  .solve-banner-inner { padding: 12px 20px; }
+  .gran-hero-row { flex-direction: column; align-items: stretch; }
+  .gran-hero-row h2 { font-size: 24px; white-space: normal; }
+  .gran-hero-action { flex-direction: column; align-items: stretch; max-width: none; }
+  .gran-hero-cta { justify-content: center; }
+  .gran-resume { flex-direction: column; align-items: stretch; }
+  .gran-list .exam-card-v2 { flex-wrap: wrap; }
+  .gran-list .exam-card-content { flex: 1 1 100%; order: 2; }
+  .gran-list .exam-card-footer { flex: 1 1 100%; order: 3; justify-content: stretch; }
+  .gran-list .exam-card-cta { flex: 1; }
+  .gran-footer-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  #root > .topbar .topbar-inner { padding: 0 12px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gran-hero-cta { transition: none; }
+}
+
+/* Heatmap: meses ocultos (fileira fixa desalinhava da grade rolável) */
+.view-exams .github-calendar .github-months { display: none !important; }
+
+/* ---- Banner do solver (delimitador topbar ↔ workspace, padrão Gran) ---- */
+.solve-banner { background: #1e1b4b; color: #fff; flex: 0 0 auto; height: 88px; }
+.solve-banner-inner { max-width: 1280px; margin: 0 auto; padding: 0 36px; height: 100%; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+.solve-crumbs { display: flex; align-items: center; gap: 8px; height: auto !important; font-size: 12px; color: rgba(255, 255, 255, .65); margin-bottom: 5px; }
+.solve-crumbs button { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; }
+.solve-crumbs button:hover { color: #fff; text-decoration: underline; }
+.solve-crumbs span[aria-hidden] { color: rgba(255, 255, 255, .4); }
+.solve-banner h2 { margin: 0; font: 800 20px/1.3 var(--font-primary); letter-spacing: -.01em; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (min-width: 1051px) {
+  #root.view-solve main { display: flex; flex-direction: column; height: calc(100vh - 80px); overflow: hidden; }
+  #root.view-solve .solve { height: auto; flex: 1 1 auto; min-height: 0; }
+  #root.view-solve .solve-workspace { height: calc(100vh - 80px - 88px); min-height: 0; }
+  #root.view-solve .pdf-column { height: calc(100vh - 80px - 88px); }
+  #root.view-solve .image-viewport { height: calc(100vh - 164px - 88px); }
+  #root.view-solve .question-panel { height: calc(100vh - 80px - 88px); }
+}
+@media (max-width: 1050px) {
+  .solve-banner { height: auto; }
+  .solve-banner-inner { padding: 12px 22px; }
+  .solve-banner h2 { font-size: 18px; }
+}
+
+/* ---- Paginação da biblioteca ---- */
+.gran-pagination { margin-top: 18px; display: flex; justify-content: center; }
+.gran-pagination {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.gran-page, .gran-page-nav {
+  min-width: 36px; height: 36px; padding: 0 10px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  background: #fff; border: 1px solid #E4E4E4; border-radius: 0;
+  color: #4A5060; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.gran-page:hover:not(:disabled), .gran-page-nav:hover:not(:disabled) { border-color: #4f46e5; color: #3730a3; }
+.gran-page.on { background: #4f46e5; border-color: #4f46e5; color: #fff; font-weight: 800; }
+.gran-page:disabled, .gran-page-nav:disabled { opacity: .45; cursor: default; }
+.gran-page-nav span { font-size: 13px; }
+.gran-page:focus-visible, .gran-page-nav:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
+
+/* ---- Cor de apoio #D97706: botões principais e de ação ----
+   Primary, salvar e avanço do solver. Texto escuro para contraste. */
+.primary,
+.exam-edit-save { background-color: #D97706 !important; color: #1A1F28 !important; border-color: #D97706 !important; }
+.primary:hover:not(:disabled),
+.exam-edit-save:hover { background-color: #B45309 !important; color: #1A1F28 !important; border-color: #B45309 !important; }
+.btn-respond,
+.btn-finish { background-color: #D97706 !important; color: #fff !important; border-color: #D97706 !important; }
+.btn-respond:hover:not(:disabled),
+.btn-finish:hover:not(:disabled),
+.bottom-nav.feedback-active .btn-respond { background-color: #B45309 !important; color: #fff !important; border-color: #B45309 !important; }
+
+/* Alternativa marcada: borda índigo fina, sem barra lateral */
+.option.selected,
+.option.selected:hover { border-color: #4F46E5 !important; background-color: #fff !important; box-shadow: none !important; }
+
+/* Toolbar do PDF no solver: cinza do projeto; hover com efeito índigo */
+.view-solve .image-toolbar button:hover { background: #E0E7FF !important; color: #3730A3 !important; }
+.view-solve .image-toolbar button:focus-visible { outline: 2px solid #4f46e5; outline-offset: 1px; }
+/* Estado padrão com o efeito da paginação: fundo índigo-claro + ícone índigo */
+.view-solve .image-toolbar button { background: #fff !important; color: #4A5060 !important; }
