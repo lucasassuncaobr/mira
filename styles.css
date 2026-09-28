@@ -21,6 +21,7 @@ body {
     background-color: var(--bg-light);
     color: var(--text-dark);
     min-height: 100vh;
+    overflow-x: hidden;
 }
 
 /* Header */
@@ -32,6 +33,10 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    contain: layout paint;
 }
 
 .header-left {
@@ -44,6 +49,7 @@ body {
     display: flex;
     flex-direction: column;
     line-height: 1;
+    contain: layout;
 }
 
 .logo-text {
@@ -74,6 +80,8 @@ body {
     align-items: center;
     gap: 8px;
     transition: background-color 0.2s;
+    contain: layout;
+    border-radius: 4px;
 }
 
 .nav-item:hover {
@@ -88,6 +96,7 @@ body {
     width: 18px;
     height: 18px;
     opacity: 0.9;
+    flex-shrink: 0;
 }
 
 .header-right {
@@ -100,6 +109,7 @@ body {
     align-items: center;
     gap: 10px;
     cursor: pointer;
+    contain: layout;
 }
 
 .user-avatar {
@@ -111,23 +121,27 @@ body {
     justify-content: center;
     font-weight: 600;
     font-size: 13px;
+    flex-shrink: 0;
 }
 
 .user-name {
     font-weight: 500;
     font-size: 14px;
+    white-space: nowrap;
 }
 
 .menu-icon {
     width: 20px;
     height: 20px;
     opacity: 0.8;
+    flex-shrink: 0;
 }
 
 /* Main Content */
 .main-content {
     display: flex;
     height: calc(100vh - 56px);
+    contain: layout;
 }
 
 /* PDF Panel */
@@ -136,6 +150,8 @@ body {
     display: flex;
     flex-direction: column;
     background-color: var(--pdf-bg);
+    min-width: 0;
+    contain: layout paint;
 }
 
 .pdf-header {
@@ -144,6 +160,7 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+    contain: layout;
 }
 
 .pdf-icon {
@@ -151,11 +168,16 @@ body {
     height: 18px;
     color: var(--text-gray);
     opacity: 0.7;
+    flex-shrink: 0;
 }
 
 .pdf-title {
     font-size: 13px;
     color: var(--text-gray);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
 }
 
 .pdf-viewer {
@@ -163,6 +185,7 @@ body {
     overflow: auto;
     padding: 0 20px 20px 20px;
     position: relative;
+    contain: layout;
 }
 
 .pdf-content {
@@ -171,12 +194,16 @@ body {
     padding: 40px 50px;
     max-width: 100%;
     min-height: calc(100vh - 120px);
+    contain: layout paint;
 }
 
 .pdf-page {
     line-height: 1.7;
     font-size: 14px;
     color: #1a1a1a;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
 }
 
 .pdf-page p {
@@ -186,11 +213,13 @@ body {
 /* Question Panel */
 .question-panel {
     width: 440px;
+    min-width: 320px;
     background-color: var(--bg-white);
     display: flex;
     flex-direction: column;
     overflow-y: auto;
     border-left: 1px solid var(--border-color);
+    contain: layout paint;
 }
 
 .question-header {
@@ -199,12 +228,16 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
+    contain: layout;
+    flex-shrink: 0;
 }
 
 .question-number {
     font-size: 20px;
     font-weight: 600;
     color: var(--text-dark);
+    white-space: nowrap;
 }
 
 /* Clock */
@@ -212,6 +245,8 @@ body {
     background-color: #f8fafc;
     border: 1px solid var(--border-color);
     padding: 0;
+    flex-shrink: 0;
+    contain: layout;
 }
 
 .clock-inner {
@@ -226,6 +261,7 @@ body {
     height: 16px;
     color: var(--text-gray);
     opacity: 0.7;
+    flex-shrink: 0;
 }
 
 .clock-label {
@@ -233,6 +269,7 @@ body {
     font-weight: 600;
     color: var(--text-gray);
     letter-spacing: 0.5px;
+    white-space: nowrap;
 }
 
 .clock-time {
@@ -241,6 +278,7 @@ body {
     color: #095B83;
     font-family: 'Rawline', 'Courier New', monospace;
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
 }
 
 /* Question Index */
@@ -249,6 +287,8 @@ body {
     height: 100px;
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
+    contain: layout;
 }
 
 .index-header {
@@ -258,6 +298,7 @@ body {
     padding: 10px 12px 6px;
     flex-shrink: 0;
     background-color: var(--bg-white);
+    contain: layout;
 }
 
 .index-title {
@@ -265,11 +306,13 @@ body {
     font-weight: 600;
     color: var(--text-gray);
     letter-spacing: 0.5px;
+    white-space: nowrap;
 }
 
 .index-count {
     font-size: 11px;
     color: var(--text-gray);
+    white-space: nowrap;
 }
 
 .index-grid {
@@ -280,6 +323,7 @@ body {
     flex: 1;
     padding: 0 12px 8px;
     scroll-behavior: smooth;
+    contain: layout;
 }
 
 .index-grid::-webkit-scrollbar {
@@ -308,6 +352,8 @@ body {
     padding: 0;
     min-height: 20px;
     min-width: 20px;
+    contain: layout paint;
+    flex-shrink: 0;
 }
 
 .index-btn:hover {
@@ -362,6 +408,7 @@ body {
 /* Answer Section */
 .answer-section {
     padding: 16px 20px;
+    contain: layout;
 }
 
 .answer-section.changing {
@@ -384,6 +431,7 @@ body {
     color: var(--text-gray);
     letter-spacing: 0.5px;
     margin-bottom: 14px;
+    white-space: nowrap;
 }
 
 .option {
@@ -396,6 +444,9 @@ body {
     cursor: pointer;
     transition: all 0.25s ease;
     background-color: var(--bg-white);
+    contain: layout paint;
+    will-change: border-color, background-color, transform;
+    flex-shrink: 0;
 }
 
 .option:hover {
@@ -443,6 +494,7 @@ body {
     color: var(--text-gray);
     flex-shrink: 0;
     transition: all 0.25s ease;
+    contain: layout;
 }
 
 .option.selected .option-letter {
@@ -456,6 +508,8 @@ body {
     color: var(--text-dark);
     line-height: 1.5;
     padding-top: 6px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 /* Feedback */
@@ -464,6 +518,8 @@ body {
     padding: 14px 16px;
     border-left: 4px solid;
     animation: feedbackSlideIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    contain: layout paint;
+    will-change: opacity, transform;
 }
 
 .feedback.correct {
@@ -511,6 +567,8 @@ body {
     align-items: center;
     background-color: var(--bg-white);
     transition: all 0.3s ease;
+    contain: layout;
+    flex-shrink: 0;
 }
 
 .nav-arrows {
@@ -530,6 +588,8 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
     color: #888;
+    flex-shrink: 0;
+    contain: layout paint;
 }
 
 .nav-arrow:hover {
@@ -560,6 +620,8 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
     letter-spacing: 0.3px;
+    flex-shrink: 0;
+    contain: layout paint;
 }
 
 .btn-respond:hover {
@@ -578,6 +640,7 @@ body {
     }
     .question-panel {
         width: 100%;
+        min-width: 0;
     }
 }
 
@@ -591,4 +654,31 @@ body {
     .index-grid {
         grid-template-columns: repeat(10, 1fr);
     }
+    .question-panel {
+        width: 100%;
+    }
+    .pdf-content {
+        padding: 20px;
+    }
+}
+
+/* Font loading prevention - avoid reflow */
+@font-face {
+    font-family: 'Rawline';
+    src: local('Rawline');
+    font-display: swap;
+}
+
+/* Prevent layout shift during Alpine.js initialization */
+[x-cloak] {
+    display: none !important;
+}
+
+body {
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+body.alpine-ready {
+    opacity: 1;
 }

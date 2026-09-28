@@ -1,6 +1,11 @@
 .git
+Agente/
+Aprova/
+zapzap-prodata-agent/
+dist/
 *.md
-*.pyc
-__pycache__
-.venv
-venv
+mira
+.server.log
+skills-lock.json
+*.js
+*.json

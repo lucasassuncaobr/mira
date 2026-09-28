@@ -1,7 +1,13 @@
 .stfolder/
 LucasShell/
 NuvioWeb/
-node_modules/
 dist/
 *.sync-conflict-*
 .server.log
+mira
+*.exe
+*.test
+*.out
+node_modules/
+skills-lock.json
+*.js
