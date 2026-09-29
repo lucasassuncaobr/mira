@@ -1,0 +1,12 @@
+import { mount } from 'svelte';
+import App from './App.svelte';
+import './styles.css';
+import './theme.css';
+import './theme-polish.css';
+import './compact.css';
+import './pdf-modal.css';
+import './focus.css';
+import './mobile.css';
+import './navbar.css';
+import './gran.css';
+mount(App, { target: document.getElementById('app')! });

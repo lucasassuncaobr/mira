@@ -362,10 +362,69 @@
   #root.view-solve main { display: flex; flex-direction: column; height: calc(100vh - 80px); overflow: hidden; }
   #root.view-solve .solve { height: auto; flex: 1 1 auto; min-height: 0; }
   #root.view-solve .solve-workspace { height: calc(100vh - 80px - 88px); min-height: 0; }
-  #root.view-solve .pdf-column { height: calc(100vh - 80px - 88px); }
-  #root.view-solve .image-viewport { height: calc(100vh - 164px - 88px); }
-  #root.view-solve .question-panel { height: calc(100vh - 80px - 88px); }
+  /* Desloca 30px à direita mas encolhe 30px na largura: a borda
+     direita fica parada e nunca invade o trilho de questões.
+     Sem card (transparente, sem borda) e sem respiro no topo: a página
+     do PDF encosta direto no banner acima. */
+  #root.view-solve .pdf-column {
+    height: calc(100vh - 80px - 88px);
+    position: relative;
+    left: 30px;
+    top: 0;
+    width: calc(100% - 30px);
+    margin-top: 0;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    padding: 0 18px 0;
+  }
+  /* Viewport cresce até embaixo: coluna em flex, figure ocupa a sobra
+     após o delimitador, viewport ocupa a sobra após a toolbar
+     (foco usa clientHeight em runtime). */
+  #root.view-solve .pdf-column { display: flex; flex-direction: column; }
+  #root.view-solve .pdf-column .page-reference { flex: 1 1 auto; min-height: 0; height: auto; display: flex; flex-direction: column; margin: 0; }
+  #root.view-solve .image-viewport { flex: 1 1 auto; min-height: 0; height: auto; }
+  #root.view-solve .image-toolbar { flex: 0 0 auto; }
+/* Sem linha divisória no cabeçalho da questão. */
+#root.view-solve .question-header { border-bottom: 0; }
+#root.view-solve .question-number { position: relative; top: 5px; }
+/* Alternativa marcada: preenchimento estilo gabarito (sem rádio).
+   Linhas compactas (só a letra); ao clicar, transição leve do preenchimento. */
+#root.view-solve .option { padding: 8px 14px !important; transition: background-color .25s ease, border-color .25s ease !important; }
+#root.view-solve .option.selected {
+  background-color: #E0E7FF !important;
+  border-color: #4F46E5 !important;
 }
+#root.view-solve .option.selected .option-letter { color: #3730A3; font-weight: 800; }
+/* Índice 5px acima; grade interna 3px acima. */
+#root.view-solve .question-index { position: relative; top: -5px; }
+#root.view-solve .index-grid { position: relative; top: -3px; }
+/* Índice de questões em paleta sutil (menos chamativa). */
+#root.view-solve .index-btn.active { background: #E2E8F0; color: #334155; box-shadow: none; }
+#root.view-solve .index-btn.correct-answer { background: #E7F2EA; color: #4A7C59; }
+#root.view-solve .index-btn.wrong-answer { background: #F3E4E4; color: #9C6B6B; }
+/* Faixa delimitadora entre o banner e o PDF (todas as larguras). */
+.pdf-delim .clock-container { border: 0; }
+.pdf-delim .clock-time { color: #B6BBC4; }
+.clock-pause { border: 0; background: transparent; color: #B6BBC4; cursor: pointer; padding: 2px; display: inline-flex; align-items: center; }
+.clock-pause:hover { color: #6C7480; }
+.pdf-delim {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 14px;
+  margin-bottom: 0;
+  background: #fff;
+  border: 1px solid #E8E8E8;
+  border-radius: 0;
+}
+  /* Deslocamento proporcional à tela (3vw, teto 50px): igual ao atual
+     em monitor médio, sem estourar a margem nos menores nem sumir nos maiores. */
+  #root.view-solve .question-panel { height: calc(100vh - 80px - 88px); position: relative; left: clamp(0px, 3vw, 50px); z-index: 1; }
+}
+
 @media (max-width: 1050px) {
   .solve-banner { height: auto; }
   .solve-banner-inner { padding: 12px 22px; }
@@ -405,8 +464,7 @@
 .option.selected,
 .option.selected:hover { border-color: #4F46E5 !important; background-color: #fff !important; box-shadow: none !important; }
 
-/* Toolbar do PDF no solver: cinza do projeto; hover com efeito índigo */
-.view-solve .image-toolbar button:hover { background: #E0E7FF !important; color: #3730A3 !important; }
+/* Toolbar do PDF no solver: só ícones cinza (mesmo do relógio), sem caixa */
+.view-solve .image-toolbar button:hover { background: transparent !important; color: #9AA0AA !important; }
 .view-solve .image-toolbar button:focus-visible { outline: 2px solid #4f46e5; outline-offset: 1px; }
-/* Estado padrão com o efeito da paginação: fundo índigo-claro + ícone índigo */
-.view-solve .image-toolbar button { background: #fff !important; color: #4A5060 !important; }
+.view-solve .image-toolbar button { background: transparent !important; color: #B6BBC4 !important; }

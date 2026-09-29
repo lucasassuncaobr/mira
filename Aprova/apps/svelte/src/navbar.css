@@ -1,4 +1,4 @@
-/* Mira — navbar responsiva (Alpine: navOpen + ESC + click.away).
+/* Mira — navbar responsiva (Svelte: navOpen + ESC; fecha ao navegar).
    Desktop: layout atual preservado (.nav-menu vira container flexível).
    Mobile (<=900px): hambúrguer + painel dropdown sobre o conteúdo.
    NOTA: seletores com #root e !important para prevalecer sobre os

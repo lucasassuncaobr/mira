@@ -2,10 +2,10 @@ NOTICE — Dependências do produto Aprova
 =======================================
 
 O produto em produção é o binário Go servido pelo Dockerfile.go. O frontend
-é HTML, CSS, JavaScript e Alpine.js servido diretamente pelo Fiber.
+é Svelte 5 compilado via Vite, servido diretamente pelo Fiber.
 
 Dependências embarcadas no frontend:
-- Alpine.js — MIT
+- Svelte 5 — MIT
 - PDF.js — Apache-2.0
 - PeerJS — MIT
 

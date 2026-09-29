@@ -1,6 +1,7 @@
 package main
 
-// Frontend AlpineJS sem build (fase 3): HTML + CSS + JS servidos pelo Fiber.
+// Frontend Svelte 5 compilado (dist achatado em web-svelte):
+// HTML + CSS + JS servidos pelo Fiber.
 // Cache agressivo no versionado (vendor), sem cache no index.
 
 import (
@@ -38,6 +39,36 @@ func hasIndex(dir string) bool {
 	return err == nil && !st.IsDir()
 }
 
+// isHashedAsset detecta o padrão do Vite: nome-HASH8.ext (o hash muda a
+// cada build, então o conteúdo é imutável e pode cachear agressivo).
+func isHashedAsset(p string) bool {
+	base := filepath.Base(p)
+	dot := -1
+	for i := len(base) - 1; i >= 0; i-- {
+		if base[i] == '.' {
+			dot = i
+			break
+		}
+	}
+	if dot < 10 {
+		return false
+	}
+	ext := base[dot:]
+	if ext != ".js" && ext != ".css" {
+		return false
+	}
+	name := base[:dot]
+	if len(name) < 10 || name[len(name)-9] != '-' {
+		return false
+	}
+	for _, r := range name[len(name)-8:] {
+		if !(r >= '0' && r <= '9' || r >= 'a' && r <= 'z' || r >= 'A' && r <= 'Z') {
+			return false
+		}
+	}
+	return true
+}
+
 func registerWeb(app *fiber.App) {
 	webDir = resolveWebDir()
 	if webDir == "" {
@@ -48,9 +79,14 @@ func registerWeb(app *fiber.App) {
 		return c.SendFile(filepath.Join(webDir, "index.html"))
 	})
 	assets := app.Group("/assets", func(c *fiber.Ctx) error {
-		// Front local: revalida sempre (sem immutable) para o navegador
-		// buscar HTML/CSS/JS novos com F5 comum após cada deploy.
-		c.Set("Cache-Control", "no-cache, must-revalidate")
+		// Bundle com hash do Vite (index-XXXXXXXX.js): imutável por construção,
+		// cache de 1 ano sem revalidação. Vendor sem hash e demais arquivos:
+		// revalida sempre para F5 comum buscar deploy novo.
+		if isHashedAsset(c.Path()) {
+			c.Set("Cache-Control", "public, max-age=31536000, immutable")
+		} else {
+			c.Set("Cache-Control", "no-cache, must-revalidate")
+		}
 		return c.Next()
 	})
 	assets.Static("/", webDir)

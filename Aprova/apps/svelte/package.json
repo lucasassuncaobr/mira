@@ -1,0 +1,16 @@
+{
+  "name": "aprova-svelte",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:prod": "vite build --outDir ../goapi/web-svelte --emptyOutDir && mv ../goapi/web-svelte/assets/* ../goapi/web-svelte/ && rmdir ../goapi/web-svelte/assets"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^6.2.1",
+    "svelte": "^5.38.7",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.2"
+  }
+}

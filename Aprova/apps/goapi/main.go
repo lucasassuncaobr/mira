@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	_ "modernc.org/sqlite"
 )
@@ -158,6 +159,9 @@ func main() {
 
 	app := fiber.New(fiber.Config{DisableStartupMessage: true, BodyLimit: 22 * 1024 * 1024})
 	app.Use(cors.New())
+	// Brotli/gzip negociado (fasthttp): bundle JS/CSS e JSON menores
+	// para redes lentas; custo irrelevante no servidor local.
+	app.Use(compress.New())
 	app.Use(func(c *fiber.Ctx) error {
 		c.Set("Cache-Control", "no-store, no-cache, must-revalidate")
 		c.Set("Cross-Origin-Resource-Policy", "cross-origin")

@@ -8,4 +8,5 @@ uploads/
 *.tsbuildinfo
 .DS_Store
 /apps/goapi/mira-goapi
+/apps/goapi/web-svelte/
 __pycache__/

@@ -28,5 +28,6 @@ PDFs compostos somente por imagens ainda precisam da etapa de OCR. Layouts em m�
 
 ## Estrutura
 
-- `apps/goapi`: Go + Fiber servindo API e frontend AlpineJS sem build.
+- `apps/goapi`: Go + Fiber servindo API e frontend Svelte 5 compilado (`apps/svelte` → `apps/goapi/web-svelte`).
+- `apps/svelte`: frontend Svelte 5 + Vite (runes, sem runtime interpretado).
 - `apps/api`: Express, extração de PDF e SQLite.

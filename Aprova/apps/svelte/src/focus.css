@@ -33,13 +33,19 @@
 }
 
 /* Viewport vira scroll container nativo (sem transform de pan/zoom). */
+/* Scrollbar invisível nos dois motores; a rolagem continua por
+   arrasto, roda do mouse e toque. */
 .image-viewport {
     overflow: auto;
     cursor: grab;
     touch-action: auto;
     overscroll-behavior: contain;
-    scrollbar-width: thin;
+    scrollbar-width: none;
     background: #F5F5F5;
+}
+
+.image-viewport::-webkit-scrollbar {
+    display: none;
 }
 
 .image-viewport.dragging {
