@@ -409,6 +409,7 @@
 #root.view-solve .question-header { border-bottom-color: #E3E5E9; }
 #root.view-solve .question-number { color: #2B2F36; }
 #root.view-solve .answer-title, #root.view-solve .index-title { color: #8A8F98; }
+#root.view-solve .index-header { background-color: #FAFAFB; }
 #root.view-solve .answer-section .option { background: #fff; border-color: #E1E3E8; }
 #root.view-solve .answer-section .option:hover { background: #F2F3F6; border-color: #CFD3DA; }
 #root.view-solve .option.selected { border-color: #4f46e5; background: #EEEFFE; box-shadow: 0 1px 3px rgba(79, 70, 229, .12); }
@@ -429,6 +430,21 @@
 #root.view-solve .question-context { background: #EDEFFD; }
 #root.view-solve .feedback.success { background: #EAF4ED; color: #2E7D46; }
 #root.view-solve .feedback.danger { background: #FAEEE9; color: #A34A3E; }
+/* Tesoura: risca a alternativa (elimina visualmente). */
+#root.view-solve .scissor-btn { flex: 0 0 auto; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; background: transparent; border: 0; border-radius: 6px; color: #C3C7CE; cursor: pointer; padding: 0; }
+#root.view-solve .scissor-btn:hover:not(:disabled) { color: #8B0000; background: transparent; }
+#root.view-solve .scissor-btn:disabled { opacity: .35; cursor: default; }
+#root.view-solve .scissor-btn.on { color: #A34A3E; }
+#root.view-solve .option.eliminated { opacity: .5; }
+/* Tesoura oculta com visibility (não display): o espaço é preservado
+   e a letra não se move. Reaparece no hover da riscada. */
+#root.view-solve .option.eliminated .scissor-btn { visibility: hidden; }
+#root.view-solve .option.eliminated:hover .scissor-btn { visibility: visible; }
+#root.view-solve .option.eliminated .option-letter,
+#root.view-solve .option.eliminated .option-text { text-decoration: line-through; }
+/* Selo da alternativa marcada no feedback: linha de texto acima do card,
+   sem fundo e sem contorno. */
+#root.view-solve .marked-flag { display: block; margin: 2px 0 4px; text-align: left; background: transparent; border: 0; color: #6C7480; font-family: var(--font-functional); font-size: 9px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
 /* Faixa delimitadora entre o banner e o PDF (todas as larguras). */
 .pdf-delim .clock-container { border: 0; }
 .pdf-delim .clock-time { color: #B6BBC4; }

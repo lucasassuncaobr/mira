@@ -21,6 +21,7 @@
 
   let currentIdx = $state(0);
   let answers = $state<Record<number, string>>({});
+  let eliminated = $state<Record<number, string[]>>({});
   let results = $state<Record<number, 'correct' | 'wrong'>>({});
   let feedback = $state<Feedback | null>(null);
   let submitting = $state(false);
@@ -123,7 +124,37 @@
   function selectAnswer(label: string): void {
     const q = question;
     if (!q || feedback) return;
+    // Clicar na alternativa riscada (sem tesoura visível) restaura.
+    if (isEliminated(q.id, label)) {
+      const cur = eliminated[q.id] ?? [];
+      eliminated = { ...eliminated, [q.id]: cur.filter((l) => l !== label) };
+      return;
+    }
     answers = { ...answers, [q.id]: label };
+  }
+
+  // Tesoura: risca a alternativa (elimina visualmente). Alternativa
+  // riscada não pode ser marcada; riscar a marcada limpa a seleção.
+  // O estado é por questão e sobrevive à navegação entre questões.
+  function isEliminated(qid: number, label: string): boolean {
+    return (eliminated[qid] ?? []).includes(label);
+  }
+
+  function toggleEliminate(e: Event, qid: number, label: string, total: number): void {
+    e.stopPropagation();
+    if (feedback) return;
+    const cur = eliminated[qid] ?? [];
+    // Não pode anular todas: pelo menos uma alternativa fica disponível.
+    if (!cur.includes(label) && cur.length + 1 >= total) return;
+    eliminated = {
+      ...eliminated,
+      [qid]: cur.includes(label) ? cur.filter((l) => l !== label) : [...cur, label],
+    };
+    if (answers[qid] === label) {
+      const next = { ...answers };
+      delete next[qid];
+      answers = next;
+    }
   }
 
   async function submitAnswer(): Promise<void> {
@@ -145,6 +176,13 @@
       results = { ...results, [q.id]: 'wrong' };
     } finally {
       submitting = false;
+      // No feedback nunca há risco: limpa as anulações da questão,
+      // mesmo que o usuário tenha riscado a alternativa correta.
+      if (feedback) {
+        const next = { ...eliminated };
+        delete next[q.id];
+        eliminated = next;
+      }
     }
   }
 
@@ -228,15 +266,25 @@
           </div>
         </div>
         <div class="answer-section">
-          <h3 class="answer-title">ESCOLHA UMA RESPOSTA</h3>
+          {#if !feedback}
+            <h3 class="answer-title">ESCOLHA UMA RESPOSTA</h3>
+          {/if}
           <div id="options-host">
             {#each question.alternatives as alt (alt.label)}
               {@const isMarked = selected === alt.label}
               {@const isCorrect = !!feedback && !feedback.unknown && feedback.correctAnswer === alt.label}
               {#if !feedback || isMarked || isCorrect}
-                <div class={optionClass(alt.label)} data-label={alt.label} onclick={() => selectAnswer(alt.label)}>
+                {#if feedback && isMarked}
+                  <span class="marked-flag">Sua resposta</span>
+                {/if}
+                <div class={optionClass(alt.label)} class:eliminated={isEliminated(question.id, alt.label)} data-label={alt.label} onclick={() => selectAnswer(alt.label)}>
+                  {#if !feedback}
+                    <button class="scissor-btn" class:on={isEliminated(question.id, alt.label)} title="Riscar alternativa" aria-label={'Riscar alternativa ' + alt.label} aria-pressed={isEliminated(question.id, alt.label)} onclick={(e) => toggleEliminate(e, question.id, alt.label, question.alternatives.length)}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 8.5 20 20M8.5 15.5 20 4"/></svg>
+                    </button>
+                  {/if}
                   <div class="option-letter">({alt.label})</div>
-                  {#if feedback}
+                  {#if feedback || isMarked}
                     <div class="option-text texto-questao">{alt.text}</div>
                   {/if}
                 </div>

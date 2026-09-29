@@ -63,7 +63,15 @@ export async function fetchExams(): Promise<Exam[]> {
 
 export async function fetchExam(id: number): Promise<SolveExam> {
   const response = await fetch(`${API}/exams/${id}`);
-  return (await response.json()) as SolveExam;
+  const exam = (await response.json()) as SolveExam;
+  // O banco pode trazer as alternativas em ordem invertida (D→A);
+  // normaliza para ordem crescente de rótulo (A→D) na exibição.
+  for (const q of exam.questions ?? []) {
+    q.alternatives = [...(q.alternatives ?? [])].sort((a, b) =>
+      String(a.label).localeCompare(String(b.label), 'pt-BR'),
+    );
+  }
+  return exam;
 }
 
 export async function deleteExam(id: number): Promise<boolean> {
