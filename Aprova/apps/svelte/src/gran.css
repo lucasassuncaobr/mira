@@ -362,17 +362,17 @@
   #root.view-solve main { display: flex; flex-direction: column; height: calc(100vh - 80px); overflow: hidden; }
   #root.view-solve .solve { height: auto; flex: 1 1 auto; min-height: 0; }
   #root.view-solve .solve-workspace { height: calc(100vh - 80px - 88px); min-height: 0; }
-  /* Desloca 30px à direita mas encolhe 30px na largura: a borda
-     direita fica parada e nunca invade o trilho de questões.
+  /* Respiro de 30px à esquerda via margin (não via left): no flex o
+     margin encolhe o PDF de verdade (876px) e a borda direita encosta
+     no card de questões sem invadir o trilho nem estourar a viewport.
      Sem card (transparente, sem borda) e sem respiro no topo: a página
      do PDF encosta direto no banner acima. */
   #root.view-solve .pdf-column {
     height: calc(100vh - 80px - 88px);
     position: relative;
-    left: 30px;
     top: 0;
-    width: calc(100% - 30px);
     margin-top: 0;
+    margin-left: 30px;
     background: transparent;
     border: 0;
     border-radius: 0;
@@ -388,21 +388,47 @@
 /* Sem linha divisória no cabeçalho da questão. */
 #root.view-solve .question-header { border-bottom: 0; }
 #root.view-solve .question-number { position: relative; top: 5px; }
-/* Alternativa marcada: preenchimento estilo gabarito (sem rádio).
-   Linhas compactas (só a letra); ao clicar, transição leve do preenchimento. */
+/* Alternativa marcada: linhas compactas (só a letra); ao clicar,
+   transição leve. (Cores dos estados no tema "cinza conforto" abaixo.) */
 #root.view-solve .option { padding: 8px 14px !important; transition: background-color .25s ease, border-color .25s ease !important; }
-#root.view-solve .option.selected {
-  background-color: #E0E7FF !important;
-  border-color: #4F46E5 !important;
-}
-#root.view-solve .option.selected .option-letter { color: #3730A3; font-weight: 800; }
+#root.view-solve .option.selected .option-letter { font-weight: 800; }
 /* Índice 5px acima; grade interna 3px acima. */
 #root.view-solve .question-index { position: relative; top: -5px; }
 #root.view-solve .index-grid { position: relative; top: -3px; }
 /* Índice de questões em paleta sutil (menos chamativa). */
-#root.view-solve .index-btn.active { background: #E2E8F0; color: #334155; box-shadow: none; }
-#root.view-solve .index-btn.correct-answer { background: #E7F2EA; color: #4A7C59; }
-#root.view-solve .index-btn.wrong-answer { background: #F3E4E4; color: #9C6B6B; }
+#root.view-solve .index-btn { background: #E8EAED; color: #8A8F98; }
+#root.view-solve .index-btn:hover { background: #E3E7FB; color: #3730A3; }
+#root.view-solve .index-btn.active { background: #DFE4FA; color: #3730A3; box-shadow: none; }
+#root.view-solve .index-btn.correct-answer { background: #E2EFE6; color: #357A4B; }
+#root.view-solve .index-btn.wrong-answer { background: #F6E7E1; color: #A34A3E; }
+/* ---- Tema conforto "cinza claro" (só solve): fundo cinza-claro frio,
+   painel em branco gelo, índigo contido como único acento e feedback
+   em pastel. Moderno e leve, com cara de prova. ---- */
+#root.view-solve main, #root.view-solve .solve-workspace { background: #F0F1F4; }
+#root.view-solve .question-panel { background: #FAFAFB; }
+#root.view-solve .question-header { border-bottom-color: #E3E5E9; }
+#root.view-solve .question-number { color: #2B2F36; }
+#root.view-solve .answer-title, #root.view-solve .index-title { color: #8A8F98; }
+#root.view-solve .answer-section .option { background: #fff; border-color: #E1E3E8; }
+#root.view-solve .answer-section .option:hover { background: #F2F3F6; border-color: #CFD3DA; }
+#root.view-solve .option.selected { border-color: #4f46e5; background: #EEEFFE; box-shadow: 0 1px 3px rgba(79, 70, 229, .12); }
+#root.view-solve .option.selected:hover { border-color: #4f46e5; background: #EEEFFE; box-shadow: 0 1px 3px rgba(79, 70, 229, .12); }
+#root.view-solve .option.selected .option-letter { color: #4f46e5; }
+#root.view-solve .option.disabled { background: #EDEEF1; border-color: #E1E3E8; }
+#root.view-solve .option.correct-highlight { border-color: #93C2A3; background: #EAF4ED; }
+#root.view-solve .option.correct-highlight .option-text { color: #33373E; }
+#root.view-solve .option.correct-highlight .option-letter { color: #2E7D46; }
+#root.view-solve .option.wrong-highlight { border-color: #D9A89D; background: #FAEEE9; }
+#root.view-solve .option.wrong-highlight .option-letter { color: #A34A3E; }
+#root.view-solve .option-text { color: #33373E; }
+#root.view-solve .bottom-nav { background: #FAFAFB; border-top-color: #E3E5E9; }
+#root.view-solve .nav-arrow { background: #ECEEF1; border-color: #D8DBE0; color: #8A8F98; }
+#root.view-solve .nav-arrow:hover:not(:disabled) { background: #E3E7FB; border-color: #4f46e5; color: #4f46e5; }
+#root.view-solve .image-viewport { background: #E0E3E8; border-color: #CFD3DA; }
+#root.view-solve .image-toolbar { background: #FAFAFB; border-color: #E1E3E8; }
+#root.view-solve .question-context { background: #EDEFFD; }
+#root.view-solve .feedback.success { background: #EAF4ED; color: #2E7D46; }
+#root.view-solve .feedback.danger { background: #FAEEE9; color: #A34A3E; }
 /* Faixa delimitadora entre o banner e o PDF (todas as larguras). */
 .pdf-delim .clock-container { border: 0; }
 .pdf-delim .clock-time { color: #B6BBC4; }
@@ -420,9 +446,10 @@
   border: 1px solid #E8E8E8;
   border-radius: 0;
 }
-  /* Deslocamento proporcional à tela (3vw, teto 50px): igual ao atual
-     em monitor médio, sem estourar a margem nos menores nem sumir nos maiores. */
-  #root.view-solve .question-panel { height: calc(100vh - 80px - 88px); position: relative; left: clamp(0px, 3vw, 50px); z-index: 1; }
+  /* Card de questões encostado no card do PDF (sem deslocamento):
+     o left positivo anterior empurrava o painel para fora da viewport,
+     cortando as opções e o botão Responder na borda direita. */
+  #root.view-solve .question-panel { height: calc(100vh - 80px - 88px); position: relative; left: 0; z-index: 1; }
 }
 
 @media (max-width: 1050px) {
@@ -459,10 +486,6 @@
 .btn-respond:hover:not(:disabled),
 .btn-finish:hover:not(:disabled),
 .bottom-nav.feedback-active .btn-respond { background-color: #B45309 !important; color: #fff !important; border-color: #B45309 !important; }
-
-/* Alternativa marcada: borda índigo fina, sem barra lateral */
-.option.selected,
-.option.selected:hover { border-color: #4F46E5 !important; background-color: #fff !important; box-shadow: none !important; }
 
 /* Toolbar do PDF no solver: só ícones cinza (mesmo do relógio), sem caixa */
 .view-solve .image-toolbar button:hover { background: transparent !important; color: #9AA0AA !important; }
