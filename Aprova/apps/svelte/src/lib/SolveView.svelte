@@ -274,7 +274,10 @@
               {@const isMarked = selected === alt.label}
               {@const isCorrect = !!feedback && !feedback.unknown && feedback.correctAnswer === alt.label}
               {#if !feedback || isMarked || isCorrect}
-                {#if feedback && isMarked}
+                {#if feedback && isCorrect}
+                  <span class="correct-flag">Resposta correta</span>
+                {/if}
+                {#if feedback && isMarked && !isCorrect}
                   <span class="marked-flag">Sua resposta</span>
                 {/if}
                 <div class={optionClass(alt.label)} class:eliminated={isEliminated(question.id, alt.label)} data-label={alt.label} onclick={() => selectAnswer(alt.label)}>

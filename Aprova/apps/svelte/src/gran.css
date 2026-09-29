@@ -445,6 +445,8 @@
 /* Selo da alternativa marcada no feedback: linha de texto acima do card,
    sem fundo e sem contorno. */
 #root.view-solve .marked-flag { display: block; margin: 2px 0 4px; text-align: left; background: transparent; border: 0; color: #6C7480; font-family: var(--font-functional); font-size: 9px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+/* Selo da resposta correta no feedback: mesmo padrão sutil, em verde. */
+#root.view-solve .correct-flag { display: block; margin: 2px 0 4px; text-align: left; background: transparent; border: 0; color: #2E7D46; font-family: var(--font-functional); font-size: 9px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
 /* Faixa delimitadora entre o banner e o PDF (todas as larguras). */
 .pdf-delim .clock-container { border: 0; }
 .pdf-delim .clock-time { color: #B6BBC4; }
