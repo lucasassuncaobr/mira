@@ -22,6 +22,10 @@
   let currentIdx = $state(0);
   let answers = $state<Record<number, string>>({});
   let eliminated = $state<Record<number, string[]>>({});
+  // Feedback por questão: ao responder, a escolha trava e o feedback
+  // persiste — ao retornar na questão, ele reaparece em vez de liberar
+  // nova marcação.
+  let feedbacks = $state<Record<number, Feedback>>({});
   let results = $state<Record<number, 'correct' | 'wrong'>>({});
   let feedback = $state<Feedback | null>(null);
   let submitting = $state(false);
@@ -117,8 +121,14 @@
   }
 
   function selectQuestion(i: number): void {
-    feedback = null;
+    restoreFeedback(i);
     currentIdx = i;
+  }
+
+  // Restaura o feedback da questão destino (ou limpa, se não respondida).
+  function restoreFeedback(i: number): void {
+    const nq = questions[i];
+    feedback = (nq && feedbacks[nq.id]) ?? null;
   }
 
   function selectAnswer(label: string): void {
@@ -159,7 +169,7 @@
 
   async function submitAnswer(): Promise<void> {
     const q = question;
-    if (!q || !answers[q.id] || submitting) return;
+    if (!q || !answers[q.id] || submitting || feedbacks[q.id]) return;
     submitting = true;
     feedback = null;
     try {
@@ -171,9 +181,11 @@
         feedback = { correct: isCorrect, correctAnswer: data.correctAnswer ?? '?' };
         results = { ...results, [q.id]: isCorrect ? 'correct' : 'wrong' };
       }
+      if (feedback) feedbacks = { ...feedbacks, [q.id]: feedback };
     } catch {
       feedback = { correct: false, correctAnswer: '?' };
       results = { ...results, [q.id]: 'wrong' };
+      feedbacks = { ...feedbacks, [q.id]: feedback };
     } finally {
       submitting = false;
       // No feedback nunca há risco: limpa as anulações da questão,
@@ -188,14 +200,14 @@
 
   function goNext(): void {
     if (currentIdx < total - 1) {
-      feedback = null;
+      restoreFeedback(currentIdx + 1);
       currentIdx += 1;
     }
   }
 
   function goPrev(): void {
     if (currentIdx > 0) {
-      feedback = null;
+      restoreFeedback(currentIdx - 1);
       currentIdx -= 1;
     }
   }
@@ -297,8 +309,12 @@
         </div>
         <div class="bottom-nav" class:feedback-active={!!feedback}>
           <div class="nav-arrows">
-            <button class="nav-arrow" id="prev-btn" onclick={goPrev} disabled={currentIdx === 0}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
-            <button class="nav-arrow" id="next-btn" onclick={goNext} disabled={currentIdx === total - 1}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+            {#if currentIdx > 0}
+              <button class="nav-arrow" id="prev-btn" onclick={goPrev}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+            {/if}
+            {#if currentIdx < total - 1}
+              <button class="nav-arrow" id="next-btn" onclick={goNext}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+            {/if}
           </div>
           {#if feedback}
             {#if currentIdx === total - 1}

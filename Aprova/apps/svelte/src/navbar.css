@@ -18,11 +18,11 @@
   flex-shrink: 0;
 }
 .nav-toggle:hover { background: rgba(255, 255, 255, .1); }
-.nav-toggle:focus-visible { outline: 2px solid #D6A12A; outline-offset: 2px; }
+.nav-toggle:focus-visible { outline: 2px solid #F9DB5C; outline-offset: 2px; }
 .nav-toggle svg { transition: transform 160ms ease; }
 .nav-toggle.open {
   background: rgba(255, 255, 255, .12);
-  border-color: #D6A12A;
+  border-color: #F9DB5C;
 }
 .nav-toggle.open svg { transform: rotate(90deg); }
 
@@ -44,7 +44,7 @@
 /* Polish visível no desktop: profundidade + foco acessível */
 #root > .topbar { box-shadow: 0 8px 24px rgba(55, 48, 163, .25) !important; }
 #root > .topbar .nav:focus-visible {
-  outline: 2px solid #D6A12A !important;
+  outline: 2px solid #F9DB5C !important;
   outline-offset: -2px;
 }
 
@@ -117,7 +117,7 @@
   #root > .topbar .nav-menu .nav.active {
     background: #e0e7ff !important;
     color: #3730a3 !important;
-    box-shadow: inset 3px 0 #D6A12A !important;
+    box-shadow: inset 3px 0 #F9DB5C !important;
   }
   #root > .topbar .nav-menu .nav::before,
   #root > .topbar .nav-menu .nav::after { display: none !important; content: none !important; }

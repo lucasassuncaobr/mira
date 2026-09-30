@@ -1,7 +1,7 @@
 <script lang="ts">
   // Trava de 120 frames, scroll por mutação direta do DOM e faixa em px
   // derivada de % em runtime.
-  import { tick } from 'svelte';
+  import { onDestroy, onMount, tick } from 'svelte';
   import type { FocusEntry, Question } from './solve-types';
   import { API, fetchPageSrc, openPdfModal, warmPdf } from './bridge';
 
@@ -25,6 +25,18 @@
   let focoTentativas = 0;
   let drag: { x: number; y: number; scrollLeft: number; scrollTop: number } | null = null;
   let alive = true;
+  let isFullscreen = $state(false);
+
+  onMount(() => {
+    const sync = () => { isFullscreen = !!document.fullscreenElement; };
+    document.addEventListener('fullscreenchange', sync);
+    return () => document.removeEventListener('fullscreenchange', sync);
+  });
+
+  onDestroy(() => {
+    alive = false;
+    if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
+  });
 
   export function load(
     nextExamId: number,
@@ -121,9 +133,11 @@
           faixa.style.left = '0';
           faixa.style.right = '0';
         } else {
+          // Meia-banda esquerda cobre 90% da página: o texto da questão
+          // vai até ~85% e a faixa precisa ir junto (máscara dissolve a ponta).
           const ladoEsquerdo = (focus.x_center as number) < 50;
           faixa.style.left = ladoEsquerdo ? '0' : '50%';
-          faixa.style.right = ladoEsquerdo ? '50%' : '0';
+          faixa.style.right = ladoEsquerdo ? '10%' : '0';
         }
       } else {
         faixa.style.left = '0';
@@ -148,6 +162,19 @@
   function openPdf(): void {
     pdfOpen = true;
     openPdfModal(examId, examTitle || `Questão ${questionNumber}`, () => { pdfOpen = false; });
+  }
+
+  // Tela cheia real do navegador na página inteira (mesmo efeito do F11).
+  async function toggleFullscreen(): Promise<void> {
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      } else {
+        await document.documentElement.requestFullscreen();
+      }
+    } catch {
+      /* Fullscreen API indisponível: sem efeito. */
+    }
   }
 
   function changeZoom(d: number): void {
@@ -226,13 +253,16 @@
       </div>
     </div>
     <div class="image-toolbar">
-      <span>Zoom {Math.round(zoom * 100)}%</span>
-      <div>
-        <button class="fit-button" onclick={openPdf} onmouseenter={warm} onfocus={warm}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg> Página inteira</button>
+      <div class="toolbar-group toolbar-zoom">
+        <button aria-label="Diminuir zoom" title="Diminuir zoom" onclick={() => changeZoom(-0.25)}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
+        <span title="Nível de zoom">Zoom {Math.round(zoom * 100)}%</span>
+        <button aria-label="Aumentar zoom" title="Aumentar zoom" onclick={() => changeZoom(0.25)}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
+        <button aria-label="Redefinir imagem" title="Redefinir zoom" onclick={() => { zoom = 1; }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button>
+      </div>
+      <div class="toolbar-group">
+        <button class="fit-button" onclick={openPdf} onmouseenter={warm} onfocus={warm}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg> PDF</button>
+        <button class="fit-button" onclick={toggleFullscreen}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg> {isFullscreen ? 'Sair da tela cheia' : 'Tela cheia'}</button>
         <button class="fit-button" onclick={toggleFixa}>Foco</button>
-        <button aria-label="Diminuir zoom" onclick={() => changeZoom(-0.25)}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
-        <button aria-label="Aumentar zoom" onclick={() => changeZoom(0.25)}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
-        <button aria-label="Redefinir imagem" onclick={() => { zoom = 1; }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button>
       </div>
     </div>
   </figure>

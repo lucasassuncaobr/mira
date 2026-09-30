@@ -172,7 +172,7 @@
   transition: background-color 150ms ease, color 150ms ease;
 }
 .gran-hero-cta:hover { background: #fff; color: #1e1b4b; border-color: #fff; }
-.gran-hero-cta:focus-visible { outline: 2px solid #D6A12A; outline-offset: 2px; }
+.gran-hero-cta:focus-visible { outline: 2px solid #F9DB5C; outline-offset: 2px; }
 
 /* ---- Stats / resume ---- */
 .gran-provas .stats { margin: 24px 0 22px; }
@@ -299,7 +299,7 @@
 .gran-footer-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 24px; }
 .gran-footer strong { color: #fff; display: block; margin-bottom: 10px; font-size: 13px; text-transform: uppercase; letter-spacing: .08em; }
 .gran-footer-brand { font-size: 20px !important; text-transform: none !important; letter-spacing: 0 !important; }
-.gran-footer-brand span { color: #D6A12A; font-size: 12px; }
+.gran-footer-brand span { color: #F9DB5C; font-size: 12px; }
 .gran-footer p { font-size: 13px; line-height: 1.6; margin: 8px 0 0; color: #a5b4fc; }
 .gran-footer nav { display: grid; gap: 8px; align-content: start; height: auto; }
 .gran-footer nav button { border: 0; background: transparent; color: #eef2ff; text-align: left; padding: 0; cursor: pointer; font-size: 13px; }
@@ -398,9 +398,14 @@
 /* Índice de questões em paleta sutil (menos chamativa). */
 #root.view-solve .index-btn { background: #E8EAED; color: #8A8F98; }
 #root.view-solve .index-btn:hover { background: #E3E7FB; color: #3730A3; }
-#root.view-solve .index-btn.active { background: #DFE4FA; color: #3730A3; box-shadow: none; }
 #root.view-solve .index-btn.correct-answer { background: #E2EFE6; color: #357A4B; }
 #root.view-solve .index-btn.wrong-answer { background: #F6E7E1; color: #A34A3E; }
+/* Avanço por cor em tom leve: a célula ativa recebe o índigo suave que
+   viaja com a navegação; ao sair, retrocede à cor da célula (trilha em
+   pastel nas respondidas, cinza nas pendentes). Transição suave de 180ms.
+   A regra vem por último para prevalecer sobre certa/errada. */
+#root.view-solve .index-btn { transition: background-color .18s ease, color .18s ease; }
+#root.view-solve .index-btn.active { background: #DFE4FA; color: #3730A3; box-shadow: none; }
 /* ---- Tema conforto "cinza claro" (só solve): fundo cinza-claro frio,
    painel em branco gelo, índigo contido como único acento e feedback
    em pastel. Moderno e leve, com cara de prova. ---- */
@@ -445,6 +450,12 @@
 /* Selo da alternativa marcada no feedback: linha de texto acima do card,
    sem fundo e sem contorno. */
 #root.view-solve .marked-flag { display: block; margin: 2px 0 4px; text-align: left; background: transparent; border: 0; color: #6C7480; font-family: var(--font-functional); font-size: 9px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+/* Navegação livre: setas ‹ › funcionam em todas as questões,
+   respondidas ou não (o feedback persiste sem prender a navegação).
+   No feedback o botão divide a linha com as setas: trava a largura
+   para nunca sobrepor os direcionais. */
+#root.view-solve .bottom-nav.feedback-active .nav-arrows { transform: none; opacity: 1; pointer-events: auto; }
+#root.view-solve .bottom-nav.feedback-active .btn-respond { max-width: 250px; }
 /* Selo da resposta correta no feedback: mesmo padrão sutil, em verde. */
 #root.view-solve .correct-flag { display: block; margin: 2px 0 4px; text-align: left; background: transparent; border: 0; color: #2E7D46; font-family: var(--font-functional); font-size: 9px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
 /* Faixa delimitadora entre o banner e o PDF (todas as larguras). */
@@ -500,10 +511,9 @@
 .primary:hover:not(:disabled),
 .exam-edit-save:hover { background-color: #B45309 !important; color: #1A1F28 !important; border-color: #B45309 !important; }
 .btn-respond,
-.btn-finish { background-color: #D97706 !important; color: #fff !important; border-color: #D97706 !important; }
+.btn-finish { background-color: #F9DB5C !important; color: #1A1F28 !important; border-color: #F9DB5C !important; }
 .btn-respond:hover:not(:disabled),
-.btn-finish:hover:not(:disabled),
-.bottom-nav.feedback-active .btn-respond { background-color: #B45309 !important; color: #fff !important; border-color: #B45309 !important; }
+.btn-finish:hover:not(:disabled) { background-color: #F9DB5C !important; color: #fff !important; border-color: #F9DB5C !important; }
 
 /* Toolbar do PDF no solver: só ícones cinza (mesmo do relógio), sem caixa */
 .view-solve .image-toolbar button:hover { background: transparent !important; color: #9AA0AA !important; }
