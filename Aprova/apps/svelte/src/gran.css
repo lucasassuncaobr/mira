@@ -287,6 +287,14 @@
   cursor: pointer; white-space: nowrap;
 }
 .exam-card-cta:hover { color: #4f46e5; background: #F1F2F4; }
+/* Editar/remover com o mesmo contorno fino dos demais botões do card */
+.exam-card-edit, .exam-card-remove {
+  border: 1px solid #E5E7EB !important;
+  border-radius: 0 !important;
+  background: #fff;
+  width: 32px; height: 32px;
+  display: inline-flex; align-items: center; justify-content: center;
+}
 /* Sem traço de divisão sob a faixa da logo */
 .view-exams .exam-card-v2 .exam-card-visual { border-bottom: 0 !important; }
 
@@ -390,8 +398,12 @@
 #root.view-solve .question-number { position: relative; top: 5px; }
 /* Alternativa marcada: linhas compactas (só a letra); ao clicar,
    transição leve. (Cores dos estados no tema "cinza conforto" abaixo.) */
-#root.view-solve .option { padding: 8px 14px !important; transition: background-color .25s ease, border-color .25s ease !important; }
+#root.view-solve .option { padding: 8px 14px !important; transition: background-color .25s ease, border-color .25s ease !important; border: 1px solid #E5E7EB !important; border-radius: 0 !important; }
 #root.view-solve .option.selected .option-letter { font-weight: 800; }
+/* Setas direcionais com cantos leve e sutilmente arredondados. */
+#root.view-solve .bottom-nav .nav-arrow { border-radius: 4px !important; }
+#root.view-solve .bottom-nav .nav-arrow { border-radius: 4px !important; border: 0 !important; }
+#root.view-solve .bottom-nav .btn-respond { border-radius: 4px !important; }
 /* Índice 5px acima; grade interna 3px acima. */
 #root.view-solve .question-index { position: relative; top: -5px; }
 #root.view-solve .index-grid { position: relative; top: -3px; }
@@ -437,6 +449,9 @@
 #root.view-solve .feedback.danger { background: #FAEEE9; color: #A34A3E; }
 /* Tesoura: risca a alternativa (elimina visualmente). */
 #root.view-solve .scissor-btn { flex: 0 0 auto; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; background: transparent; border: 0; border-radius: 6px; color: #C3C7CE; cursor: pointer; padding: 0; }
+/* Tesoura da marcada oculta com visibility (não display): o espaço é
+   preservado e a letra não muda de lado. */
+#root.view-solve .scissor-btn.scissor-hidden { visibility: hidden; }
 #root.view-solve .scissor-btn:hover:not(:disabled) { color: #8B0000; background: transparent; }
 #root.view-solve .scissor-btn:disabled { opacity: .35; cursor: default; }
 #root.view-solve .scissor-btn.on { color: #A34A3E; }
@@ -446,7 +461,7 @@
 #root.view-solve .option.eliminated .scissor-btn { visibility: hidden; }
 #root.view-solve .option.eliminated:hover .scissor-btn { visibility: visible; }
 #root.view-solve .option.eliminated .option-letter,
-#root.view-solve .option.eliminated .option-text { text-decoration: line-through; }
+#root.view-solve .option.eliminated .option-text { text-decoration: line-through; text-decoration-thickness: 2px; }
 /* Selo da alternativa marcada no feedback: linha de texto acima do card,
    sem fundo e sem contorno. */
 #root.view-solve .marked-flag { display: block; margin: 2px 0 4px; text-align: left; background: transparent; border: 0; color: #6C7480; font-family: var(--font-functional); font-size: 9px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
@@ -461,6 +476,12 @@
 /* Faixa delimitadora entre o banner e o PDF (todas as larguras). */
 .pdf-delim .clock-container { border: 0; }
 .pdf-delim .clock-time { color: #B6BBC4; }
+/* Cobertura cinza sólida sobre a coluna do PDF pausado: camada absoluta
+   ancorada no aside (que não rola — dentro do viewport ela ficaria para
+   trás ao girar a roda). Sem blur, sem reflow. */
+
+
+
 .clock-pause { border: 0; background: transparent; color: #B6BBC4; cursor: pointer; padding: 2px; display: inline-flex; align-items: center; }
 .clock-pause:hover { color: #6C7480; }
 .pdf-delim {
@@ -513,7 +534,7 @@
 .btn-respond,
 .btn-finish { background-color: #F9DB5C !important; color: #1A1F28 !important; border-color: #F9DB5C !important; }
 .btn-respond:hover:not(:disabled),
-.btn-finish:hover:not(:disabled) { background-color: #F9DB5C !important; color: #fff !important; border-color: #F9DB5C !important; }
+.btn-finish:hover:not(:disabled) { background-color: #F2CE45 !important; color: #1A1F28 !important; border-color: #F2CE45 !important; transform: none; box-shadow: none; transition: background-color .25s ease, border-color .25s ease; }
 
 /* Toolbar do PDF no solver: só ícones cinza (mesmo do relógio), sem caixa */
 .view-solve .image-toolbar button:hover { background: transparent !important; color: #9AA0AA !important; }

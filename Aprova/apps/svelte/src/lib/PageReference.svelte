@@ -5,6 +5,10 @@
   import type { FocusEntry, Question } from './solve-types';
   import { API, fetchPageSrc, openPdfModal, warmPdf } from './bridge';
 
+  let { disabled = false }: { disabled?: boolean } = $props();
+
+
+
   let viewportEl = $state<HTMLElement | null>(null);
   let paginaEl = $state<HTMLElement | null>(null);
   let faixaEl = $state<HTMLElement | null>(null);
@@ -137,7 +141,7 @@
           // vai até ~85% e a faixa precisa ir junto (máscara dissolve a ponta).
           const ladoEsquerdo = (focus.x_center as number) < 50;
           faixa.style.left = ladoEsquerdo ? '0' : '50%';
-          faixa.style.right = ladoEsquerdo ? '10%' : '0';
+          faixa.style.right = ladoEsquerdo ? 'calc(10% - 30px)' : '0';
         }
       } else {
         faixa.style.left = '0';
@@ -160,12 +164,14 @@
   }
 
   function openPdf(): void {
+    if (disabled) return;
     pdfOpen = true;
     openPdfModal(examId, examTitle || `Questão ${questionNumber}`, () => { pdfOpen = false; });
   }
 
   // Tela cheia real do navegador na página inteira (mesmo efeito do F11).
   async function toggleFullscreen(): Promise<void> {
+    if (disabled) return;
     try {
       if (document.fullscreenElement) {
         await document.exitFullscreen();
@@ -178,13 +184,14 @@
   }
 
   function changeZoom(d: number): void {
+    if (disabled) return;
     zoom = Math.min(4, Math.max(1, Math.round((zoom + d) * 100) / 100));
     void tick().then(() => aplicarFoco());
   }
 
   function toggleFixa(): void {
     const el = faixaEl;
-    if (!el) return;
+    if (!el || disabled) return;
     const isActive = el.classList.contains('ativa');
     window.clearTimeout(faixaTimer);
     if (isActive) {
@@ -199,7 +206,7 @@
 
   function pointerDown(e: PointerEvent): void {
     const container = viewportEl;
-    if (!container) return;
+    if (!container || disabled) return;
     drag = { x: e.clientX, y: e.clientY, scrollLeft: container.scrollLeft, scrollTop: container.scrollTop };
     dragging = true;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
@@ -254,15 +261,15 @@
     </div>
     <div class="image-toolbar">
       <div class="toolbar-group toolbar-zoom">
-        <button aria-label="Diminuir zoom" title="Diminuir zoom" onclick={() => changeZoom(-0.25)}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
+        <button aria-label="Diminuir zoom" title="Diminuir zoom" disabled={disabled} onclick={() => changeZoom(-0.25)}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
         <span title="Nível de zoom">Zoom {Math.round(zoom * 100)}%</span>
-        <button aria-label="Aumentar zoom" title="Aumentar zoom" onclick={() => changeZoom(0.25)}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
-        <button aria-label="Redefinir imagem" title="Redefinir zoom" onclick={() => { zoom = 1; }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button>
+        <button aria-label="Aumentar zoom" title="Aumentar zoom" disabled={disabled} onclick={() => changeZoom(0.25)}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
+        <button aria-label="Redefinir imagem" title="Redefinir zoom" disabled={disabled} onclick={() => { zoom = 1; }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button>
       </div>
       <div class="toolbar-group">
-        <button class="fit-button" onclick={openPdf} onmouseenter={warm} onfocus={warm}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg> PDF</button>
-        <button class="fit-button" onclick={toggleFullscreen}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg> {isFullscreen ? 'Sair da tela cheia' : 'Tela cheia'}</button>
-        <button class="fit-button" onclick={toggleFixa}>Foco</button>
+        <button class="fit-button" disabled={disabled} onclick={toggleFullscreen}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg> {isFullscreen ? 'Sair da tela cheia' : 'Tela cheia'}</button>
+        <button class="fit-button" disabled={disabled} onclick={toggleFixa}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg> Destacar</button>
+        <button class="fit-button" disabled={disabled} onclick={openPdf} onmouseenter={warm} onfocus={warm}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6"/><path d="M9 17h4"/></svg> PDF</button>
       </div>
     </div>
   </figure>

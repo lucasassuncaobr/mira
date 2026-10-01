@@ -121,6 +121,7 @@
   }
 
   function selectQuestion(i: number): void {
+    if (paused) return;
     restoreFeedback(i);
     currentIdx = i;
   }
@@ -133,7 +134,14 @@
 
   function selectAnswer(label: string): void {
     const q = question;
-    if (!q || feedback) return;
+    if (!q || feedback || paused) return;
+    // Clicar na marcada desmarca.
+    if (answers[q.id] === label) {
+      const next = { ...answers };
+      delete next[q.id];
+      answers = next;
+      return;
+    }
     // Clicar na alternativa riscada (sem tesoura visível) restaura.
     if (isEliminated(q.id, label)) {
       const cur = eliminated[q.id] ?? [];
@@ -152,7 +160,7 @@
 
   function toggleEliminate(e: Event, qid: number, label: string, total: number): void {
     e.stopPropagation();
-    if (feedback) return;
+    if (feedback || paused) return;
     const cur = eliminated[qid] ?? [];
     // Não pode anular todas: pelo menos uma alternativa fica disponível.
     if (!cur.includes(label) && cur.length + 1 >= total) return;
@@ -169,7 +177,7 @@
 
   async function submitAnswer(): Promise<void> {
     const q = question;
-    if (!q || !answers[q.id] || submitting || feedbacks[q.id]) return;
+    if (!q || !answers[q.id] || submitting || feedbacks[q.id] || paused) return;
     submitting = true;
     feedback = null;
     try {
@@ -199,6 +207,7 @@
   }
 
   function goNext(): void {
+    if (paused) return;
     if (currentIdx < total - 1) {
       restoreFeedback(currentIdx + 1);
       currentIdx += 1;
@@ -206,6 +215,7 @@
   }
 
   function goPrev(): void {
+    if (paused) return;
     if (currentIdx > 0) {
       restoreFeedback(currentIdx - 1);
       currentIdx -= 1;
@@ -256,7 +266,7 @@
             </div>
           </div>
         </div>
-        <PageReference bind:this={pageRefComp} />
+        <PageReference bind:this={pageRefComp} disabled={paused} />
       </aside>
       <section class="question-panel">
         <div class="question-header">
@@ -294,7 +304,7 @@
                 {/if}
                 <div class={optionClass(alt.label)} class:eliminated={isEliminated(question.id, alt.label)} data-label={alt.label} onclick={() => selectAnswer(alt.label)}>
                   {#if !feedback}
-                    <button class="scissor-btn" class:on={isEliminated(question.id, alt.label)} title="Riscar alternativa" aria-label={'Riscar alternativa ' + alt.label} aria-pressed={isEliminated(question.id, alt.label)} onclick={(e) => toggleEliminate(e, question.id, alt.label, question.alternatives.length)}>
+                    <button class="scissor-btn" class:on={isEliminated(question.id, alt.label)} class:scissor-hidden={selected === alt.label} title="Riscar alternativa" aria-label={'Riscar alternativa ' + alt.label} aria-pressed={isEliminated(question.id, alt.label)} onclick={(e) => toggleEliminate(e, question.id, alt.label, question.alternatives.length)}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 8.5 20 20M8.5 15.5 20 4"/></svg>
                     </button>
                   {/if}
@@ -309,23 +319,19 @@
         </div>
         <div class="bottom-nav" class:feedback-active={!!feedback}>
           <div class="nav-arrows">
-            {#if currentIdx > 0}
-              <button class="nav-arrow" id="prev-btn" onclick={goPrev}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
-            {/if}
-            {#if currentIdx < total - 1}
-              <button class="nav-arrow" id="next-btn" onclick={goNext}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
-            {/if}
+            <button class="nav-arrow" id="prev-btn" disabled={currentIdx === 0} onclick={goPrev}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <button class="nav-arrow" id="next-btn" disabled={currentIdx === total - 1} onclick={goNext}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
           </div>
           {#if feedback}
             {#if currentIdx === total - 1}
-              <button class="btn-respond btn-finish" id="finish-btn" onclick={onFinish} disabled={!allAnswered}>
+              <button class="btn-respond btn-finish" id="finish-btn" onclick={onFinish} disabled={!allAnswered || paused}>
                 {allAnswered ? 'Finalizar prova' : `Faltam ${total - answeredCount} questões`}
               </button>
             {:else}
-              <button class="btn-respond" id="respond-btn" onclick={goNext}>Próxima</button>
+              <button class="btn-respond" id="respond-btn" disabled={paused} onclick={goNext}>Próxima</button>
             {/if}
           {:else}
-            <button class="btn-respond" id="respond-btn" onclick={submitAnswer} disabled={!selected || submitting}>
+            <button class="btn-respond" id="respond-btn" onclick={submitAnswer} disabled={!selected || submitting || paused}>
               {submitting ? 'Enviando...' : 'Responder'}
             </button>
           {/if}
