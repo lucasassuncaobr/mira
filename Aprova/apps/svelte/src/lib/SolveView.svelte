@@ -22,6 +22,7 @@
   let currentIdx = $state(0);
   let answers = $state<Record<number, string>>({});
   let eliminated = $state<Record<number, string[]>>({});
+  let nightMode = $state(false);
   // Feedback por questão: ao responder, a escolha trava e o feedback
   // persiste — ao retornar na questão, ele reaparece em vez de liberar
   // nova marcação.
@@ -73,6 +74,8 @@
       (map) => { if (alive) focusMap = map; },
       () => undefined,
     );
+    try { nightMode = localStorage.getItem('mira:solve-night') === '1'; } catch { /* sem persistência */ }
+    applyNight();
   });
 
   onDestroy(() => {
@@ -80,7 +83,19 @@
     if (clockId !== undefined) window.clearInterval(clockId);
     pageRefComp?.destroy();
     shutdownP2PSafe();
+    document.getElementById('root')?.classList.remove('night');
   });
+
+  // Modo noturno: classe no #root (escopo view-solve) + persistência.
+  function applyNight(): void {
+    document.getElementById('root')?.classList.toggle('night', nightMode);
+    try { localStorage.setItem('mira:solve-night', nightMode ? '1' : '0'); } catch { /* sem persistência */ }
+  }
+
+  function toggleNight(): void {
+    nightMode = !nightMode;
+    applyNight();
+  }
 
   // $watch("currentIdx"): scroll do índice ativo + reload da página.
   // No mount a página também é carregada; só o scrollIntoView
@@ -271,6 +286,10 @@
       <section class="question-panel">
         <div class="question-header">
           <h2 class="question-number">Questão {question.number}</h2>
+          <button class="contrast-btn" class:on={nightMode} onclick={toggleNight} title="Alternar modo noturno" aria-label="Alternar modo noturno" aria-pressed={nightMode}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></svg>
+            <span>Contraste</span>
+          </button>
         </div>
         <div class="question-index">
           <div class="index-header"><span class="index-title">ÍNDICE DE QUESTÕES</span><span class="index-count">{question.number}/{total}</span></div>

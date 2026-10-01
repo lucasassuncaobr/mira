@@ -360,6 +360,13 @@
 
 /* ---- Banner do solver (delimitador topbar ↔ workspace, padrão Gran) ---- */
 .solve-banner { background: #1e1b4b; color: #fff; flex: 0 0 auto; height: 88px; }
+/* No noturno o banner usa #1F1A3A com texto #E8E6EF para se destacar dos cards escuros. */
+#root.view-solve.night .solve-banner { background: #1F1A3A; }
+#root.view-solve.night .solve-banner h2,
+#root.view-solve.night .solve-crumbs,
+#root.view-solve.night .solve-crumbs button,
+#root.view-solve.night .solve-crumbs strong,
+#root.view-solve.night .solve-crumbs span[aria-hidden] { color: #E8E6EF; }
 .solve-banner-inner { max-width: 1280px; margin: 0 auto; padding: 0 36px; height: 100%; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
 .solve-crumbs { display: flex; align-items: center; gap: 8px; height: auto !important; font-size: 12px; color: rgba(255, 255, 255, .65); margin-bottom: 5px; }
 .solve-crumbs button { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; }
@@ -473,6 +480,78 @@
 #root.view-solve .bottom-nav.feedback-active .btn-respond { max-width: 250px; }
 /* Selo da resposta correta no feedback: mesmo padrão sutil, em verde. */
 #root.view-solve .correct-flag { display: block; margin: 2px 0 4px; text-align: left; background: transparent; border: 0; color: #2E7D46; font-family: var(--font-functional); font-size: 9px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+/* ---- Modo noturno da prova (classe .night no #root, com persistência):
+   neutros universais (preto + cinza-escuro) + acento #2596be.
+   Relógio mantém o índigo do modo claro. Escopo total à view-solve. ---- */
+#root.view-solve.night main, #root.view-solve.night .solve-workspace { background: #000; }
+#root.view-solve.night .topbar { background: #080808 !important; border-color: #212121; }
+#root.view-solve.night .topbar .topbar-inner { background: #080808 !important; }
+#root.view-solve.night .topbar .brand-name { color: #fafafa; }
+#root.view-solve.night .topbar .nav { color: #9B9B9B; }
+#root.view-solve.night .topbar .nav.active { color: #fff; }
+#root.view-solve.night .question-panel { background: #1D1D1D; }
+#root.view-solve.night .question-header { border-bottom-color: #2C2C2C; }
+#root.view-solve.night .question-number { color: #fafafa; }
+#root.view-solve .contrast-btn { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid #E1E3E8; border-radius: 99px; color: #8A8F98; font-family: var(--font-functional); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 6px 10px; cursor: pointer; }
+#root.view-solve .contrast-btn:hover { color: #4f46e5; border-color: #4f46e5; }
+#root.view-solve .contrast-btn.on { color: #3730A3; border-color: #4f46e5; background: #EEF0FE; }
+#root.view-solve.night .contrast-btn { color: #9B9B9B; border-color: #3C3C3C; }
+#root.view-solve.night .contrast-btn:hover { color: #7cc7ea; border-color: #2596be; }
+#root.view-solve.night .contrast-btn.on { color: #fff; background: #2C2C2C; border-color: transparent; }
+#root.view-solve.night .answer-title, #root.view-solve.night .index-title, #root.view-solve.night .index-count { color: #9B9B9B; }
+#root.view-solve.night .index-header { background-color: #1D1D1D; }
+#root.view-solve.night .index-btn { background: #252525; color: #9B9B9B; }
+#root.view-solve.night .index-btn:hover { background: #3C3C3C; color: #D9D9D9; }
+#root.view-solve.night .index-btn.active { background: #2596be; color: #fff; box-shadow: none; }
+#root.view-solve.night .index-btn.correct-answer { background: rgba(46, 125, 70, .32); color: #7bd88f; }
+#root.view-solve.night .index-btn.wrong-answer { background: rgba(163, 74, 62, .32); color: #e08d7e; }
+#root.view-solve.night .answer-section .option { background: #252525; border-color: #3C3C3C !important; }
+#root.view-solve.night .answer-section .option:hover { background: #2C2C2C; border-color: #535353 !important; }
+#root.view-solve.night .option-letter { color: #9B9B9B; }
+#root.view-solve.night .option-text { color: #D9D9D9; }
+#root.view-solve.night .option.selected { border-color: rgba(124, 199, 234, .45) !important; background: rgba(37, 150, 190, .14); box-shadow: none; }
+#root.view-solve.night .option.selected:hover { border-color: rgba(124, 199, 234, .45) !important; background: rgba(37, 150, 190, .14); }
+#root.view-solve.night .option.selected .option-letter { color: #7cc7ea; }
+#root.view-solve.night .option.disabled { background: #1D1D1D; border-color: #212121 !important; }
+#root.view-solve.night .option.disabled .option-text { color: #616161; }
+#root.view-solve.night .option.disabled .option-letter { color: #545454; }
+#root.view-solve.night .option.correct-highlight { border-color: #2e7d46 !important; background: rgba(46, 125, 70, .22); }
+#root.view-solve.night .option.correct-highlight .option-letter { color: #7bd88f; }
+#root.view-solve.night .option.correct-highlight .option-text { color: #d7e9dc; }
+#root.view-solve.night .option.wrong-highlight { border-color: #a34a3e !important; background: rgba(163, 74, 62, .22); }
+#root.view-solve.night .option.wrong-highlight .option-letter { color: #e08d7e; }
+#root.view-solve.night .option.wrong-highlight .option-text { color: #ecd9d4; }
+#root.view-solve.night .option.eliminated { opacity: .45; }
+#root.view-solve.night .scissor-btn { color: #616161; }
+#root.view-solve.night .scissor-btn:hover:not(:disabled) { color: #CFCFCF; }
+#root.view-solve.night .scissor-btn.on { color: #e08d7e; }
+#root.view-solve.night .marked-flag { color: #9B9B9B; }
+#root.view-solve.night .correct-flag { color: #7bd88f; }
+#root.view-solve.night .bottom-nav { background: #212121; border-top-color: #2C2C2C; }
+#root.view-solve.night .nav-arrow { background: #2C2C2C; border-color: #3C3C3C; color: #9B9B9B; }
+#root.view-solve.night .nav-arrow:hover:not(:disabled) { background: #3C3C3C; border-color: #535353; color: #fff; }
+#root.view-solve.night .image-toolbar { background: #212121; border-color: #2C2C2C; }
+/* Faixa do relógio no noturno: mesmo cinza do rodapé, sem bordas nem
+   fundo em quadrado; relógio em branco. */
+#root.view-solve.night .pdf-delim { background: transparent; border-color: transparent; }
+#root.view-solve.night .pdf-delim .clock-container { background: transparent; border: 0; }
+#root.view-solve.night .pdf-delim .clock-pause { color: #706E7A; }
+/* Texto do relógio em #706E7A no noturno. */
+#root.view-solve.night .pdf-delim .clock-time { color: #706E7A; }
+#root.view-solve.night .image-viewport { background: #000000; border-color: #2C2C2C; }
+/* PDF noturno leve (ideal p/ PCs antigos): inverte a página via GPU sem
+   re-renderizar; hue-rotate preserva as cores. A faixa usa screen para
+   continuar visível sobre a página invertida. */
+#root.view-solve.night .pagina-pdf img { filter: invert(.93) hue-rotate(180deg); }
+#root.view-solve.night .faixa-questao {
+  mix-blend-mode: screen;
+  background: linear-gradient(90deg, rgba(7, 0, 33, .9) 0%, rgba(7, 0, 33, .85) 80%, rgba(7, 0, 33, .5) 94%, rgba(7, 0, 33, 0) 100%);
+  background-color: rgba(7, 0, 33, .85);
+}
+#root.view-solve.night .question-context { background: rgba(255, 255, 255, .04); border-left-color: #2596be; }
+#root.view-solve.night .question-context p, #root.view-solve.night .question-context .context-label { color: #D9D9D9; }
+#root.view-solve.night .feedback.success { background: rgba(46, 125, 70, .22); color: #7bd88f; }
+#root.view-solve.night .feedback.danger { background: rgba(163, 74, 62, .22); color: #e08d7e; }
 /* Faixa delimitadora entre o banner e o PDF (todas as larguras). */
 .pdf-delim .clock-container { border: 0; }
 .pdf-delim .clock-time { color: #B6BBC4; }
