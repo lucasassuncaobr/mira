@@ -286,10 +286,25 @@
       <section class="question-panel">
         <div class="question-header">
           <h2 class="question-number">Questão {question.number}</h2>
-          <button class="contrast-btn" class:on={nightMode} onclick={toggleNight} title="Alternar modo noturno" aria-label="Alternar modo noturno" aria-pressed={nightMode}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></svg>
-            <span>Contraste</span>
-          </button>
+          <!-- From Uiverse.io by Type-Delta -->
+          <label for="themeToggle" class="themeToggle st-sunMoonThemeToggleBtn" title="Alternar modo noturno" aria-label="Alternar modo noturno">
+            <input type="checkbox" id="themeToggle" class="themeToggleInput" checked={!nightMode} onchange={toggleNight} />
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor" stroke="none" aria-hidden="true">
+              <mask id="moon-mask">
+                <rect x="0" y="0" width="20" height="20" fill="white"></rect>
+                <circle cx="11" cy="3" r="8" fill="black"></circle>
+              </mask>
+              <circle class="sunMoon" cx="10" cy="10" r="8" mask="url(#moon-mask)"></circle>
+              <g>
+                <circle class="sunRay sunRay1" cx="18" cy="10" r="1.5"></circle>
+                <circle class="sunRay sunRay2" cx="14" cy="16.928" r="1.5"></circle>
+                <circle class="sunRay sunRay3" cx="6" cy="16.928" r="1.5"></circle>
+                <circle class="sunRay sunRay4" cx="2" cy="10" r="1.5"></circle>
+                <circle class="sunRay sunRay5" cx="6" cy="3.1718" r="1.5"></circle>
+                <circle class="sunRay sunRay6" cx="14" cy="3.1718" r="1.5"></circle>
+              </g>
+            </svg>
+          </label>
         </div>
         <div class="question-index">
           <div class="index-header"><span class="index-title">ÍNDICE DE QUESTÕES</span><span class="index-count">{question.number}/{total}</span></div>

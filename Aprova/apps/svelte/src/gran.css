@@ -359,9 +359,9 @@
 .view-exams .github-calendar .github-months { display: none !important; }
 
 /* ---- Banner do solver (delimitador topbar ↔ workspace, padrão Gran) ---- */
-.solve-banner { background: #1e1b4b; color: #fff; flex: 0 0 auto; height: 88px; }
-/* No noturno o banner usa #1F1A3A com texto #E8E6EF para se destacar dos cards escuros. */
-#root.view-solve.night .solve-banner { background: #1F1A3A; }
+.solve-banner { position: relative; left: 50%; width: 100vw; margin-left: -50vw; background: #1e1b4b; color: #fff; flex: 0 0 auto; height: 88px; border: 0; border-radius: 0; overflow: hidden; }
+/* Banner noturno neutro: contraste suave sem competir com o indigo do tema claro. */
+#root.view-solve.night .solve-banner { background: #24242B; border: 0; }
 #root.view-solve.night .solve-banner h2,
 #root.view-solve.night .solve-crumbs,
 #root.view-solve.night .solve-crumbs button,
@@ -450,7 +450,7 @@
 #root.view-solve .nav-arrow { background: #ECEEF1; border-color: #D8DBE0; color: #8A8F98; }
 #root.view-solve .nav-arrow:hover:not(:disabled) { background: #E3E7FB; border-color: #4f46e5; color: #4f46e5; }
 #root.view-solve .image-viewport { background: #E0E3E8; border-color: #CFD3DA; }
-#root.view-solve .image-toolbar { background: #FAFAFB; border-color: #E1E3E8; }
+#root.view-solve .image-toolbar { background: transparent; border-color: transparent; }
 #root.view-solve .question-context { background: #EDEFFD; }
 #root.view-solve .feedback.success { background: #EAF4ED; color: #2E7D46; }
 #root.view-solve .feedback.danger { background: #FAEEE9; color: #A34A3E; }
@@ -483,54 +483,75 @@
 /* ---- Modo noturno da prova (classe .night no #root, com persistência):
    neutros universais (preto + cinza-escuro) + acento #2596be.
    Relógio mantém o índigo do modo claro. Escopo total à view-solve. ---- */
-#root.view-solve.night main, #root.view-solve.night .solve-workspace { background: #000; }
-#root.view-solve.night .topbar { background: #080808 !important; border-color: #212121; }
-#root.view-solve.night .topbar .topbar-inner { background: #080808 !important; }
-#root.view-solve.night .topbar .brand-name { color: #fafafa; }
-#root.view-solve.night .topbar .nav { color: #9B9B9B; }
-#root.view-solve.night .topbar .nav.active { color: #fff; }
+#root.view-solve.night main, #root.view-solve.night .solve-workspace { background: #151518; }
+#root.view-solve.night > .topbar { background: #1D1D1D !important; border-color: #1D1D1D !important; border-bottom: 0 !important; }
+#root.view-solve.night > .topbar .topbar-inner { background: #1D1D1D !important; }
+#root.view-solve.night > .topbar .brand-name { color: #F4F2FA !important; }
+#root.view-solve.night > .topbar .nav,
+#root.view-solve.night > .topbar .nav:hover,
+#root.view-solve.night > .topbar .nav.active { color: #A1A1AA !important; background: transparent !important; border-bottom-color: transparent !important; box-shadow: none !important; }
+#root.view-solve.night > .topbar .nav:hover { color: #F4F2FA !important; background: transparent !important; }
+#root.view-solve.night > .topbar .nav.active { color: #FFFFFF !important; background: transparent !important; border-bottom-color: transparent !important; box-shadow: none !important; }
+#root.view-solve.night > .topbar .profile { border-color: #3F3F46 !important; }
+#root.view-solve.night > .topbar .profile strong { color: #E4E4E7 !important; }
+#root.view-solve.night > .topbar .profile > svg { color: #A1A1AA !important; }
+#root.view-solve.night > .topbar .profile .avatar { background: #514C68 !important; color: #F4F2FA !important; }
 #root.view-solve.night .question-panel { background: #1D1D1D; }
 #root.view-solve.night .question-header { border-bottom-color: #2C2C2C; }
 #root.view-solve.night .question-number { color: #fafafa; }
-#root.view-solve .contrast-btn { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid #E1E3E8; border-radius: 99px; color: #8A8F98; font-family: var(--font-functional); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 6px 10px; cursor: pointer; }
-#root.view-solve .contrast-btn:hover { color: #4f46e5; border-color: #4f46e5; }
-#root.view-solve .contrast-btn.on { color: #3730A3; border-color: #4f46e5; background: #EEF0FE; }
-#root.view-solve.night .contrast-btn { color: #9B9B9B; border-color: #3C3C3C; }
-#root.view-solve.night .contrast-btn:hover { color: #7cc7ea; border-color: #2596be; }
-#root.view-solve.night .contrast-btn.on { color: #fff; background: #2C2C2C; border-color: transparent; }
+/* Toggle sol/lua Uiverse.io by Type-Delta (clone de joshwcomeau.com, CSS puro).
+   Escopado à prova; tamanho ajustado ao cabeçalho. checked = dia (sol). */
+#root.view-solve .themeToggle { color: #8A8F98; width: 28px; display: inline-flex; }
+#root.view-solve.night .themeToggle { color: #9B9B9B; }
+#root.view-solve .st-sunMoonThemeToggleBtn { position: relative; cursor: pointer; }
+#root.view-solve .st-sunMoonThemeToggleBtn .themeToggleInput { opacity: 0; width: 100%; aspect-ratio: 1; margin: 0; }
+#root.view-solve .st-sunMoonThemeToggleBtn svg { position: absolute; left: 0; width: 100%; height: 100%; transition: transform 0.4s ease; transform: rotate(40deg); }
+#root.view-solve .st-sunMoonThemeToggleBtn svg .sunMoon { transform-origin: center center; transition: inherit; transform: scale(1); }
+#root.view-solve .st-sunMoonThemeToggleBtn svg .sunRay { transform-origin: center center; transform: scale(0); }
+#root.view-solve .st-sunMoonThemeToggleBtn svg mask > circle { transition: transform 0.64s cubic-bezier(0.41, 0.64, 0.32, 1.575); transform: translate(0px, 0px); }
+#root.view-solve .st-sunMoonThemeToggleBtn svg .sunRay2 { animation-delay: 0.05s !important; }
+#root.view-solve .st-sunMoonThemeToggleBtn svg .sunRay3 { animation-delay: 0.1s !important; }
+#root.view-solve .st-sunMoonThemeToggleBtn svg .sunRay4 { animation-delay: 0.17s !important; }
+#root.view-solve .st-sunMoonThemeToggleBtn svg .sunRay5 { animation-delay: 0.25s !important; }
+#root.view-solve .st-sunMoonThemeToggleBtn svg .sunRay5 { animation-delay: 0.29s !important; }
+#root.view-solve .st-sunMoonThemeToggleBtn .themeToggleInput:checked + svg { transform: rotate(90deg); }
+#root.view-solve .st-sunMoonThemeToggleBtn .themeToggleInput:checked + svg mask > circle { transform: translate(16px, -3px); }
+#root.view-solve .st-sunMoonThemeToggleBtn .themeToggleInput:checked + svg .sunMoon { transform: scale(0.55); }
+#root.view-solve .st-sunMoonThemeToggleBtn .themeToggleInput:checked + svg .sunRay { animation: showRay1832 0.4s ease 0s 1 forwards; }
+@keyframes showRay1832 { 0% { transform: scale(0); } 100% { transform: scale(1); } }
 #root.view-solve.night .answer-title, #root.view-solve.night .index-title, #root.view-solve.night .index-count { color: #9B9B9B; }
 #root.view-solve.night .index-header { background-color: #1D1D1D; }
 #root.view-solve.night .index-btn { background: #252525; color: #9B9B9B; }
 #root.view-solve.night .index-btn:hover { background: #3C3C3C; color: #D9D9D9; }
-#root.view-solve.night .index-btn.active { background: #2596be; color: #fff; box-shadow: none; }
-#root.view-solve.night .index-btn.correct-answer { background: rgba(46, 125, 70, .32); color: #7bd88f; }
-#root.view-solve.night .index-btn.wrong-answer { background: rgba(163, 74, 62, .32); color: #e08d7e; }
+#root.view-solve.night .index-btn.active { background: #514C68; color: #F4F2FA; box-shadow: none; }
+#root.view-solve.night .index-btn.correct-answer { background: rgba(61, 91, 70, .28); color: #A8C3AE; }
+#root.view-solve.night .index-btn.wrong-answer { background: rgba(99, 66, 63, .28); color: #C5A5A0; }
 #root.view-solve.night .answer-section .option { background: #252525; border-color: #3C3C3C !important; }
 #root.view-solve.night .answer-section .option:hover { background: #2C2C2C; border-color: #535353 !important; }
 #root.view-solve.night .option-letter { color: #9B9B9B; }
 #root.view-solve.night .option-text { color: #D9D9D9; }
-#root.view-solve.night .option.selected { border-color: rgba(124, 199, 234, .45) !important; background: rgba(37, 150, 190, .14); box-shadow: none; }
-#root.view-solve.night .option.selected:hover { border-color: rgba(124, 199, 234, .45) !important; background: rgba(37, 150, 190, .14); }
-#root.view-solve.night .option.selected .option-letter { color: #7cc7ea; }
+#root.view-solve.night .option.selected { border-color: #514C68 !important; background: #302D3D; box-shadow: none; }
+#root.view-solve.night .option.selected:hover { border-color: #514C68 !important; background: #302D3D; }
+#root.view-solve.night .option.selected .option-letter { color: #C8C2E6; }
 #root.view-solve.night .option.disabled { background: #1D1D1D; border-color: #212121 !important; }
 #root.view-solve.night .option.disabled .option-text { color: #616161; }
 #root.view-solve.night .option.disabled .option-letter { color: #545454; }
-#root.view-solve.night .option.correct-highlight { border-color: #2e7d46 !important; background: rgba(46, 125, 70, .22); }
-#root.view-solve.night .option.correct-highlight .option-letter { color: #7bd88f; }
-#root.view-solve.night .option.correct-highlight .option-text { color: #d7e9dc; }
-#root.view-solve.night .option.wrong-highlight { border-color: #a34a3e !important; background: rgba(163, 74, 62, .22); }
-#root.view-solve.night .option.wrong-highlight .option-letter { color: #e08d7e; }
-#root.view-solve.night .option.wrong-highlight .option-text { color: #ecd9d4; }
+#root.view-solve.night .option.correct-highlight { border-color: #3D5B46 !important; background: rgba(61, 91, 70, .28); box-shadow: none !important; outline: 0; }
+#root.view-solve.night .option.correct-highlight .option-letter { color: #A8C3AE; }
+#root.view-solve.night .option.correct-highlight .option-text { color: #D9E2DB; }
+#root.view-solve.night .option.wrong-highlight { border-color: #63423F !important; background: rgba(99, 66, 63, .28); box-shadow: none !important; outline: 0; }
+#root.view-solve.night .option.wrong-highlight .option-letter { color: #C5A5A0; }
+#root.view-solve.night .option.wrong-highlight .option-text { color: #E2D5D2; }
 #root.view-solve.night .option.eliminated { opacity: .45; }
 #root.view-solve.night .scissor-btn { color: #616161; }
 #root.view-solve.night .scissor-btn:hover:not(:disabled) { color: #CFCFCF; }
 #root.view-solve.night .scissor-btn.on { color: #e08d7e; }
 #root.view-solve.night .marked-flag { color: #9B9B9B; }
-#root.view-solve.night .correct-flag { color: #7bd88f; }
-#root.view-solve.night .bottom-nav { background: #212121; border-top-color: #2C2C2C; }
+#root.view-solve.night .correct-flag { color: #A8C3AE; }
+#root.view-solve.night .bottom-nav { background: #1D1D1D; border-top-color: #2C2C2C; }
 #root.view-solve.night .nav-arrow { background: #2C2C2C; border-color: #3C3C3C; color: #9B9B9B; }
-#root.view-solve.night .nav-arrow:hover:not(:disabled) { background: #3C3C3C; border-color: #535353; color: #fff; }
-#root.view-solve.night .image-toolbar { background: #212121; border-color: #2C2C2C; }
+#root.view-solve.night .nav-arrow:hover:not(:disabled) { background: #3C3947; border-color: #514C68; color: #F4F2FA; }
+#root.view-solve.night .image-toolbar { background: transparent; border-color: transparent; }
 /* Faixa do relógio no noturno: mesmo cinza do rodapé, sem bordas nem
    fundo em quadrado; relógio em branco. */
 #root.view-solve.night .pdf-delim { background: transparent; border-color: transparent; }
@@ -538,15 +559,19 @@
 #root.view-solve.night .pdf-delim .clock-pause { color: #706E7A; }
 /* Texto do relógio em #706E7A no noturno. */
 #root.view-solve.night .pdf-delim .clock-time { color: #706E7A; }
-#root.view-solve.night .image-viewport { background: #000000; border-color: #2C2C2C; }
+#root.view-solve .pdf-delim,
+#root.view-solve .clock-container { background: transparent; border-color: transparent; box-shadow: none; }
+#root.view-solve.night .image-viewport { background: #151518; border: 1px solid #29292E; border-radius: 0; }
+/* Moldura colada na folha do PDF no noturno. */
+#root.view-solve.night .pagina-pdf { border-left: 1px solid #303036; border-right: 1px solid #303036; border-radius: 0; overflow: hidden; }
 /* PDF noturno leve (ideal p/ PCs antigos): inverte a página via GPU sem
    re-renderizar; hue-rotate preserva as cores. A faixa usa screen para
    continuar visível sobre a página invertida. */
 #root.view-solve.night .pagina-pdf img { filter: invert(.93) hue-rotate(180deg); }
 #root.view-solve.night .faixa-questao {
   mix-blend-mode: screen;
-  background: linear-gradient(90deg, rgba(7, 0, 33, .9) 0%, rgba(7, 0, 33, .85) 80%, rgba(7, 0, 33, .5) 94%, rgba(7, 0, 33, 0) 100%);
-  background-color: rgba(7, 0, 33, .85);
+  background: linear-gradient(90deg, rgba(31, 30, 43, .34) 0%, rgba(31, 30, 43, .29) 80%, rgba(31, 30, 43, .16) 94%, rgba(31, 30, 43, 0) 100%);
+  background-color: rgba(31, 30, 43, .27);
 }
 #root.view-solve.night .question-context { background: rgba(255, 255, 255, .04); border-left-color: #2596be; }
 #root.view-solve.night .question-context p, #root.view-solve.night .question-context .context-label { color: #D9D9D9; }
@@ -571,9 +596,19 @@
   gap: 10px;
   padding: 10px 14px;
   margin-bottom: 0;
-  background: #fff;
-  border: 1px solid #E8E8E8;
+  background: transparent;
+  border: 1px solid transparent;
   border-radius: 0;
+}
+#root.view-solve .pdf-column > .pdf-delim,
+#root.view-solve .pdf-column > .pdf-delim .clock-container {
+  background: transparent !important;
+}
+#root.view-solve .pdf-column > .pdf-delim {
+  border-color: transparent !important;
+}
+#root.view-solve .pdf-column > .pdf-delim .clock-container {
+  border: 0 !important;
 }
   /* Card de questões encostado no card do PDF (sem deslocamento):
      o left positivo anterior empurrava o painel para fora da viewport,
@@ -614,8 +649,14 @@
 .btn-finish { background-color: #F9DB5C !important; color: #1A1F28 !important; border-color: #F9DB5C !important; }
 .btn-respond:hover:not(:disabled),
 .btn-finish:hover:not(:disabled) { background-color: #F2CE45 !important; color: #1A1F28 !important; border-color: #F2CE45 !important; transform: none; box-shadow: none; transition: background-color .25s ease, border-color .25s ease; }
+#root.view-solve.night .btn-respond,
+#root.view-solve.night .btn-finish { background-color: #B49A55 !important; color: #1A1915 !important; border-color: #B49A55 !important; }
+#root.view-solve.night .btn-respond:hover:not(:disabled),
+#root.view-solve.night .btn-finish:hover:not(:disabled) { background-color: #C3AA64 !important; color: #171612 !important; border-color: #C3AA64 !important; }
 
 /* Toolbar do PDF no solver: só ícones cinza (mesmo do relógio), sem caixa */
-.view-solve .image-toolbar button:hover { background: transparent !important; color: #9AA0AA !important; }
+#root.view-solve .image-toolbar button:hover { background: transparent !important; color: #6C7480 !important; }
 .view-solve .image-toolbar button:focus-visible { outline: 2px solid #4f46e5; outline-offset: 1px; }
-.view-solve .image-toolbar button { background: transparent !important; color: #B6BBC4 !important; }
+#root.view-solve .image-toolbar button { background: transparent !important; color: #B6BBC4 !important; }
+#root.view-solve.night .image-toolbar button { color: #706E7A !important; }
+#root.view-solve.night .image-toolbar button:hover { color: #9B9B9B !important; }
