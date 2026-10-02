@@ -1,5 +1,5 @@
 /* Mira: sistema tipográfico completo */
-@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800&display=swap');
 
 /* Seleção de texto em lilás terciário. */
@@ -24,12 +24,12 @@
   --success:#4f46e5;
   --error:#8B0000;
   
-  /* Tipografia - Famílias */
-  --font-primary: "Atkinson Hyperlegible Next", sans-serif;
-  --font-prova: "Gabarito", "Atkinson Hyperlegible Next", sans-serif;
-  --font-functional: "Atkinson Hyperlegible Next", sans-serif;
+  /* Tipografia - Famílias (webfont + cadeia de sistema completa) */
+  --font-primary: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-prova: "Gabarito", "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-functional: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif;
   /* Números (métricas, cronômetros, contadores) = sempre Gabarito */
-  --font-number: "Gabarito", "Atkinson Hyperlegible Next", sans-serif;
+  --font-number: "Gabarito", "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   
   /* Pesos Atkinson Hyperlegible Next */
   --font-weight-atl-300: 300;
@@ -78,9 +78,9 @@ body,.app-shell{
 
 /* === SISTEMA TIPOGRÁFICO COMPLETO ===
 
-   Arquitetura: Atkinson Hyperlegible Next (principal) | Gabarito (prova) | Atkinson funcional
+   Arquitetura: Plus Jakarta Sans (principal) | Gabarito (prova) | Jakarta funcional
 
-   1. HEADINGS - Atkinson Hyperlegible Next
+   1. HEADINGS - Plus Jakarta Sans
    2. PARÁGRAFOS E TEXTO GERAL
    3. GABARITO - Conteúdo da prova
    4. ATCKINSON FUNCIONAL - Página de prova
@@ -90,10 +90,10 @@ body,.app-shell{
    8. ACESSIBILIDADE E ESTADOS
 */
 
-/* 1. HEADINGS - Atkinson Hyperlegible Next */
-h1{font-family:var(--font-primary);font-size:var(--font-size-5xl);font-weight:var(--font-weight-atl-800);line-height:var(--line-height-heading);color:var(--ink);margin:0 0 1rem;}
-h2{font-family:var(--font-primary);font-size:var(--font-size-4xl);font-weight:var(--font-weight-atl-800);line-height:var(--line-height-heading);color:var(--ink);margin:0 0 1rem;}
-h3{font-family:var(--font-primary);font-size:var(--font-size-3xl);font-weight:var(--font-weight-atl-700);line-height:var(--line-height-heading);color:var(--ink);margin:0 0 1rem;}
+/* 1. HEADINGS - Plus Jakarta Sans (elegante: pesos contidos, tracking justo) */
+h1{font-family:var(--font-primary);font-size:var(--font-size-5xl);font-weight:700;letter-spacing:-.025em;line-height:var(--line-height-heading);color:var(--ink);margin:0 0 1rem;}
+h2{font-family:var(--font-primary);font-size:var(--font-size-4xl);font-weight:700;letter-spacing:-.02em;line-height:var(--line-height-heading);color:var(--ink);margin:0 0 1rem;}
+h3{font-family:var(--font-primary);font-size:var(--font-size-3xl);font-weight:600;letter-spacing:-.01em;line-height:var(--line-height-heading);color:var(--ink);margin:0 0 1rem;}
 h4{font-family:var(--font-primary);font-size:var(--font-size-2xl);font-weight:var(--font-weight-atl-600);line-height:var(--line-height-heading);color:var(--ink);margin:0 0 1rem;}
 h5{font-family:var(--font-primary);font-size:var(--font-size-xl);font-weight:var(--font-weight-atl-500);line-height:var(--line-height-heading);color:var(--ink);margin:0 0 1rem;}
 h6{font-family:var(--font-primary);font-size:var(--font-size-lg);font-weight:var(--font-weight-atl-500);line-height:var(--line-height-heading);color:var(--ink);margin:0 0 0.5rem;}

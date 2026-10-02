@@ -407,6 +407,9 @@
    transição leve. (Cores dos estados no tema "cinza conforto" abaixo.) */
 #root.view-solve .option { padding: 8px 14px !important; transition: background-color .25s ease, border-color .25s ease !important; border: 1px solid #E5E7EB !important; border-radius: 0 !important; }
 #root.view-solve .option.selected .option-letter { font-weight: 800; }
+/* Card de filtros em Gabarito; botão Responder em Gabarito. */
+.gran-filters, .gran-filters h3, .gran-filters label, .gran-filters .gran-field input, .gran-filters .gran-field select, .gran-filters button { font-family: var(--font-prova); }
+#root.view-solve .bottom-nav .btn-respond { font-family: var(--font-prova); }
 /* Setas direcionais com cantos leve e sutilmente arredondados. */
 #root.view-solve .bottom-nav .nav-arrow { border-radius: 4px !important; }
 #root.view-solve .bottom-nav .nav-arrow { border-radius: 4px !important; border: 0 !important; }
