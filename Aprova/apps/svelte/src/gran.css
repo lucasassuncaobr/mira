@@ -428,6 +428,7 @@
    A regra vem por último para prevalecer sobre certa/errada. */
 #root.view-solve .index-btn { transition: background-color .18s ease, color .18s ease; }
 #root.view-solve .index-btn.active { background: #DFE4FA; color: #3730A3; box-shadow: none; }
+#root.view-solve .index-btn.active { border-radius: 3px; }
 /* ---- Tema conforto "cinza claro" (só solve): fundo cinza-claro frio,
    painel em branco gelo, índigo contido como único acento e feedback
    em pastel. Moderno e leve, com cara de prova. ---- */
@@ -504,7 +505,7 @@
 #root.view-solve.night .question-number { color: #fafafa; }
 /* Toggle sol/lua Uiverse.io by Type-Delta (clone de joshwcomeau.com, CSS puro).
    Escopado à prova; tamanho ajustado ao cabeçalho. checked = dia (sol). */
-#root.view-solve .themeToggle { color: #8A8F98; width: 28px; display: inline-flex; }
+#root.view-solve .themeToggle { color: #8A8F98; width: 26px; display: inline-flex; }
 #root.view-solve.night .themeToggle { color: #9B9B9B; }
 #root.view-solve .st-sunMoonThemeToggleBtn { position: relative; cursor: pointer; }
 #root.view-solve .st-sunMoonThemeToggleBtn .themeToggleInput { opacity: 0; width: 100%; aspect-ratio: 1; margin: 0; }
@@ -547,6 +548,16 @@
 #root.view-solve.night .option.wrong-highlight .option-text { color: #E2D5D2; }
 #root.view-solve.night .option.eliminated { opacity: .45; }
 #root.view-solve.night .scissor-btn { color: #616161; }
+#root.view-solve.night .option.eliminated {
+  opacity: 1;
+  background: #1B1D23;
+  box-shadow: none;
+}
+#root.view-solve.night .option.eliminated .option-letter,
+#root.view-solve.night .option.eliminated .option-text {
+  color: #858892;
+  text-decoration: none;
+}
 #root.view-solve.night .scissor-btn:hover:not(:disabled) { color: #CFCFCF; }
 #root.view-solve.night .scissor-btn.on { color: #e08d7e; }
 #root.view-solve.night .marked-flag { color: #9B9B9B; }
@@ -567,14 +578,15 @@
 #root.view-solve.night .image-viewport { background: #151518; border: 1px solid #29292E; border-radius: 0; }
 /* Moldura colada na folha do PDF no noturno. */
 #root.view-solve.night .pagina-pdf { border-left: 1px solid #303036; border-right: 1px solid #303036; border-radius: 0; overflow: hidden; }
-/* PDF noturno leve (ideal p/ PCs antigos): inverte a página via GPU sem
-   re-renderizar; hue-rotate preserva as cores. A faixa usa screen para
-   continuar visível sobre a página invertida. */
-#root.view-solve.night .pagina-pdf img { filter: invert(.93) hue-rotate(180deg); }
+/* PDF noturno confortável: reduz o brilho do papel, aquece levemente os
+   neutros e preserva as cores importantes do documento sem re-renderizar. */
+#root.view-solve.night .pagina-pdf img {
+  filter: invert(.9) hue-rotate(180deg) sepia(.1) saturate(.82) brightness(.86) contrast(.92);
+}
 #root.view-solve.night .faixa-questao {
   mix-blend-mode: screen;
-  background: linear-gradient(90deg, rgba(31, 30, 43, .34) 0%, rgba(31, 30, 43, .29) 80%, rgba(31, 30, 43, .16) 94%, rgba(31, 30, 43, 0) 100%);
-  background-color: rgba(31, 30, 43, .27);
+  background: linear-gradient(90deg, rgba(32, 29, 43, .3) 0%, rgba(32, 29, 43, .25) 80%, rgba(32, 29, 43, .13) 94%, rgba(32, 29, 43, 0) 100%);
+  background-color: rgba(32, 29, 43, .22);
 }
 #root.view-solve.night .question-context { background: rgba(255, 255, 255, .04); border-left-color: #2596be; }
 #root.view-solve.night .question-context p, #root.view-solve.night .question-context .context-label { color: #D9D9D9; }
@@ -663,3 +675,504 @@
 #root.view-solve .image-toolbar button { background: transparent !important; color: #B6BBC4 !important; }
 #root.view-solve.night .image-toolbar button { color: #706E7A !important; }
 #root.view-solve.night .image-toolbar button:hover { color: #9B9B9B !important; }
+
+/* Mishu Obsidian — adaptação do Mira para leitura noturna prolongada.
+   Baseada na proposta do Mishu Theme: sem preto/branco puros, contraste
+   controlado e azul dessaturado como acento principal. */
+#root.view-solve.night {
+  --mishu-bg: #0A0A0E;
+  --mishu-header: #06060A;
+  --mishu-surface: #0E0E12;
+  --mishu-elevated: #141418;
+  --mishu-border: #141418;
+  --mishu-text: #B8B8C0;
+  --mishu-muted: #909098;
+  --mishu-faint: #585860;
+  /* Índigo de tinta: violeta azulado, dessaturado e próprio do modo noturno. */
+  --mishu-accent: #756A9F;
+  --mishu-accent-soft: #A29AC8;
+  --mishu-selection: #242235;
+  --mishu-success: #78B080;
+  --mishu-warning: #B08868;
+  --mishu-danger: #A07070;
+  --mishu-purple: #9888B0;
+  --mishu-cyan: #70A8B0;
+}
+#root.view-solve.night main,
+#root.view-solve.night .solve-workspace { background: var(--mishu-bg); }
+#root.view-solve.night > .topbar,
+#root.view-solve.night > .topbar .topbar-inner { background: var(--mishu-header) !important; }
+#root.view-solve.night > .topbar .brand-name { color: var(--mishu-text) !important; }
+#root.view-solve.night > .topbar .nav { color: var(--mishu-muted) !important; }
+#root.view-solve.night > .topbar .nav:hover,
+#root.view-solve.night > .topbar .nav.active { color: var(--mishu-accent-soft) !important; }
+#root.view-solve.night > .topbar .profile { border-color: var(--mishu-border) !important; }
+#root.view-solve.night > .topbar .profile strong { color: var(--mishu-text) !important; }
+#root.view-solve.night > .topbar .profile .avatar { background: #51496F !important; color: #E5E1F0 !important; }
+#root.view-solve.night .question-panel,
+#root.view-solve.night .index-header,
+#root.view-solve.night .bottom-nav { background: var(--mishu-surface); }
+#root.view-solve.night .question-header,
+#root.view-solve.night .bottom-nav { border-color: var(--mishu-border); }
+#root.view-solve.night .question-number,
+#root.view-solve.night .option-text { color: var(--mishu-text); }
+#root.view-solve.night .answer-title,
+#root.view-solve.night .index-title,
+#root.view-solve.night .index-count { color: var(--mishu-muted); }
+#root.view-solve.night .index-btn { background: #171A21; color: var(--mishu-muted); border-color: transparent; }
+#root.view-solve.night .index-btn:hover { background: #222832; color: var(--mishu-text); }
+#root.view-solve.night .index-btn.active {
+  background: var(--mishu-selection);
+  color: var(--mishu-accent-soft);
+  border-color: transparent !important;
+  border-radius: 3px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
+}
+#root.view-solve.night .answer-section .option {
+  background: var(--mishu-elevated);
+  border: 0 !important;
+  outline: 0 !important;
+  border-radius: 0 !important;
+}
+#root.view-solve.night .answer-section .option:hover { background: #202630; border-color: #3B4A5A !important; }
+#root.view-solve.night .option-letter { color: var(--mishu-muted); }
+#root.view-solve.night .option.selected,
+#root.view-solve.night .option.selected:hover {
+  border: 0 !important;
+  outline: 0 !important;
+  border-color: transparent !important;
+  background: var(--mishu-selection);
+  border-radius: 0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
+}
+#root.view-solve.night .option.selected .option-letter { color: #9188B4; }
+#root.view-solve.night .nav-arrow { background: #1B2028; border-color: var(--mishu-border); color: var(--mishu-muted); }
+#root.view-solve.night .nav-arrow:hover:not(:disabled) { background: #293440; border-color: var(--mishu-accent); color: var(--mishu-text); }
+#root.view-solve.night .pdf-delim .clock-pause,
+#root.view-solve.night .pdf-delim .clock-time { color: var(--mishu-accent-soft); }
+#root.view-solve.night .image-viewport { background: var(--mishu-surface); border-color: var(--mishu-border); }
+#root.view-solve.night .question-context { background: rgba(104, 152, 192, .1); border-left-color: var(--mishu-accent); }
+#root.view-solve.night .question-context p,
+#root.view-solve.night .question-context .context-label { color: #B8B8C0; }
+#root.view-solve.night .option.correct-highlight { border-color: #4D7962 !important; background: rgba(65, 111, 84, .25); }
+#root.view-solve.night .option.wrong-highlight { border-color: #805B5B !important; background: rgba(117, 69, 69, .25); }
+#root.view-solve.night .feedback.success,
+#root.view-solve.night .feedback.danger {
+  border: 0 !important;
+  border-color: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
+}
+#root.view-solve.night .feedback.success { background: #1B2920; color: var(--mishu-success); }
+#root.view-solve.night .feedback.danger { background: #2B2022; color: var(--mishu-danger); }
+#root.view-solve.night .btn-respond,
+#root.view-solve.night .btn-finish { background: var(--mishu-accent) !important; color: #101820 !important; border-color: var(--mishu-accent) !important; }
+#root.view-solve.night .btn-respond:hover:not(:disabled),
+#root.view-solve.night .btn-finish:hover:not(:disabled) { background: var(--mishu-accent-soft) !important; border-color: var(--mishu-accent-soft) !important; }
+#root.view-solve.night .pagina-pdf img {
+  /* A página compartilha o mesmo fundo do Mishu; o texto invertido é
+     composto por screen para evitar um retângulo cinza sobre a interface. */
+  filter: invert(.88) hue-rotate(180deg) saturate(.72) brightness(.8) contrast(.98) !important;
+  mix-blend-mode: screen;
+  opacity: .95;
+}
+#root.view-solve.night .pagina-pdf,
+#root.view-solve.night .image-viewport,
+#root.view-solve.night .pdf-column,
+#root.view-solve.night .page-reference { background: #0E0E12 !important; }
+#root.view-solve.night .pagina-pdf {
+  position: relative;
+}
+#root.view-solve.night .pagina-pdf::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: rgba(14, 16, 24, .16);
+  mix-blend-mode: multiply;
+}
+#root.view-solve.night .pagina-pdf img,
+#root.view-solve.night .pagina-pdf .faixa-questao { position: relative; z-index: 0; }
+#root.view-solve.night .pagina-pdf .faixa-questao { z-index: 2; }
+#root.view-solve.night .faixa-questao {
+  position: absolute !important;
+  z-index: 2 !important;
+  mix-blend-mode: normal !important;
+  background-color: #121212 !important;
+  background-image: none !important;
+  box-shadow: none;
+}
+#root.view-solve.night .faixa-questao.ativa {
+  background: rgba(18, 18, 18, .55) !important;
+  background-image: none !important;
+  opacity: .58 !important;
+  contain: none !important;
+  box-shadow: none !important;
+}
+#root.view-solve.night .pagina-pdf { overflow: visible !important; }
+#root.view-solve.night .image-toolbar button { color: var(--mishu-muted) !important; }
+#root.view-solve.night .image-toolbar button:hover { color: var(--mishu-accent-soft) !important; }
+
+/* A célula ativa é o único elemento com cantos arredondados nos dois temas. */
+#root.view-solve .index-btn.active,
+#root.view-solve.night .index-btn.active { border-radius: 3px !important; }
+
+/* Somente a imagem do PDF recebe o tratamento de leitura noturna. O entorno
+   volta às superfícies originais do modo noturno. */
+#root.view-solve.night .pdf-column,
+#root.view-solve.night .page-reference,
+#root.view-solve.night .pagina-pdf { background: transparent !important; }
+#root.view-solve.night .image-viewport { background: #151518 !important; }
+#root.view-solve.night .pagina-pdf::before { display: none !important; }
+#root.view-solve.night .pagina-pdf img {
+  filter: invert(.9) hue-rotate(180deg) saturate(.7) brightness(.82) contrast(.9) !important;
+  mix-blend-mode: normal;
+  opacity: .94;
+}
+
+/* Estado anulado: somente uma superfície cinza distinta, sem faixa lateral
+   ou risco; a tesoura continua alternando o estado normalmente. */
+#root.view-solve.night .answer-section .option.eliminated {
+  opacity: .72 !important;
+  background: #101115 !important;
+  box-shadow: none !important;
+}
+#root.view-solve.night .answer-section .option.eliminated .option-letter,
+#root.view-solve.night .answer-section .option.eliminated .option-text {
+  color: #62646D !important;
+  text-decoration: line-through !important;
+  text-decoration-color: #51535C !important;
+  text-decoration-thickness: 4.5px;
+}
+#root.view-solve.night .answer-section .option.eliminated .option-letter {
+  position: relative;
+  text-decoration: none !important;
+}
+#root.view-solve.night .answer-section .option.eliminated .option-letter::after {
+  content: "×";
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -53%);
+  color: #62646D;
+  font: 700 22px/1 var(--font-functional);
+  pointer-events: none;
+}
+#root.view-solve.night .answer-section .option.eliminated .option-letter .eliminated-x {
+  color: #62646D;
+}
+
+/* X da alternativa anulada: sobreposto à letra nos dois temas. */
+#root.view-solve .option.eliminated .option-letter {
+  position: relative;
+  text-decoration: none !important;
+}
+#root.view-solve .option.eliminated .option-letter::after { display: none !important; }
+#root.view-solve .option .option-letter .marked-x {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -53%);
+  margin: 0 !important;
+  width: 22px;
+  height: 22px;
+  color: transparent;
+  font-size: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+#root.view-solve .option .option-letter .marked-x::before,
+#root.view-solve .option .option-letter .marked-x::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 1px;
+  width: 2px;
+  height: 20px;
+  background: #9BA0AA;
+  border-radius: 2px;
+}
+#root.view-solve .option .option-letter .marked-x::before { transform: rotate(45deg); }
+#root.view-solve .option .option-letter .marked-x::after { transform: rotate(-45deg); }
+#root.view-solve.night .option .option-letter .marked-x { color: #62646D; }
+#root.view-solve.night .option .option-letter .marked-x::before,
+#root.view-solve.night .option .option-letter .marked-x::after { background: #62646D; }
+
+/* Separação final dos estados: risco no anulado, X apenas no marcado. */
+#root.view-solve .option.eliminated .option-letter,
+#root.view-solve .option.eliminated .option-text {
+  text-decoration: line-through !important;
+  text-decoration-thickness: 4.5px !important;
+}
+#root.view-solve .option.eliminated .option-letter::after { display: none !important; }
+#root.view-solve .option .option-letter:has(.marked-x) {
+  position: relative;
+  text-decoration: none !important;
+}
+
+/* Risco e marca da resposta, com regras independentes. */
+#root.view-solve .option.eliminated .option-letter,
+#root.view-solve .option.eliminated .option-text {
+  text-decoration: line-through !important;
+  text-decoration-thickness: 2px !important;
+  text-decoration-line: line-through !important;
+}
+
+/* Corrige a regra noturna mais específica: anulado usa apenas risco real. */
+#root.view-solve.night .answer-section .option.eliminated .option-letter,
+#root.view-solve.night .answer-section .option.eliminated .option-text {
+  text-decoration: line-through !important;
+  text-decoration-line: line-through !important;
+  text-decoration-thickness: 2px !important;
+}
+#root.view-solve.night .answer-section .option.eliminated .option-letter::after,
+#root.view-solve.night .answer-section .option.eliminated .option-letter::before {
+  content: none !important;
+  display: none !important;
+}
+
+/* Relógio alinhado ao cinza dos SVGs da topbar no modo noturno. */
+#root.view-solve.night .pdf-delim .clock-pause,
+#root.view-solve.night .pdf-delim .clock-time {
+  color: #62646D !important;
+}
+
+/* Tesoura ativa no escuro: cinza neutro, sem o vermelho que destoa da paleta. */
+#root.view-solve.night .scissor-btn.on,
+#root.view-solve.night .scissor-btn[aria-pressed="true"] {
+  color: #62646D !important;
+  background: transparent !important;
+}
+#root.view-solve.night .scissor-btn.on:hover,
+#root.view-solve.night .scissor-btn[aria-pressed="true"]:hover {
+  color: #71717A !important;
+}
+
+/* Ícones do toolbar inferior com o mesmo cinza sutil da referência. */
+#root.view-solve.night .image-toolbar button svg {
+  color: #62646D !important;
+  stroke: #62646D !important;
+}
+
+/* Cinza sutil compartilhado pelo relógio e pelos ícones SVG da topbar. */
+#root.view-solve.night > .topbar .nav svg,
+#root.view-solve.night > .topbar .profile > svg,
+#root.view-solve.night .pdf-delim .clock-pause,
+#root.view-solve.night .pdf-delim .clock-time {
+  color: #62646D !important;
+}
+#root.view-solve .option.selected .option-letter {
+  position: relative;
+}
+#root.view-solve .option.selected .option-letter::after {
+  content: "";
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 20px;
+  height: 20px;
+  transform: translate(-50%, -50%);
+  border: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+#root.view-solve .option.selected .option-letter::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1.5px;
+  height: 19px;
+  background: currentColor;
+  border-radius: 999px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  z-index: 3;
+}
+#root.view-solve .option.selected .option-letter::after {
+  box-shadow: 0 0 0 transparent;
+  width: 1.5px;
+  height: 19px;
+  background: currentColor;
+  border-radius: 999px;
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+#root.view-solve.night .option.eliminated .option-letter,
+#root.view-solve.night .option.eliminated .option-text {
+  text-decoration: line-through !important;
+  text-decoration-thickness: 2px !important;
+  text-decoration-color: #51535C !important;
+}
+
+/* Estado final: sem X; somente risco de 2px nos dois temas. */
+#root.view-solve .option.selected .option-letter::before,
+#root.view-solve .option.selected .option-letter::after { display: none !important; }
+#root.view-solve .option.eliminated .option-letter,
+#root.view-solve .option.eliminated .option-text {
+  text-decoration: line-through !important;
+  text-decoration-thickness: 2px !important;
+}
+
+/* Índice em formato de mini-gabarito: número e alternativa marcada. */
+#root.view-solve .index-btn {
+  position: relative;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  line-height: 1;
+  min-height: 22px;
+  padding: 0;
+}
+#root.view-solve .index-number { font-size: 11px; line-height: 1; font-weight: 600; }
+#root.view-solve .index-answer {
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 600;
+  opacity: .9;
+}
+#root.view-solve.night .index-answer { color: #A29AC8; }
+#root.view-solve:not(.night) .index-answer { color: #4F46E5; }
+#root.view-solve:not(.night) .index-answer.answer-correct { color: #357A4B; }
+#root.view-solve:not(.night) .index-answer.answer-wrong { color: #A34A3E; }
+#root.view-solve.night .index-answer.answer-correct { color: #A8C3AE; }
+#root.view-solve.night .index-answer.answer-wrong { color: #C5A5A0; }
+
+/* Índice em matriz de gabarito: questões nas colunas e alternativas nas linhas. */
+#root.view-solve .answer-key-grid {
+  display: grid;
+  position: relative;
+  grid-template-columns: 28px repeat(40, 22px);
+  grid-auto-rows: 22px;
+  gap: 1px;
+  max-height: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  justify-content: start;
+  padding-bottom: 3px;
+}
+/* Cursor do gabarito: faixa da coluna ativa; desliza com transition só
+   de transform (compositor), sem reflow e sem reatividade. */
+#root.view-solve .ak-cursor {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 22px;
+  background: rgba(79, 70, 229, .10);
+  border-left: 2px solid #4f46e5;
+  pointer-events: none;
+  transition: transform .22s ease, width .22s ease;
+}
+#root.view-solve .answer-key-corner,
+#root.view-solve .answer-key-label,
+#root.view-solve .answer-key-number,
+#root.view-solve .answer-key-cell {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  font-family: var(--font-functional);
+  font-size: 10px;
+  line-height: 1;
+}
+#root.view-solve .answer-key-corner,
+#root.view-solve .answer-key-label {
+  color: var(--mishu-muted, #909098);
+  font-weight: 600;
+}
+#root.view-solve .answer-key-number {
+  background: #E8EAED;
+  color: #6C7480;
+  cursor: pointer;
+  font-weight: 600;
+}
+#root.view-solve .answer-key-number.active {
+  background: #DFE4FA;
+  color: #3730A3;
+}
+#root.view-solve .answer-key-cell {
+  position: relative;
+  background: #F1F2F4;
+  cursor: pointer;
+}
+#root.view-solve .answer-key-cell:hover { background: #E3E7FB; }
+#root.view-solve .answer-key-cell.active { box-shadow: inset 0 0 0 1px #AEB7D9; }
+#root.view-solve .answer-key-cell.selected { background: #C9D1F7; }
+#root.view-solve .answer-key-cell.selected::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4F46E5;
+}
+#root.view-solve .answer-key-cell.answer-correct { background: #D9EBDD; }
+#root.view-solve .answer-key-cell.answer-correct::after { background: #357A4B; }
+#root.view-solve .answer-key-cell.answer-wrong { background: #F0DCD7; }
+#root.view-solve .answer-key-cell.answer-wrong::after { background: #A34A3E; }
+#root.view-solve.night .answer-key-number { background: #171A21; color: var(--mishu-muted); }
+#root.view-solve.night .answer-key-number.active { background: #3A3650; color: #C8C2E6; }
+#root.view-solve.night .answer-key-cell { background: #171A21; }
+#root.view-solve.night .answer-key-cell:hover { background: #222832; }
+#root.view-solve.night .answer-key-cell.active { box-shadow: inset 0 0 0 1px #4D4963; }
+#root.view-solve.night .answer-key-cell.selected { background: #302D3D; }
+#root.view-solve.night .answer-key-cell.selected::after { background: #A29AC8; }
+#root.view-solve.night .answer-key-cell.answer-correct { background: #26372C; }
+#root.view-solve.night .answer-key-cell.answer-correct::after { background: #A8C3AE; }
+#root.view-solve.night .answer-key-cell.answer-wrong { background: #392B2B; }
+#root.view-solve.night .answer-key-cell.answer-wrong::after { background: #C5A5A0; }
+
+/* Acabamento de quadro de gabarito, seguindo a referência visual. */
+#root.view-solve .answer-key-grid {
+  grid-template-columns: 34px repeat(40, 28px);
+  grid-auto-rows: 24px;
+  gap: 0;
+  border: 1px solid #303238;
+  background: #303238;
+}
+#root.view-solve .answer-key-corner {
+  grid-row: span 6;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  background: #88898B;
+  color: #FFFFFF;
+  letter-spacing: .04em;
+  font-size: 10px;
+  font-weight: 700;
+}
+#root.view-solve .answer-key-label,
+#root.view-solve .answer-key-number,
+#root.view-solve .answer-key-cell {
+  border-radius: 0;
+  border-right: 1px solid #303238;
+  border-bottom: 1px solid #303238;
+}
+#root.view-solve .answer-key-number {
+  background: #88898B;
+  color: #FFFFFF;
+  font-size: 11px;
+}
+#root.view-solve .answer-key-label {
+  background: #FFFFFF;
+  color: #202124;
+  font-size: 11px;
+}
+#root.view-solve .answer-key-cell {
+  background: #FFFFFF;
+  color: #202124;
+  font-size: 13px;
+  font-family: Georgia, serif;
+}
+#root.view-solve .answer-key-cell::after { display: none; }
+#root.view-solve .answer-key-cell.selected { background: #756A9F; color: #FFFFFF; }
+#root.view-solve .answer-key-cell.answer-correct { background: #5F9A72; color: #FFFFFF; }
+#root.view-solve .answer-key-cell.answer-wrong { background: #A96B65; color: #FFFFFF; }
+#root.view-solve .answer-key-cell.active { box-shadow: inset 0 0 0 2px #756A9F; }
+#root.view-solve.night .answer-key-corner,
+#root.view-solve.night .answer-key-number { background: #45464B; color: #F0F0F2; }
+#root.view-solve.night .answer-key-label,
+#root.view-solve.night .answer-key-cell { background: #17181C; color: #D8D8DE; }
+#root.view-solve.night .answer-key-cell.selected { background: #756A9F; color: #FFFFFF; }
+#root.view-solve.night .answer-key-cell.answer-correct { background: #4B7257; color: #FFFFFF; }
+#root.view-solve.night .answer-key-cell.answer-wrong { background: #754B49; color: #FFFFFF; }

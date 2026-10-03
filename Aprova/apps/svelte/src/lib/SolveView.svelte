@@ -33,6 +33,7 @@
   let focusMap = $state<Record<string, FocusEntry> | null>(null);
 
   let indexGridEl = $state<HTMLElement | null>(null);
+  let akCursorEl = $state<HTMLElement | null>(null);
   let pageRefComp = $state<PageReference | null>(null);
   let clockText = $state('00:00:00');
   let paused = $state(false);
@@ -107,9 +108,12 @@
     if (!first) {
       const grid = indexGridEl;
       void tick().then(() => {
-        const active = grid?.querySelector('.index-btn.active');
+        const active = grid?.querySelector('.answer-key-number.active');
         if (active) (active as HTMLElement).scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        moveAkCursor();
       });
+    } else {
+      void tick().then(() => moveAkCursor());
     }
     reloadPage();
   });
@@ -127,6 +131,19 @@
       pauseBegin = performance.now();
       paused = true;
     }
+  }
+
+  // Cursor do gabarito: faixa vertical que desliza para a coluna ativa
+  // (direita ao avançar, esquerda ao voltar). Mutação direta no DOM,
+  // sem reatividade: só transform, custo de compositor.
+  function moveAkCursor(): void {
+    const grid = indexGridEl;
+    const cursor = akCursorEl;
+    if (!grid || !cursor) return;
+    const active = grid.querySelector('.answer-key-number.active') as HTMLElement | null;
+    if (!active) return;
+    cursor.style.width = `${active.offsetWidth}px`;
+    cursor.style.transform = `translateX(${active.offsetLeft}px)`;
   }
 
   function reloadPage(): void {
@@ -211,13 +228,6 @@
       feedbacks = { ...feedbacks, [q.id]: feedback };
     } finally {
       submitting = false;
-      // No feedback nunca há risco: limpa as anulações da questão,
-      // mesmo que o usuário tenha riscado a alternativa correta.
-      if (feedback) {
-        const next = { ...eliminated };
-        delete next[q.id];
-        eliminated = next;
-      }
     }
   }
 
@@ -287,7 +297,7 @@
         <div class="question-header">
           <h2 class="question-number">Questão {question.number}</h2>
           <!-- From Uiverse.io by Type-Delta -->
-          <label for="themeToggle" class="themeToggle st-sunMoonThemeToggleBtn" title="Alternar modo noturno" aria-label="Alternar modo noturno">
+          <label for="themeToggle" class="themeToggle st-sunMoonThemeToggleBtn" title="Modo noturno" aria-label="Modo noturno">
             <input type="checkbox" id="themeToggle" class="themeToggleInput" checked={!nightMode} onchange={toggleNight} />
             <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor" stroke="none" aria-hidden="true">
               <mask id="moon-mask">
@@ -308,16 +318,31 @@
         </div>
         <div class="question-index">
           <div class="index-header"><span class="index-title">ÍNDICE DE QUESTÕES</span><span class="index-count">{question.number}/{total}</span></div>
-          <div bind:this={indexGridEl} class="index-grid">
+          <div bind:this={indexGridEl} class="index-grid answer-key-grid">
+            <span bind:this={akCursorEl} class="ak-cursor" aria-hidden="true"></span>
+            <div class="answer-key-corner">RESPOSTA</div>
             {#each questions as q, i (q.id)}
-              {@const r = results[q.id]}
               <button
-                class="index-btn"
+                class="answer-key-number"
                 class:active={i === currentIdx}
-                class:correct-answer={r === 'correct'}
-                class:wrong-answer={r === 'wrong'}
+                aria-label={`Ir para questão ${q.number}`}
                 onclick={() => selectQuestion(i)}
-              >{String(q.number).padStart(2, '0')}</button>
+              >{q.number}</button>
+            {/each}
+            {#each ['A', 'B', 'C', 'D', 'E'] as label}
+              <div class="answer-key-label">{label}</div>
+              {#each questions as q, i (q.id)}
+                {@const r = results[q.id]}
+                <button
+                  class="answer-key-cell"
+                  class:selected={answers[q.id] === label}
+                  class:answer-correct={answers[q.id] === label && r === 'correct'}
+                  class:answer-wrong={answers[q.id] === label && r === 'wrong'}
+                  class:active={i === currentIdx}
+                  aria-label={`Questão ${q.number}, alternativa ${label}`}
+                  onclick={() => selectQuestion(i)}
+                >{label}</button>
+              {/each}
             {/each}
           </div>
         </div>
@@ -342,7 +367,9 @@
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 8.5 20 20M8.5 15.5 20 4"/></svg>
                     </button>
                   {/if}
-                  <div class="option-letter">({alt.label})</div>
+                  <div class="option-letter">
+                    ({alt.label})
+                  </div>
                   {#if feedback || isMarked}
                     <div class="option-text texto-questao">{alt.text}</div>
                   {/if}
