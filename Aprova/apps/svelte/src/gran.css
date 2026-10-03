@@ -1125,9 +1125,9 @@
 #root.view-solve .answer-key-cell.answer-correct::after { background: #357A4B; }
 #root.view-solve .answer-key-cell.answer-wrong { background: #F0DCD7; }
 #root.view-solve .answer-key-cell.answer-wrong::after { background: #A34A3E; }
-#root.view-solve.night .answer-key-number { background: #171A21; color: var(--mishu-muted); }
+#root.view-solve.night .answer-key-number { background: #252525; color: var(--mishu-muted); }
 #root.view-solve.night .answer-key-number.active { background: #3A3650; color: #C8C2E6; }
-#root.view-solve.night .answer-key-cell { background: #171A21; }
+#root.view-solve.night .answer-key-cell { background: #252525; }
 #root.view-solve.night .answer-key-cell:hover { background: #222832; }
 #root.view-solve.night .answer-key-cell.active { box-shadow: inset 0 0 0 1px #4D4963; }
 #root.view-solve.night .answer-key-cell.selected { background: #302D3D; }
