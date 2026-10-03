@@ -1062,6 +1062,23 @@
   pointer-events: none;
   transition: transform .22s ease, width .22s ease;
 }
+#root.view-solve.night .ak-cursor {
+  background: rgba(165, 180, 252, .16);
+  border-left-color: #A5B4FC;
+}
+/* Setas de rolagem lateral do gabarito. */
+#root.view-solve .ak-scroll { display: inline-flex; gap: 4px; margin-left: auto; }
+#root.view-solve .ak-scroll button {
+  border: 1px solid #E8E8E8;
+  background: #fff;
+  color: #6C7480;
+  width: 22px;
+  height: 20px;
+  line-height: 1;
+  cursor: pointer;
+  font-size: 13px;
+}
+#root.view-solve .ak-scroll button:hover { border-color: #4f46e5; color: #4f46e5; }
 #root.view-solve .answer-key-corner,
 #root.view-solve .answer-key-label,
 #root.view-solve .answer-key-number,

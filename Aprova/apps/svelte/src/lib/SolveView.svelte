@@ -51,6 +51,9 @@
   );
   let question = $derived<Question | undefined>(questions[currentIdx]);
   let total = $derived(questions.length);
+  // Rótulos vindos das alternativas reais (A-D, A-E…): sem limite fixo,
+  // o gabarito cresce para a direita conforme a prova.
+  let altLabels = $derived([...new Set(questions.flatMap((q) => q.alternatives.map((a) => a.label)))]);
   let selected = $derived(question ? (answers[question.id] ?? null) : null);
   let allAnswered = $derived(questions.every((q) => answers[q.id]));
   let answeredCount = $derived(questions.filter((q) => answers[q.id]).length);
@@ -136,6 +139,11 @@
   // Cursor do gabarito: faixa vertical que desliza para a coluna ativa
   // (direita ao avançar, esquerda ao voltar). Mutação direta no DOM,
   // sem reatividade: só transform, custo de compositor.
+  // Rolagem lateral do gabarito (compositor; comportada em PC fraco).
+  function scrollAkGrid(dir: number): void {
+    indexGridEl?.scrollBy({ left: dir * 240, behavior: 'smooth' });
+  }
+
   function moveAkCursor(): void {
     const grid = indexGridEl;
     const cursor = akCursorEl;
@@ -317,20 +325,29 @@
           </label>
         </div>
         <div class="question-index">
-          <div class="index-header"><span class="index-title">ÍNDICE DE QUESTÕES</span><span class="index-count">{question.number}/{total}</span></div>
-          <div bind:this={indexGridEl} class="index-grid answer-key-grid">
+          <div class="index-header">
+            <span class="index-title">ÍNDICE DE QUESTÕES</span>
+            <span class="ak-scroll">
+              <button aria-label="Rolar gabarito para a esquerda" onclick={() => scrollAkGrid(-1)}>‹</button>
+              <button aria-label="Rolar gabarito para a direita" onclick={() => scrollAkGrid(1)}>›</button>
+            </span>
+            <span class="index-count">{question.number}/{total}</span>
+          </div>
+          <div bind:this={indexGridEl} class="index-grid answer-key-grid" style:grid-template-columns={`28px repeat(${total}, 22px)`}>
             <span bind:this={akCursorEl} class="ak-cursor" aria-hidden="true"></span>
-            <div class="answer-key-corner">RESPOSTA</div>
+            <div class="answer-key-corner" style:grid-row="1" style:grid-column="1">RESPOSTA</div>
             {#each questions as q, i (q.id)}
               <button
                 class="answer-key-number"
                 class:active={i === currentIdx}
+                style:grid-row="1"
+                style:grid-column={i + 2}
                 aria-label={`Ir para questão ${q.number}`}
                 onclick={() => selectQuestion(i)}
               >{q.number}</button>
             {/each}
-            {#each ['A', 'B', 'C', 'D', 'E'] as label}
-              <div class="answer-key-label">{label}</div>
+            {#each altLabels as label, ri}
+              <div class="answer-key-label" style:grid-row={ri + 2} style:grid-column="1">{label}</div>
               {#each questions as q, i (q.id)}
                 {@const r = results[q.id]}
                 <button
@@ -339,6 +356,8 @@
                   class:answer-correct={answers[q.id] === label && r === 'correct'}
                   class:answer-wrong={answers[q.id] === label && r === 'wrong'}
                   class:active={i === currentIdx}
+                  style:grid-row={ri + 2}
+                  style:grid-column={i + 2}
                   aria-label={`Questão ${q.number}, alternativa ${label}`}
                   onclick={() => selectQuestion(i)}
                 >{label}</button>
