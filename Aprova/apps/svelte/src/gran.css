@@ -1040,8 +1040,8 @@
 #root.view-solve .answer-key-grid {
   display: grid;
   position: relative;
-  grid-template-columns: 28px repeat(40, 22px);
-  grid-auto-rows: 22px;
+  grid-template-columns: repeat(40, 34px);
+  grid-auto-rows: 30px;
   gap: 1px;
   max-height: none;
   overflow-x: auto;
@@ -1079,8 +1079,6 @@
   font-size: 13px;
 }
 #root.view-solve .ak-scroll button:hover { border-color: #4f46e5; color: #4f46e5; }
-#root.view-solve .answer-key-corner,
-#root.view-solve .answer-key-label,
 #root.view-solve .answer-key-number,
 #root.view-solve .answer-key-cell {
   display: grid;
@@ -1088,33 +1086,32 @@
   min-width: 0;
   min-height: 0;
   padding: 0;
-  border: 0;
-  border-radius: 2px;
+  border: 1px solid #D9DCE1;
+  border-radius: 0;
   font-family: var(--font-functional);
-  font-size: 10px;
+  font-size: 12px;
+  font-weight: 600;
   line-height: 1;
+}
+#root.view-solve .answer-key-number {
+  background: #6B7280;
+  color: #fff;
+  cursor: pointer;
+}
+#root.view-solve .answer-key-cell {
+  background: #fff;
+  color: #374151;
+  cursor: pointer;
 }
 #root.view-solve .answer-key-corner,
 #root.view-solve .answer-key-label {
   color: var(--mishu-muted, #909098);
   font-weight: 600;
 }
-#root.view-solve .answer-key-number {
-  background: #E8EAED;
-  color: #6C7480;
-  cursor: pointer;
-  font-weight: 600;
-}
 #root.view-solve .answer-key-number.active {
-  background: #DFE4FA;
-  color: #3730A3;
+  background: #4F46E5;
+  color: #fff;
 }
-#root.view-solve .answer-key-cell {
-  position: relative;
-  background: #F1F2F4;
-  cursor: pointer;
-}
-#root.view-solve .answer-key-cell:hover { background: #E3E7FB; }
 #root.view-solve .answer-key-cell.active { box-shadow: inset 0 0 0 1px #AEB7D9; }
 #root.view-solve .answer-key-cell.selected { background: #C9D1F7; }
 #root.view-solve .answer-key-cell.selected::after {

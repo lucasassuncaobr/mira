@@ -333,21 +333,19 @@
             </span>
             <span class="index-count">{question.number}/{total}</span>
           </div>
-          <div bind:this={indexGridEl} class="index-grid answer-key-grid" style:grid-template-columns={`28px repeat(${total}, 22px)`}>
+          <div bind:this={indexGridEl} class="index-grid answer-key-grid" style:grid-template-columns={`repeat(${total}, 34px)`}>
             <span bind:this={akCursorEl} class="ak-cursor" aria-hidden="true"></span>
-            <div class="answer-key-corner" style:grid-row="1" style:grid-column="1">RESPOSTA</div>
             {#each questions as q, i (q.id)}
               <button
                 class="answer-key-number"
                 class:active={i === currentIdx}
                 style:grid-row="1"
-                style:grid-column={i + 2}
+                style:grid-column={i + 1}
                 aria-label={`Ir para questão ${q.number}`}
                 onclick={() => selectQuestion(i)}
               >{q.number}</button>
             {/each}
             {#each altLabels as label, ri}
-              <div class="answer-key-label" style:grid-row={ri + 2} style:grid-column="1">{label}</div>
               {#each questions as q, i (q.id)}
                 {@const r = results[q.id]}
                 <button
@@ -357,7 +355,7 @@
                   class:answer-wrong={answers[q.id] === label && r === 'wrong'}
                   class:active={i === currentIdx}
                   style:grid-row={ri + 2}
-                  style:grid-column={i + 2}
+                  style:grid-column={i + 1}
                   aria-label={`Questão ${q.number}, alternativa ${label}`}
                   onclick={() => selectQuestion(i)}
                 >{label}</button>
