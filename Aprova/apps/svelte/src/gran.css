@@ -1190,3 +1190,360 @@
 #root.view-solve.night .answer-key-cell.selected { background: #756A9F; color: #FFFFFF; }
 #root.view-solve.night .answer-key-cell.answer-correct { background: #4B7257; color: #FFFFFF; }
 #root.view-solve.night .answer-key-cell.answer-wrong { background: #754B49; color: #FFFFFF; }
+
+/* Modernização final: mesma linguagem visual do projeto, sem cinza pesado. */
+#root.view-solve .answer-key-grid {
+  gap: 2px;
+  padding: 2px 0 5px;
+  border: 0;
+  background: transparent;
+  scrollbar-width: none;
+}
+#root.view-solve .answer-key-grid::-webkit-scrollbar { display: none; width: 0; height: 0; }
+#root.view-solve .ak-cursor {
+  top: 2px;
+  bottom: 5px;
+  background: rgba(79, 70, 229, .06);
+  border-left: 2px solid #818CF8;
+  border-right: 2px solid rgba(129, 140, 248, .20);
+}
+#root.view-solve .answer-key-number,
+#root.view-solve .answer-key-cell {
+  border: 1px solid #E3E6EC;
+  border-radius: 4px;
+  font-family: var(--font-functional);
+  font-weight: 600;
+}
+#root.view-solve .answer-key-number {
+  background: #F1F3F6;
+  color: #697180;
+}
+#root.view-solve .answer-key-number:hover,
+#root.view-solve .answer-key-number.active {
+  background: #E8E9FF;
+  border-color: #C7C9F5;
+  color: #4F46E5;
+}
+#root.view-solve .answer-key-cell {
+  background: #FFFFFF;
+  color: #6B7280;
+}
+#root.view-solve .answer-key-cell:hover { background: #F5F6FF; border-color: #C7C9F5; }
+#root.view-solve .answer-key-cell.active { box-shadow: inset 0 0 0 1px #A5B4FC; }
+#root.view-solve .answer-key-cell.selected { background: #E8E9FF; border-color: #A5B4FC; color: #4F46E5; }
+#root.view-solve .answer-key-cell.answer-correct { background: #E7F3EA; border-color: #B7D8BE; color: #357A4B; }
+#root.view-solve .answer-key-cell.answer-wrong { background: #F8EAE7; border-color: #E6C2BC; color: #A34A3E; }
+#root.view-solve.night .ak-cursor {
+  background: rgba(162, 154, 200, .08);
+  border-left-color: #8E86B8;
+  border-right-color: rgba(142, 134, 184, .18);
+}
+#root.view-solve.night .answer-key-number,
+#root.view-solve.night .answer-key-cell {
+  border-color: #252832;
+}
+#root.view-solve.night .answer-key-number {
+  background: #171A21;
+  color: #858995;
+}
+#root.view-solve.night .answer-key-number:hover,
+#root.view-solve.night .answer-key-number.active {
+  background: #29263B;
+  border-color: #514C68;
+  color: #B8B0D8;
+}
+#root.view-solve.night .answer-key-cell {
+  background: #101116;
+  color: #858995;
+}
+#root.view-solve.night .answer-key-cell:hover { background: #1A1C24; border-color: #514C68; }
+#root.view-solve.night .answer-key-cell.active { box-shadow: inset 0 0 0 1px #514C68; }
+
+/* A seleção não usa barra de carregamento nem brilho estrutural. */
+#root.view-solve .ak-cursor { display: none !important; }
+#root.view-solve .answer-key-cell.active,
+#root.view-solve.night .answer-key-cell.active { box-shadow: none !important; }
+#root.view-solve.night .answer-key-cell.selected { background: #29263B; border-color: #756A9F; color: #B8B0D8; }
+#root.view-solve.night .answer-key-cell.answer-correct { background: #24352A; border-color: #45684E; color: #A8C3AE; }
+#root.view-solve.night .answer-key-cell.answer-wrong { background: #382727; border-color: #684545; color: #C5A5A0; }
+
+/* Corrige a geometria: os botões ocupam integralmente cada célula da matriz. */
+#root.view-solve .answer-key-grid {
+  grid-template-columns: repeat(40, 20px) !important;
+  grid-template-rows: repeat(6, 22px) !important;
+  grid-auto-rows: unset !important;
+  gap: 1px !important;
+  align-items: stretch;
+  justify-items: stretch;
+}
+#root.view-solve .answer-key-number,
+#root.view-solve .answer-key-cell {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 20px !important;
+  min-height: 18px !important;
+  box-sizing: border-box;
+  margin: 0;
+  align-self: stretch;
+  justify-self: stretch;
+}
+#root.view-solve .ak-cursor {
+  width: 20px !important;
+  pointer-events: none;
+}
+
+/* Gabarito sólido e suave, sem brilho, gradiente ou transparência. */
+#root.view-solve .answer-key-grid { background: transparent !important; }
+#root.view-solve .answer-key-number,
+#root.view-solve .answer-key-cell {
+  box-shadow: none !important;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+#root.view-solve .answer-key-number {
+  background: #E9EBEF !important;
+  border-color: #DDE1E7 !important;
+  color: #697180 !important;
+}
+#root.view-solve .answer-key-number:hover,
+#root.view-solve .answer-key-number.active {
+  background: #DDD9EC !important;
+  border-color: #C9C3DF !important;
+  color: #5D547E !important;
+}
+#root.view-solve .answer-key-cell {
+  background: #F7F8FA !important;
+  border-color: #E1E4E9 !important;
+  color: #747B87 !important;
+}
+#root.view-solve .answer-key-cell:hover { background: #F0F1F5 !important; border-color: #D5D9E1 !important; }
+#root.view-solve .answer-key-cell.selected { background: #DDD9EC !important; border-color: #C9C3DF !important; color: #5D547E !important; }
+#root.view-solve .answer-key-cell.answer-correct { background: #DCEBDD !important; border-color: #C2D9C6 !important; color: #477353 !important; }
+#root.view-solve .answer-key-cell.answer-wrong { background: #F1DEDA !important; border-color: #E2C5BF !important; color: #945D57 !important; }
+#root.view-solve.night .answer-key-number {
+  background: #25272E !important;
+  border-color: #30333C !important;
+  color: #8B8E99 !important;
+}
+#root.view-solve.night .answer-key-number:hover,
+#root.view-solve.night .answer-key-number.active {
+  background: #39354B !important;
+  border-color: #4C4662 !important;
+  color: #B8B0D8 !important;
+}
+#root.view-solve.night .answer-key-cell {
+  background: #18191E !important;
+  border-color: #292C34 !important;
+  color: #858995 !important;
+}
+#root.view-solve.night .answer-key-cell:hover { background: #202229 !important; border-color: #373B47 !important; }
+#root.view-solve.night .answer-key-cell.selected { background: #39354B !important; border-color: #4C4662 !important; color: #B8B0D8 !important; }
+#root.view-solve.night .answer-key-cell.answer-correct { background: #2B4031 !important; border-color: #3F5D46 !important; color: #A8C3AE !important; }
+#root.view-solve.night .answer-key-cell.answer-wrong { background: #3D2D2D !important; border-color: #5D4141 !important; color: #C5A5A0 !important; }
+
+/* Tipografia secundária para não competir com a leitura da prova. */
+#root.view-solve .answer-key-number { font-size: 9px !important; }
+#root.view-solve .answer-key-cell { font-size: 10px !important; }
+
+/* Reutiliza exatamente a família cromática do índice anterior. */
+#root.view-solve .answer-key-number {
+  background: #E8EAED !important;
+  color: #8A8F98 !important;
+  border-color: #D9DCE1 !important;
+}
+#root.view-solve .answer-key-number:hover,
+#root.view-solve .answer-key-number.active {
+  background: #DFE4FA !important;
+  color: #3730A3 !important;
+  border-color: #C8D0F3 !important;
+}
+#root.view-solve .answer-key-cell {
+  background: #F1F2F4 !important;
+  color: #6C7480 !important;
+  border-color: #E0E2E6 !important;
+}
+#root.view-solve .answer-key-cell:hover,
+#root.view-solve .answer-key-cell.selected {
+  background: #DFE4FA !important;
+  color: #3730A3 !important;
+  border-color: #C8D0F3 !important;
+}
+#root.view-solve .answer-key-cell.answer-correct {
+  background: #E2EFE6 !important;
+  color: #357A4B !important;
+  border-color: #C5DDCC !important;
+}
+#root.view-solve .answer-key-cell.answer-wrong {
+  background: #F6E7E1 !important;
+  color: #A34A3E !important;
+  border-color: #E8CFC7 !important;
+}
+#root.view-solve.night .answer-key-number {
+  background: #171A21 !important;
+  color: var(--mishu-muted) !important;
+  border-color: transparent !important;
+}
+#root.view-solve.night .answer-key-number:hover,
+#root.view-solve.night .answer-key-number.active {
+  background: var(--mishu-selection) !important;
+  color: var(--mishu-accent-soft) !important;
+  border-color: transparent !important;
+}
+#root.view-solve.night .answer-key-cell {
+  background: #171A21 !important;
+  color: var(--mishu-muted) !important;
+  border-color: transparent !important;
+}
+#root.view-solve.night .answer-key-cell:hover,
+#root.view-solve.night .answer-key-cell.selected {
+  background: #242235 !important;
+  color: var(--mishu-accent-soft) !important;
+  border-color: transparent !important;
+}
+#root.view-solve.night .answer-key-cell.answer-correct {
+  background: rgba(61, 91, 70, .28) !important;
+  color: #A8C3AE !important;
+  border-color: transparent !important;
+}
+#root.view-solve.night .answer-key-cell.answer-wrong {
+  background: rgba(99, 66, 63, .28) !important;
+  color: #C5A5A0 !important;
+  border-color: transparent !important;
+}
+
+/* Letras ocultas até a alternativa ser marcada. */
+#root.view-solve .answer-key-cell {
+  color: transparent !important;
+}
+#root.view-solve .answer-key-cell.selected,
+#root.view-solve .answer-key-cell.answer-correct,
+#root.view-solve .answer-key-cell.answer-wrong {
+  color: inherit !important;
+}
+#root.view-solve:not(.night) .answer-key-cell.selected { color: #3730A3 !important; }
+#root.view-solve:not(.night) .answer-key-cell.answer-correct { color: #357A4B !important; }
+#root.view-solve:not(.night) .answer-key-cell.answer-wrong { color: #A34A3E !important; }
+#root.view-solve.night .answer-key-cell.selected { color: var(--mishu-accent-soft) !important; }
+#root.view-solve.night .answer-key-cell.answer-correct { color: #A8C3AE !important; }
+#root.view-solve.night .answer-key-cell.answer-wrong { color: #C5A5A0 !important; }
+
+
+/* Mecânica de células cobertas/reveladas, inspirada em campo minado. */
+#root.view-solve .answer-key-cell.covered {
+  background: #E8EAED !important;
+  border-color: #D9DCE1 !important;
+  color: transparent !important;
+}
+#root.view-solve .answer-key-cell.covered:hover {
+  background: #DFE4FA !important;
+  border-color: #C8D0F3 !important;
+}
+#root.view-solve.night .answer-key-cell.covered {
+  background: #171A21 !important;
+  border-color: transparent !important;
+  color: transparent !important;
+}
+
+/* Paleta neutra de cinzas para integrar o gabarito ao projeto. */
+#root.view-solve .answer-key-number,
+#root.view-solve .answer-key-cell {
+  border-color: #D9DDE3 !important;
+}
+#root.view-solve .answer-key-number {
+  background: #E5E7EB !important;
+  color: #68707C !important;
+}
+#root.view-solve .answer-key-number:hover,
+#root.view-solve .answer-key-number.active,
+#root.view-solve .answer-key-cell:hover,
+#root.view-solve .answer-key-cell.selected {
+  background: #D3D6DC !important;
+  border-color: #B9BEC7 !important;
+  color: #3F4650 !important;
+}
+#root.view-solve .answer-key-cell {
+  background: #F3F4F6 !important;
+  color: transparent !important;
+}
+#root.view-solve .answer-key-cell.answer-correct,
+#root.view-solve .answer-key-cell.answer-wrong {
+  background: #D9DCE1 !important;
+  border-color: #BFC4CC !important;
+  color: #3F4650 !important;
+}
+#root.view-solve.night .answer-key-number,
+#root.view-solve.night .answer-key-cell {
+  border-color: #292C34 !important;
+}
+#root.view-solve.night .answer-key-number {
+  background: #24262D !important;
+  color: #858995 !important;
+}
+#root.view-solve.night .answer-key-number:hover,
+#root.view-solve.night .answer-key-number.active,
+#root.view-solve.night .answer-key-cell:hover,
+#root.view-solve.night .answer-key-cell.selected {
+  background: #353840 !important;
+  border-color: #4B4F59 !important;
+  color: #D0D2D8 !important;
+}
+#root.view-solve.night .answer-key-cell {
+  background: #17191F !important;
+  color: transparent !important;
+}
+#root.view-solve.night .answer-key-cell.answer-correct,
+#root.view-solve.night .answer-key-cell.answer-wrong {
+  background: #353840 !important;
+  border-color: #4B4F59 !important;
+  color: #D0D2D8 !important;
+}
+
+/* Células integradas ao fundo do próprio índice. */
+#root.view-solve .answer-key-cell,
+#root.view-solve .answer-key-cell.covered {
+  background: #FAFAFB !important;
+  border-color: #E5E7EB !important;
+}
+#root.view-solve.night .answer-key-cell,
+#root.view-solve.night .answer-key-cell.covered {
+  background: #0E0E12 !important;
+  border-color: #1A1A20 !important;
+}
+#root.view-solve .answer-key-cell.selected { background: #D3D6DC !important; }
+#root.view-solve .answer-key-cell.answer-correct,
+#root.view-solve .answer-key-cell.answer-wrong { background: #D9DCE1 !important; }
+#root.view-solve.night .answer-key-cell.selected { background: #353840 !important; }
+#root.view-solve.night .answer-key-cell.answer-correct,
+#root.view-solve.night .answer-key-cell.answer-wrong { background: #353840 !important; }
+
+/* Hover não revela a alternativa; somente uma resposta marcada pode exibir letra. */
+#root.view-solve .answer-key-cell.covered:hover,
+#root.view-solve.night .answer-key-cell.covered:hover {
+  color: transparent !important;
+}
+
+/* Retorno à paleta cinza anterior do gabarito. */
+#root.view-solve .answer-key-cell,
+#root.view-solve .answer-key-cell.covered {
+  background: #F3F4F6 !important;
+  border-color: #D9DDE3 !important;
+}
+#root.view-solve .answer-key-cell.selected { background: #D3D6DC !important; }
+#root.view-solve .answer-key-cell.answer-correct,
+#root.view-solve .answer-key-cell.answer-wrong { background: #D9DCE1 !important; }
+#root.view-solve.night .answer-key-cell,
+#root.view-solve.night .answer-key-cell.covered {
+  background: #17191F !important;
+  border-color: #292C34 !important;
+}
+#root.view-solve.night .answer-key-cell.selected { background: #353840 !important; }
+#root.view-solve.night .answer-key-cell.answer-correct,
+#root.view-solve.night .answer-key-cell.answer-wrong { background: #353840 !important; }
+#root.view-solve.night .answer-key-cell.covered:hover {
+  background: #242235 !important;
+  border-color: transparent !important;
+}
+#root.view-solve .answer-key-cell.selected,
+#root.view-solve .answer-key-cell.answer-correct,
+#root.view-solve .answer-key-cell.answer-wrong {
+  transform: none;
+}

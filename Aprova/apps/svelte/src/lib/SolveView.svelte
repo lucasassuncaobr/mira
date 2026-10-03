@@ -327,14 +327,9 @@
         <div class="question-index">
           <div class="index-header">
             <span class="index-title">ÍNDICE DE QUESTÕES</span>
-            <span class="ak-scroll">
-              <button aria-label="Rolar gabarito para a esquerda" onclick={() => scrollAkGrid(-1)}>‹</button>
-              <button aria-label="Rolar gabarito para a direita" onclick={() => scrollAkGrid(1)}>›</button>
-            </span>
             <span class="index-count">{question.number}/{total}</span>
           </div>
-          <div bind:this={indexGridEl} class="index-grid answer-key-grid" style:grid-template-columns={`repeat(${total}, 34px)`}>
-            <span bind:this={akCursorEl} class="ak-cursor" aria-hidden="true"></span>
+          <div bind:this={indexGridEl} class="index-grid answer-key-grid" style:grid-template-columns={`repeat(${total}, 20px)`}>
             {#each questions as q, i (q.id)}
               <button
                 class="answer-key-number"
@@ -350,6 +345,7 @@
                 {@const r = results[q.id]}
                 <button
                   class="answer-key-cell"
+                  class:covered={answers[q.id] !== label}
                   class:selected={answers[q.id] === label}
                   class:answer-correct={answers[q.id] === label && r === 'correct'}
                   class:answer-wrong={answers[q.id] === label && r === 'wrong'}
@@ -378,7 +374,7 @@
                 {#if feedback && isMarked && !isCorrect}
                   <span class="marked-flag">Sua resposta</span>
                 {/if}
-                <div class={optionClass(alt.label)} class:eliminated={isEliminated(question.id, alt.label)} data-label={alt.label} onclick={() => selectAnswer(alt.label)}>
+                <div class={optionClass(alt.label)} class:eliminated={!feedback && isEliminated(question.id, alt.label)} data-label={alt.label} onclick={() => selectAnswer(alt.label)}>
                   {#if !feedback}
                     <button class="scissor-btn" class:on={isEliminated(question.id, alt.label)} class:scissor-hidden={selected === alt.label} title="Riscar alternativa" aria-label={'Riscar alternativa ' + alt.label} aria-pressed={isEliminated(question.id, alt.label)} onclick={(e) => toggleEliminate(e, question.id, alt.label, question.alternatives.length)}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 8.5 20 20M8.5 15.5 20 4"/></svg>
