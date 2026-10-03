@@ -1184,9 +1184,9 @@
 #root.view-solve .answer-key-cell.answer-wrong { background: #A96B65; color: #FFFFFF; }
 #root.view-solve .answer-key-cell.active { box-shadow: inset 0 0 0 2px #756A9F; }
 #root.view-solve.night .answer-key-corner,
-#root.view-solve.night .answer-key-number { background: #45464B; color: #F0F0F2; }
+#root.view-solve.night .answer-key-number { background: #252525; color: #F0F0F2; }
 #root.view-solve.night .answer-key-label,
-#root.view-solve.night .answer-key-cell { background: #17181C; color: #D8D8DE; }
+#root.view-solve.night .answer-key-cell { background: #252525; color: #D8D8DE; }
 #root.view-solve.night .answer-key-cell.selected { background: #756A9F; color: #FFFFFF; }
 #root.view-solve.night .answer-key-cell.answer-correct { background: #4B7257; color: #FFFFFF; }
 #root.view-solve.night .answer-key-cell.answer-wrong { background: #754B49; color: #FFFFFF; }
@@ -1546,4 +1546,11 @@
 #root.view-solve .answer-key-cell.answer-correct,
 #root.view-solve .answer-key-cell.answer-wrong {
   transform: none;
+}
+
+/* Gabarito noturno = cor das questões (#252525). Bloco final: vence as
+   camadas anteriores; estados (selected/correct/wrong/active) intactos. */
+#root.view-solve.night .answer-key-number:not(.active),
+#root.view-solve.night .answer-key-cell:not(.selected):not(.answer-correct):not(.answer-wrong) {
+  background: #252525 !important;
 }
