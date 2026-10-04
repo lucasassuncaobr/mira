@@ -150,8 +150,8 @@
     if (!grid || !cursor) return;
     const active = grid.querySelector('.answer-key-number.active') as HTMLElement | null;
     if (!active) return;
-    cursor.style.width = `${active.offsetWidth}px`;
-    cursor.style.transform = `translateX(${active.offsetLeft}px)`;
+    grid.style.setProperty('--ak-w', `${active.offsetWidth}px`);
+    grid.style.setProperty('--ak-x', `${active.offsetLeft}px`);
   }
 
   function reloadPage(): void {
@@ -329,7 +329,7 @@
             <span class="index-title">ÍNDICE DE QUESTÕES</span>
             <span class="index-count">{question.number}/{total}</span>
           </div>
-          <div bind:this={indexGridEl} class="index-grid answer-key-grid" style:grid-template-columns={`repeat(${total}, 20px)`}>
+          <div bind:this={indexGridEl} class="index-grid answer-key-grid" style:--ak-cols={total}>
             {#each questions as q, i (q.id)}
               <button
                 class="answer-key-number"

@@ -1040,7 +1040,7 @@
 #root.view-solve .answer-key-grid {
   display: grid;
   position: relative;
-  grid-template-columns: repeat(40, 34px);
+  grid-template-columns: repeat(var(--ak-cols, 40), 20px) !important;
   grid-auto-rows: 30px;
   gap: 1px;
   max-height: none;
@@ -1056,7 +1056,8 @@
   top: 0;
   bottom: 0;
   left: 0;
-  width: 22px;
+  width: var(--ak-w, 22px);
+  transform: translateX(var(--ak-x, 0px));
   background: rgba(79, 70, 229, .10);
   border-left: 2px solid #4f46e5;
   pointer-events: none;
