@@ -1553,4 +1553,5 @@
 #root.view-solve.night .answer-key-number:not(.active),
 #root.view-solve.night .answer-key-cell:not(.selected):not(.answer-correct):not(.answer-wrong) {
   background: #252525 !important;
+  color: #9B9B9B !important;
 }
