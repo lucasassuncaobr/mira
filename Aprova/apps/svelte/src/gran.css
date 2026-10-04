@@ -1569,5 +1569,5 @@
 #root.view-solve.night .answer-key-cell.answer-correct,
 #root.view-solve.night .answer-key-cell.answer-wrong { border: 0 !important; }
 
-/* Números do índice no noturno em #242235. */
-#root.view-solve.night .answer-key-number:not(.active) { background: #242235 !important; }
+/* Célula selecionada do gabarito noturno em #242235. */
+#root.view-solve.night .answer-key-cell.selected { background: #242235 !important; }
