@@ -367,12 +367,13 @@
             {#each question.alternatives as alt (alt.label)}
               {@const isMarked = selected === alt.label}
               {@const isCorrect = !!feedback && !feedback.unknown && feedback.correctAnswer === alt.label}
-              {#if feedback && isCorrect}
-                <span class="correct-flag">Resposta correta</span>
-              {/if}
-              {#if feedback && isMarked}
-                <span class="marked-flag">Sua resposta</span>
-              {/if}
+              {#if !feedback || isMarked || isCorrect}
+                {#if feedback && isCorrect}
+                  <span class="correct-flag">Resposta correta</span>
+                {/if}
+                {#if feedback && isMarked}
+                  <span class="marked-flag">Sua resposta</span>
+                {/if}
               <div class={optionClass(alt.label)} class:eliminated={!feedback && isEliminated(question.id, alt.label)} data-label={alt.label} onclick={() => selectAnswer(alt.label)}>
                 {#if !feedback}
                   <button class="scissor-btn" class:on={isEliminated(question.id, alt.label)} class:scissor-hidden={selected === alt.label} title="Riscar alternativa" aria-label={'Riscar alternativa ' + alt.label} aria-pressed={isEliminated(question.id, alt.label)} onclick={(e) => toggleEliminate(e, question.id, alt.label, question.alternatives.length)}>
@@ -386,6 +387,7 @@
                   <div class="option-text texto-questao">{alt.text}</div>
                 {/if}
               </div>
+              {/if}
             {/each}
           </div>
         </div>
