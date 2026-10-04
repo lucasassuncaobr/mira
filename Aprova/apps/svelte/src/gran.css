@@ -1585,3 +1585,7 @@
 /* Selecionada: fundo #141418 + letra #242235. */
 #root.view-solve .answer-key-cell.selected { background: #141418 !important; }
 #root.view-solve.night .answer-key-cell.selected { background: #141418 !important; }
+
+/* Selecionada: fundo #242235 + letra #141418. */
+#root.view-solve .answer-key-cell.selected { background: #242235 !important; color: #141418 !important; }
+#root.view-solve.night .answer-key-cell.selected { background: #242235 !important; color: #141418 !important; }
