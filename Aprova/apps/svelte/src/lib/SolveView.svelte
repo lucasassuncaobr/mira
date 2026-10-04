@@ -338,7 +338,7 @@
                 style:grid-column={i + 1}
                 aria-label={`Ir para questão ${q.number}`}
                 onclick={() => selectQuestion(i)}
-              >{q.number}</button>
+              >{String(q.number).padStart(2, '0')}</button>
             {/each}
             {#each altLabels as label, ri}
               {#each questions as q, i (q.id)}
