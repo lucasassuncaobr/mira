@@ -33,7 +33,6 @@
   let focusMap = $state<Record<string, FocusEntry> | null>(null);
 
   let indexGridEl = $state<HTMLElement | null>(null);
-  let akCursorEl = $state<HTMLElement | null>(null);
   let pageRefComp = $state<PageReference | null>(null);
   let clockText = $state('00:00:00');
   let paused = $state(false);
@@ -51,9 +50,6 @@
   );
   let question = $derived<Question | undefined>(questions[currentIdx]);
   let total = $derived(questions.length);
-  // Rótulos vindos das alternativas reais (A-D, A-E…): sem limite fixo,
-  // o gabarito cresce para a direita conforme a prova.
-  let altLabels = $derived([...new Set(questions.flatMap((q) => q.alternatives.map((a) => a.label)))]);
   let selected = $derived(question ? (answers[question.id] ?? null) : null);
   let allAnswered = $derived(questions.every((q) => answers[q.id]));
   let answeredCount = $derived(questions.filter((q) => answers[q.id]).length);
@@ -111,12 +107,9 @@
     if (!first) {
       const grid = indexGridEl;
       void tick().then(() => {
-        const active = grid?.querySelector('.answer-key-number.active');
+        const active = grid?.querySelector('.index-btn.active');
         if (active) (active as HTMLElement).scrollIntoView({ block: 'nearest', inline: 'nearest' });
-        moveAkCursor();
       });
-    } else {
-      void tick().then(() => moveAkCursor());
     }
     reloadPage();
   });
@@ -134,24 +127,6 @@
       pauseBegin = performance.now();
       paused = true;
     }
-  }
-
-  // Cursor do gabarito: faixa vertical que desliza para a coluna ativa
-  // (direita ao avançar, esquerda ao voltar). Mutação direta no DOM,
-  // sem reatividade: só transform, custo de compositor.
-  // Rolagem lateral do gabarito (compositor; comportada em PC fraco).
-  function scrollAkGrid(dir: number): void {
-    indexGridEl?.scrollBy({ left: dir * 240, behavior: 'smooth' });
-  }
-
-  function moveAkCursor(): void {
-    const grid = indexGridEl;
-    const cursor = akCursorEl;
-    if (!grid || !cursor) return;
-    const active = grid.querySelector('.answer-key-number.active') as HTMLElement | null;
-    if (!active) return;
-    grid.style.setProperty('--ak-w', `${active.offsetWidth}px`);
-    grid.style.setProperty('--ak-x', `${active.offsetLeft}px`);
   }
 
   function reloadPage(): void {
@@ -329,33 +304,16 @@
             <span class="index-title">ÍNDICE DE QUESTÕES</span>
             <span class="index-count">{question.number}/{total}</span>
           </div>
-          <div bind:this={indexGridEl} class="index-grid answer-key-grid" style:--ak-cols={total}>
+          <div bind:this={indexGridEl} class="index-grid">
             {#each questions as q, i (q.id)}
+              {@const r = results[q.id]}
               <button
-                class="answer-key-number"
+                class="index-btn"
                 class:active={i === currentIdx}
-                style:grid-row="1"
-                style:grid-column={i + 1}
-                aria-label={`Ir para questão ${q.number}`}
+                class:correct-answer={r === 'correct'}
+                class:wrong-answer={r === 'wrong'}
                 onclick={() => selectQuestion(i)}
               >{String(q.number).padStart(2, '0')}</button>
-            {/each}
-            {#each altLabels as label, ri}
-              {#each questions as q, i (q.id)}
-                {@const r = results[q.id]}
-                <button
-                  class="answer-key-cell"
-                  class:covered={answers[q.id] !== label}
-                  class:selected={answers[q.id] === label}
-                  class:answer-correct={answers[q.id] === label && r === 'correct'}
-                  class:answer-wrong={answers[q.id] === label && r === 'wrong'}
-                  class:active={i === currentIdx}
-                  style:grid-row={ri + 2}
-                  style:grid-column={i + 1}
-                  aria-label={`Questão ${q.number}, alternativa ${label}`}
-                  onclick={() => selectQuestion(i)}
-                >{label}</button>
-              {/each}
             {/each}
           </div>
         </div>
