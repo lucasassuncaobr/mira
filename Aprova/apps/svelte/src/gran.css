@@ -1569,8 +1569,8 @@
 #root.view-solve.night .answer-key-cell.answer-correct,
 #root.view-solve.night .answer-key-cell.answer-wrong { border: 0 !important; }
 
-/* Número atual/selecionado do gabarito noturno em #242235; demais mantêm o padrão. */
-#root.view-solve.night .answer-key-number.active { background: #242235 !important; }
+/* Número atual do gabarito noturno: tom próximo ao atual, escurecido. */
+#root.view-solve.night .answer-key-number.active { background: #1B1B29 !important; }
 
 
 /* Número selecionado/atual do gabarito sem borda. */
