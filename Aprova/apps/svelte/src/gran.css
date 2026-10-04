@@ -1066,6 +1066,12 @@
   background: rgba(165, 180, 252, .16);
   border-left-color: #A5B4FC;
 }
+/* Contraste WCAG no índice (claro): títulos e contadores em slate-600. */
+#root.view-solve .index-title, #root.view-solve .index-count { color: #475569 !important; }
+/* Letras do gabarito maiores e centralizadas. */
+#root.view-solve .answer-key-cell { font-size: 13px !important; font-weight: 700; }
+/* Respiro horizontal nas alternativas (texto não encosta na borda). */
+#root.view-solve .option { padding-left: 20px !important; padding-right: 20px !important; }
 /* Setas de rolagem lateral do gabarito. */
 #root.view-solve .ak-scroll { display: inline-flex; gap: 4px; margin-left: auto; }
 #root.view-solve .ak-scroll button {
