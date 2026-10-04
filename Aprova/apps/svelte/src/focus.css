@@ -64,9 +64,9 @@
     will-change: auto;
     pointer-events: none;
     background: #F5F5F5;
-    /* Camufla a marca d'água queimada no JPEG: cinzas claros somem
-       antes do preto do texto (filtro estático único, sem animação). */
-    filter: contrast(1.06);
+    /* Marca d'água: contraste absurdo empurra os cinzas para o branco e
+       o brilho compensa; o preto do texto sobrevive (estático, sem animação). */
+    filter: contrast(1.5) brightness(1.03);
 }
 
 /* CLASSE EXCLUSIVA PARA O ENUNCIADO — inline, quebra orgânica linha a linha */
