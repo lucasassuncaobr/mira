@@ -1560,3 +1560,11 @@
 #root.view-solve .answer-key-cell.answer-wrong { background: #FAEEE9 !important; border-color: #D9A89D !important; color: #A34A3E !important; }
 #root.view-solve.night .answer-key-cell.answer-correct { background: rgba(61, 91, 70, .28) !important; border-color: #3D5B46 !important; color: #A8C3AE !important; }
 #root.view-solve.night .answer-key-cell.answer-wrong { background: rgba(99, 66, 63, .28) !important; border-color: #63423F !important; color: #C5A5A0 !important; }
+
+/* Células preenchidas do gabarito sem borda (0px). */
+#root.view-solve .answer-key-cell.selected,
+#root.view-solve .answer-key-cell.answer-correct,
+#root.view-solve .answer-key-cell.answer-wrong,
+#root.view-solve.night .answer-key-cell.selected,
+#root.view-solve.night .answer-key-cell.answer-correct,
+#root.view-solve.night .answer-key-cell.answer-wrong { border: 0 !important; }
