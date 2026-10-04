@@ -1572,5 +1572,3 @@
 /* Número atual/selecionado do gabarito noturno em #242235; demais mantêm o padrão. */
 #root.view-solve.night .answer-key-number.active { background: #242235 !important; }
 
-/* Letra selecionada do gabarito noturno em #242235 (só a fonte). */
-#root.view-solve.night .answer-key-cell.selected { color: #242235 !important; }
