@@ -1577,3 +1577,7 @@
 
 /* Letra selecionada do gabarito no noturno (espelho do claro). */
 #root.view-solve.night .answer-key-cell.selected { color: #242235 !important; }
+
+/* Preenchimento da selecionada volta ao lavanda claro (só a letra é #242235). */
+#root.view-solve .answer-key-cell.selected { background: #C9D1F7 !important; }
+#root.view-solve.night .answer-key-cell.selected { background: #C9D1F7 !important; }
