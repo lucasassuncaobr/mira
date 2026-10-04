@@ -49,19 +49,24 @@
     nextFocus: FocusEntry | undefined,
     title: string,
   ): void {
+    const samePage = src !== null && page === (nextPage ?? 0) && nextExamId === examId;
     examId = nextExamId;
     page = nextPage ?? 0;
     questionNumber = question.number;
     focus = nextFocus;
     examTitle = title || `Questão ${question.number}`;
     focoTentativas = 0;
-    src = null;
     alive = true;
-    fetchPageSrc(nextExamId, page).then(
-      (value) => { if (alive) src = value; },
-      () => { if (alive) src = `${API}/exams/${nextExamId}/pages/${page}`; },
-    );
-    warmPdf(nextExamId);
+    // Mesma página: não recarrega a imagem (evita reset do scroll);
+    // só reposiciona o foco. Página nova: recarrega normalmente.
+    if (!samePage) {
+      src = null;
+      fetchPageSrc(nextExamId, page).then(
+        (value) => { if (alive) src = value; },
+        () => { if (alive) src = `${API}/exams/${nextExamId}/pages/${page}`; },
+      );
+      warmPdf(nextExamId);
+    }
     void tick().then(() => aplicarFoco());
   }
 

@@ -1588,3 +1588,6 @@
 #root.view-solve.night .answer-key-number { color: #A8B0BA !important; }
 #root.view-solve.night .marked-flag { color: #C7C9D1 !important; }
 #root.view-solve.night .correct-flag { color: #B9E2C3 !important; }
+
+/* Letras-base do gabarito noturno sólidas e legíveis (sem transparent). */
+#root.view-solve.night .answer-key-cell:not(.selected):not(.answer-correct):not(.answer-wrong) { color: #8A8F98 !important; }
