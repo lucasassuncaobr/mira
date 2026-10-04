@@ -92,7 +92,6 @@
   right: 0;
   width: auto;
   height: 0;
-  background: linear-gradient(90deg, rgba(224,231,255,0.96) 0%, rgba(224,231,255,0.92) 80%, rgba(224,231,255,0.62) 94%, rgba(224,231,255,0) 100%);
   background-color: rgba(224,231,255,0.92);
   mix-blend-mode: multiply;
   border-left: none;
