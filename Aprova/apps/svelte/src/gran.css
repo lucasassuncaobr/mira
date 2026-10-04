@@ -826,7 +826,7 @@
 #root.view-solve.night .image-viewport { background: #151518 !important; }
 #root.view-solve.night .pagina-pdf::before { display: none !important; }
 #root.view-solve.night .pagina-pdf img {
-  filter: invert(.9) hue-rotate(180deg) saturate(.7) brightness(.82) contrast(1.6) !important;
+  filter: invert(.9) hue-rotate(180deg) saturate(.7) brightness(.82) contrast(.9) !important;
   mix-blend-mode: normal;
   opacity: .94;
 }
