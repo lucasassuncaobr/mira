@@ -1574,3 +1574,6 @@
 
 /* Letra selecionada do gabarito em #242235. */
 #root.view-solve .answer-key-cell.selected { color: #242235 !important; }
+
+/* Letra selecionada do gabarito no noturno (espelho do claro). */
+#root.view-solve.night .answer-key-cell.selected { color: #242235 !important; }
