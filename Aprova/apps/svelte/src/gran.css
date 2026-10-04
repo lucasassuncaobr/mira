@@ -1581,3 +1581,9 @@
 
 /* Número selecionado/atual do gabarito sem borda. */
 #root.view-solve .answer-key-number.active { border: 0 !important; }
+
+/* Contraste noturno no índice: textos em slate-400, feedbacks iluminados. */
+#root.view-solve.night .index-title, #root.view-solve.night .index-count { color: #94A3B8 !important; }
+#root.view-solve.night .answer-key-number { color: #A8B0BA !important; }
+#root.view-solve.night .marked-flag { color: #C7C9D1 !important; }
+#root.view-solve.night .correct-flag { color: #B9E2C3 !important; }
