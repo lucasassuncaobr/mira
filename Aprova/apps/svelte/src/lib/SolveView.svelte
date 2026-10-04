@@ -367,27 +367,25 @@
             {#each question.alternatives as alt (alt.label)}
               {@const isMarked = selected === alt.label}
               {@const isCorrect = !!feedback && !feedback.unknown && feedback.correctAnswer === alt.label}
-              {#if !feedback || isMarked || isCorrect}
-                {#if feedback && isCorrect}
-                  <span class="correct-flag">Resposta correta</span>
-                {/if}
-                {#if feedback && isMarked && !isCorrect}
-                  <span class="marked-flag">Sua resposta</span>
-                {/if}
-                <div class={optionClass(alt.label)} class:eliminated={!feedback && isEliminated(question.id, alt.label)} data-label={alt.label} onclick={() => selectAnswer(alt.label)}>
-                  {#if !feedback}
-                    <button class="scissor-btn" class:on={isEliminated(question.id, alt.label)} class:scissor-hidden={selected === alt.label} title="Riscar alternativa" aria-label={'Riscar alternativa ' + alt.label} aria-pressed={isEliminated(question.id, alt.label)} onclick={(e) => toggleEliminate(e, question.id, alt.label, question.alternatives.length)}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 8.5 20 20M8.5 15.5 20 4"/></svg>
-                    </button>
-                  {/if}
-                  <div class="option-letter">
-                    ({alt.label})
-                  </div>
-                  {#if feedback || isMarked}
-                    <div class="option-text texto-questao">{alt.text}</div>
-                  {/if}
-                </div>
+              {#if feedback && isCorrect}
+                <span class="correct-flag">Resposta correta</span>
               {/if}
+              {#if feedback && isMarked}
+                <span class="marked-flag">Sua resposta</span>
+              {/if}
+              <div class={optionClass(alt.label)} class:eliminated={!feedback && isEliminated(question.id, alt.label)} data-label={alt.label} onclick={() => selectAnswer(alt.label)}>
+                {#if !feedback}
+                  <button class="scissor-btn" class:on={isEliminated(question.id, alt.label)} class:scissor-hidden={selected === alt.label} title="Riscar alternativa" aria-label={'Riscar alternativa ' + alt.label} aria-pressed={isEliminated(question.id, alt.label)} onclick={(e) => toggleEliminate(e, question.id, alt.label, question.alternatives.length)}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 8.5 20 20M8.5 15.5 20 4"/></svg>
+                  </button>
+                {/if}
+                <div class="option-letter">
+                  ({alt.label})
+                </div>
+                {#if feedback || isMarked}
+                  <div class="option-text texto-questao">{alt.text}</div>
+                {/if}
+              </div>
             {/each}
           </div>
         </div>
