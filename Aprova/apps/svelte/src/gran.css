@@ -1573,5 +1573,5 @@
 #root.view-solve.night .answer-key-number.active { background: #242235 !important; }
 
 
-/* Números do gabarito sem borda. */
-#root.view-solve .answer-key-number { border: 0 !important; }
+/* Número selecionado/atual do gabarito sem borda. */
+#root.view-solve .answer-key-number.active { border: 0 !important; }
