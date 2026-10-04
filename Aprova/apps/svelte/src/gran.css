@@ -1591,3 +1591,6 @@
 
 /* Letras-base do gabarito noturno sólidas e legíveis (sem transparent). */
 #root.view-solve.night .answer-key-cell:not(.selected):not(.answer-correct):not(.answer-wrong) { color: #8A8F98 !important; }
+
+/* Respiro abaixo da grade do índice (mb-7): empurra o título da seção. */
+#root.view-solve .question-index { margin-bottom: 28px; }
