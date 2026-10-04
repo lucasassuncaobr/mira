@@ -1554,3 +1554,9 @@
 #root.view-solve.night .answer-key-cell:not(.selected):not(.answer-correct):not(.answer-wrong) {
   background: #141418 !important;
 }
+
+/* Gabarito com as mesmas cores do feedback das questões. Bloco final. */
+#root.view-solve .answer-key-cell.answer-correct { background: #EAF4ED !important; border-color: #93C2A3 !important; color: #2E7D46 !important; }
+#root.view-solve .answer-key-cell.answer-wrong { background: #FAEEE9 !important; border-color: #D9A89D !important; color: #A34A3E !important; }
+#root.view-solve.night .answer-key-cell.answer-correct { background: rgba(61, 91, 70, .28) !important; border-color: #3D5B46 !important; color: #A8C3AE !important; }
+#root.view-solve.night .answer-key-cell.answer-wrong { background: rgba(99, 66, 63, .28) !important; border-color: #63423F !important; color: #C5A5A0 !important; }
