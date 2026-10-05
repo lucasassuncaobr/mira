@@ -22,7 +22,7 @@
 .pdf-modal {
   background: var(--pdf-panel);
   color: var(--pdf-ink);
-  border-radius: 6px;
+  border-radius: 0;
   width: min(1020px, 100%);
   max-height: calc(100vh - 44px);
   display: flex;
@@ -40,9 +40,9 @@
   height: auto;
   min-height: 0;
   margin: 0;
-  padding: 8px 12px;
-  /* Mesma família do chrome do viewer (#04002e): faixa única e contínua. */
-  background: #04002e;
+  padding: 4px 10px;
+  /* Slim fundida ao viewer: mesma cor, sem filete — lê-se como uma unidade. */
+  background: #f9f9fa;
   border-bottom: 0;
 }
 
@@ -51,12 +51,12 @@
   align-items: baseline;
   gap: 8px;
   min-width: 0;
-  color: #fff;
+  color: #1a1a1e;
 }
 
 .pdf-modal-title strong {
   font: 700 13px var(--font-primary);
-  color: #fff;
+  color: #1a1a1e;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -65,15 +65,27 @@
 
 .pdf-modal-title span {
   font-size: 10px;
-  color: rgba(255, 255, 255, .75);
+  color: rgba(0, 0, 0, .55);
   white-space: nowrap;
 }
 
 .pdf-modal-controls {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   flex-shrink: 0;
+  margin-left: auto;
+  /* Flutuantes na lateral externa do modal. */
+  position: absolute;
+  top: 0;
+  right: -54px;
+  flex-direction: column;
+  margin-left: 0;
+}
+.pdf-modal { position: relative; overflow: visible; }
+@media (max-width: 1100px) {
+  /* Tela estreita: fileira fixa no topo-direita da viewport. */
+  .pdf-modal-controls { position: fixed; top: 12px; right: 12px; flex-direction: row; z-index: 5; }
 }
 
 .pdf-modal-controls i {
@@ -84,21 +96,23 @@
 }
 
 .pdf-modal-controls button {
-  border: 0;
-  background: rgba(255, 255, 255, .16);
+  border: 1px solid rgba(255, 255, 255, .14);
+  background: rgba(0, 0, 0, .55);
+  backdrop-filter: blur(6px);
   color: #fff;
-  width: 28px;
-  height: 28px;
+  width: 34px;
+  height: 34px;
   border-radius: 3px;
   display: grid;
   place-items: center;
   cursor: pointer;
 }
+.pdf-modal-controls button svg { width: 16px; height: 16px; }
 
 .pdf-modal-controls button:hover:not(:disabled) {
-  background: rgba(255, 255, 255, .28);
+  background: rgba(0, 0, 0, .72);
   color: #fff;
-  border-color: transparent;
+  border-color: rgba(255, 255, 255, .22);
 }
 
 .pdf-modal-controls button:disabled {
@@ -115,13 +129,23 @@
 }
 
 .pdf-modal-close {
-  background: rgba(255, 255, 255, .16) !important;
-  border-color: transparent !important;
+  background: rgba(0, 0, 0, .55) !important;
+  border-color: rgba(255, 255, 255, .14) !important;
   color: #fff !important;
 }
 
 .pdf-modal-close:hover {
-  background: rgba(255, 255, 255, .28) !important;
+  background: rgba(0, 0, 0, .72) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .pdf-modal-toolbar { background: #38383d; }
+  .pdf-modal-title, .pdf-modal-title strong { color: #fff; }
+  .pdf-modal-title span { color: rgba(255, 255, 255, .7); }
+  .pdf-modal-controls button { background: rgba(255, 255, 255, .14); color: #fff; }
+  .pdf-modal-controls button:hover:not(:disabled) { background: rgba(255, 255, 255, .24); color: #fff; }
+  .pdf-modal-close { background: rgba(255, 255, 255, .14) !important; color: #fff !important; }
+  .pdf-modal-close:hover { background: rgba(255, 255, 255, .24) !important; }
 }
 
 .pdf-modal-body {

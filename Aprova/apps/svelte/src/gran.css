@@ -506,7 +506,9 @@
 /* Toggle sol/lua Uiverse.io by Type-Delta (clone de joshwcomeau.com, CSS puro).
    Escopado à prova; tamanho ajustado ao cabeçalho. checked = dia (sol). */
 #root.view-solve .themeToggle { color: #8A8F98; width: 26px; display: inline-flex; }
+#root.view-solve .themeToggle:hover { color: #F59E0B; }
 #root.view-solve.night .themeToggle { color: #9B9B9B; }
+#root.view-solve.night .themeToggle:hover { color: #E0E7FF; }
 #root.view-solve .st-sunMoonThemeToggleBtn { position: relative; cursor: pointer; }
 #root.view-solve .st-sunMoonThemeToggleBtn .themeToggleInput { opacity: 0; width: 100%; aspect-ratio: 1; margin: 0; }
 #root.view-solve .st-sunMoonThemeToggleBtn svg { position: absolute; left: 0; width: 100%; height: 100%; transition: transform 0.4s ease; transform: rotate(40deg); }
@@ -798,21 +800,21 @@
 #root.view-solve.night .faixa-questao {
   position: absolute !important;
   z-index: 2 !important;
-  mix-blend-mode: normal !important;
-  background-color: #121212 !important;
-  background-image: none !important;
+  mix-blend-mode: screen !important;
+  background-color: rgba(18, 18, 18, .9) !important;
+  background-image: linear-gradient(90deg, rgba(18, 18, 18, .9) 0%, rgba(18, 18, 18, .85) 80%, rgba(18, 18, 18, .5) 94%, rgba(18, 18, 18, 0) 100%) !important;
   box-shadow: none;
 }
 #root.view-solve.night .faixa-questao.ativa {
-  background: rgba(18, 18, 18, .55) !important;
-  background-image: none !important;
-  opacity: .58 !important;
+  background: rgba(18, 18, 18, .9) !important;
+  background-image: linear-gradient(90deg, rgba(18, 18, 18, .9) 0%, rgba(18, 18, 18, .85) 80%, rgba(18, 18, 18, .5) 94%, rgba(18, 18, 18, 0) 100%) !important;
+  opacity: .85 !important;
   contain: none !important;
   box-shadow: none !important;
 }
 #root.view-solve.night .pagina-pdf { overflow: visible !important; }
 #root.view-solve.night .image-toolbar button { color: var(--mishu-muted) !important; }
-#root.view-solve.night .image-toolbar button:hover { color: var(--mishu-accent-soft) !important; }
+#root.view-solve.night .image-toolbar button:hover { color: #C8C2E6 !important; background: transparent !important; }
 
 /* A célula ativa é o único elemento com cantos arredondados nos dois temas. */
 #root.view-solve .index-btn.active,
@@ -823,7 +825,7 @@
 #root.view-solve.night .pdf-column,
 #root.view-solve.night .page-reference,
 #root.view-solve.night .pagina-pdf { background: transparent !important; }
-#root.view-solve.night .image-viewport { background: #151518 !important; }
+#root.view-solve.night .image-viewport { background: var(--mishu-bg) !important; }
 #root.view-solve.night .pagina-pdf::before { display: none !important; }
 #root.view-solve.night .pagina-pdf img {
   filter: invert(.9) hue-rotate(180deg) saturate(.7) brightness(.82) contrast(.9) !important;
@@ -952,6 +954,10 @@
   color: #62646D !important;
   stroke: #62646D !important;
 }
+#root.view-solve.night .image-toolbar button:hover svg {
+  color: #C8C2E6 !important;
+  stroke: #C8C2E6 !important;
+}
 
 /* Cinza sutil compartilhado pelo relógio e pelos ícones SVG da topbar. */
 #root.view-solve.night > .topbar .nav svg,
@@ -960,6 +966,7 @@
 #root.view-solve.night .pdf-delim .clock-time {
   color: #62646D !important;
 }
+#root.view-solve.night .pdf-delim .clock-pause:hover { color: #C8C2E6 !important; }
 #root.view-solve .option.selected .option-letter {
   position: relative;
 }

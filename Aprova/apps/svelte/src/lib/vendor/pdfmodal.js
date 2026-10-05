@@ -30,62 +30,19 @@ export class PdfModal {
     el.setAttribute("aria-label", `PDF: ${this.title}`);
     el.innerHTML = `
       <div class="pdf-modal pdf-modal-embed">
-        <header class="pdf-modal-toolbar">
-          <div class="pdf-modal-title"><strong></strong><span>Página inteira • PDF original</span></div>
-          <div class="pdf-modal-controls">
-            <button data-act="fullscreen" aria-label="Expandir para tela cheia" title="Expandir para tela cheia">${ICONS.expand}</button>
-            <button class="pdf-modal-close" aria-label="Fechar PDF">${ICONS.x}</button>
-          </div>
-        </header>
+        <div class="pdf-modal-controls">
+          <button data-act="fullscreen" aria-label="Expandir para tela cheia" title="Expandir para tela cheia">${ICONS.expand}</button>
+          <button class="pdf-modal-close" aria-label="Fechar PDF">${ICONS.x}</button>
+        </div>
         <div class="pdf-modal-body pdf-modal-embed-body">
           <iframe class="pdf-viewer-frame" title="Visualizador de PDF" src="${VIEWER}?file=${file}"></iframe>
         </div>
       </div>`;
-    el.querySelector(".pdf-modal-title strong").textContent = this.title;
     el.addEventListener("click", (e) => { if (e.target === el) this.close(); });
     el.querySelector(".pdf-modal-close").addEventListener("click", () => this.close());
     el.querySelector('[data-act="fullscreen"]').addEventListener("click", () => this.toggleFullscreen());
-    this.frame = el.querySelector(".pdf-viewer-frame");
-    this.frame.addEventListener("load", () => this.applyAccent());
     this.el = el;
     document.body.appendChild(el);
-  }
-
-  // Acento principal do projeto PDF dentro do viewer oficial
-  // (mesma origem permite injetar o CSS).
-  applyAccent() {
-    try {
-      const doc = this.frame && this.frame.contentDocument;
-      if (!doc || doc.querySelector("style[data-mira-accent]")) return;
-      const style = doc.createElement("style");
-      style.dataset.miraAccent = "";
-      style.textContent = [
-        ":root{",
-        "--color-accent-primary:#2596be!important;",
-        "--color-accent-primary-hover:#1e87ae!important;",
-        "--color-accent-primary-active:#176e8f!important;",
-        "--progressBar-color:#45add6!important;",
-        "--link-fg-color:#7cc7ea!important;",
-        "--toolbar-bg-color:#04002e!important;",
-        "--body-bg-color:#040015!important;",
-        "--sidebar-narrow-bg-color:rgba(4,0,21,.94)!important;",
-        "--sidebar-toolbar-bg-color:#04002e!important;",
-        "--toolbar-border-color:#2a2b5f!important;",
-        "--main-color:#f2f2f7!important;",
-        "--field-bg-color:#1a1a2e!important;",
-        "--field-color:#f2f2f7!important;",
-        "--doorhanger-bg-color:#12122b!important;",
-        "--button-hover-color:#2a2b5f!important;",
-        "--doorhanger-hover-bg-color:rgb(93, 94, 98)!important;",
-        "--doorhanger-hover-color:#fff!important;",
-        "#zoomOutButton:hover,#zoomInButton:hover{background-color:#2a2b5f!important;}",
-        "#scaleSelect,#pageNumber{background-color:#2a2b5f!important;color:#fff!important;border-color:#47457c!important;}",
-        "}",
-      ].join("");
-      doc.head.appendChild(style);
-    } catch {
-      /* Viewer inacessível: mantém o tema padrão. */
-    }
   }
 
   bindGlobal() {
