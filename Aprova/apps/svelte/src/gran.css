@@ -403,9 +403,44 @@
 /* Sem linha divisória no cabeçalho da questão. */
 #root.view-solve .question-header { border-bottom: 0; }
 #root.view-solve .question-number { position: relative; top: 5px; }
-/* Alternativa marcada: linhas compactas (só a letra); ao clicar,
-   transição leve. (Cores dos estados no tema "cinza conforto" abaixo.) */
-#root.view-solve .option { padding: 8px 14px !important; transition: background-color .25s ease, border-color .25s ease !important; border: 1px solid #E5E7EB !important; border-radius: 0 !important; }
+/* ---- Tokens de movimento da prova (PCs fracos lagados) ----
+   Micro-feedback: 120–160ms ease-out (hover/press/estados).
+   Entradas: 200ms cubic-bezier(.22,1,.36,1), stagger 30ms.
+   SOMENTE transform/opacity; nunca width/height/box-shadow/blur.
+   Toda animação nova usa estes tokens + reduced-motion. ---- */
+/* Alternativas como fileiras full-width clicáveis (alvo ≥52px): a linha
+   inteira é o touch target, com seletor circular de peso, profundidade
+   sutil no hover/seleção e estado de press instantâneo. */
+#root.view-solve .option { padding: 8px 14px !important; transition: background-color .16s ease-out, border-color .16s ease-out, color .16s ease-out, transform .12s ease-out !important; border: 1px solid #E5E7EB !important; border-radius: 0 !important; }
+#root.view-solve .answer-section .option { min-height: 52px; padding: 6px 14px 6px 8px !important; gap: 12px; box-shadow: none; }
+#root.view-solve .answer-section .option:hover { box-shadow: 0 1px 3px rgba(16, 24, 40, .1); }
+#root.view-solve .answer-section .option:active { transform: scale(.995); }
+/* Entrada escalonada das fileiras por questão ({#key}): única linguagem
+   de movimento da área (só opacity + translateY 4px, 200ms, easing
+   compartilhado, delays 30ms) — barata p/ GPU fraca. */
+@keyframes opt-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+#root.view-solve .options-stagger > .option { animation: opt-in .2s cubic-bezier(.22, 1, .36, 1) backwards; }
+#root.view-solve .options-stagger > .option:nth-child(2) { animation-delay: 30ms; }
+#root.view-solve .options-stagger > .option:nth-child(3) { animation-delay: 60ms; }
+#root.view-solve .options-stagger > .option:nth-child(4) { animation-delay: 90ms; }
+#root.view-solve .options-stagger > .option:nth-child(5) { animation-delay: 120ms; }
+#root.view-solve .options-stagger > .option:nth-child(n+6) { animation-delay: 150ms; }
+/* PCs fracos: sem box-shadow animada (só estática), sem JS de animação —
+   só transições baratas de compositor; respeita reduced-motion. */
+#root.view-solve .answer-section .option,
+#root.view-solve .option-letter,
+#root.view-solve .index-btn { will-change: auto; }
+@media (prefers-reduced-motion: reduce) {
+  #root.view-solve .answer-section .option,
+  #root.view-solve .option-letter,
+  #root.view-solve .index-btn,
+  #root.view-solve .themeToggle svg,
+  #root.view-solve .themeToggle svg .sunRay,
+  #root.view-solve .options-stagger > .option { transition: none !important; animation: none !important; }
+  #root.view-solve .answer-section .option:active { transform: none; }
+}
+/* (wrapper .question-swap removido: sem animação de troca, sem remontagem) */
+#root.view-solve .option.selected { box-shadow: 0 1px 4px rgba(79, 70, 229, .2); }
 #root.view-solve .option.selected .option-letter { font-weight: 800; }
 /* Card de filtros em Gabarito; botão Responder em Gabarito. */
 .gran-filters, .gran-filters h3, .gran-filters label, .gran-filters .gran-field input, .gran-filters .gran-field select, .gran-filters button { font-family: var(--font-prova); }
@@ -442,7 +477,6 @@
 #root.view-solve .answer-section .option:hover { background: #F2F3F6; border-color: #CFD3DA; }
 #root.view-solve .option.selected { border-color: #4f46e5; background: #EEEFFE; box-shadow: 0 1px 3px rgba(79, 70, 229, .12); }
 #root.view-solve .option.selected:hover { border-color: #4f46e5; background: #EEEFFE; box-shadow: 0 1px 3px rgba(79, 70, 229, .12); }
-#root.view-solve .option.selected .option-letter { color: #4f46e5; }
 #root.view-solve .option.disabled { background: #EDEEF1; border-color: #E1E3E8; }
 #root.view-solve .option.correct-highlight { border-color: #93C2A3; background: #EAF4ED; }
 #root.view-solve .option.correct-highlight .option-text { color: #33373E; }
@@ -463,14 +497,17 @@
 /* Tesoura da marcada oculta com visibility (não display): o espaço é
    preservado e a letra não muda de lado. */
 #root.view-solve .scissor-btn.scissor-hidden { visibility: hidden; }
-#root.view-solve .scissor-btn:hover:not(:disabled) { color: #8B0000; background: transparent; }
+#root.view-solve .scissor-btn:hover:not(:disabled) { color: #6C7480; background: transparent; }
 #root.view-solve .scissor-btn:disabled { opacity: .35; cursor: default; }
-#root.view-solve .scissor-btn.on { color: #A34A3E; }
+#root.view-solve .scissor-btn.on { color: #6C7480; }
+#root.view-solve .scissor-btn.on:hover { color: #4A5060; }
 #root.view-solve .option.eliminated { opacity: .5; }
 /* Tesoura oculta com visibility (não display): o espaço é preservado
    e a letra não se move. Reaparece no hover da riscada. */
 #root.view-solve .option.eliminated .scissor-btn { visibility: hidden; }
 #root.view-solve .option.eliminated:hover .scissor-btn { visibility: visible; }
+/* Riscada exibe seta de desfazer (sempre visível, sem hover). */
+#root.view-solve .option.eliminated .scissor-btn.on { visibility: visible; }
 #root.view-solve .option.eliminated .option-letter,
 #root.view-solve .option.eliminated .option-text { text-decoration: line-through; text-decoration-thickness: 2px; }
 /* Selo da alternativa marcada no feedback: linha de texto acima do card,
@@ -747,7 +784,6 @@
   border-radius: 0 !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
 }
-#root.view-solve.night .option.selected .option-letter { color: #9188B4; }
 #root.view-solve.night .nav-arrow { background: #1B2028; border-color: var(--mishu-border); color: var(--mishu-muted); }
 #root.view-solve.night .nav-arrow:hover:not(:disabled) { background: #293440; border-color: var(--mishu-accent); color: var(--mishu-text); }
 #root.view-solve.night .pdf-delim .clock-pause,
@@ -958,6 +994,11 @@
   color: #C8C2E6 !important;
   stroke: #C8C2E6 !important;
 }
+/* Reset (redefinir zoom) em cinza neutro nos dois temas. */
+#root.view-solve .image-toolbar button[aria-label="Redefinir imagem"] { color: #B6BBC4; }
+#root.view-solve .image-toolbar button[aria-label="Redefinir imagem"] svg { color: #B6BBC4 !important; stroke: #B6BBC4 !important; }
+#root.view-solve.night .image-toolbar button[aria-label="Redefinir imagem"] { color: #62646D; }
+#root.view-solve.night .image-toolbar button[aria-label="Redefinir imagem"] svg { color: #62646D !important; stroke: #62646D !important; }
 
 /* Cinza sutil compartilhado pelo relógio e pelos ícones SVG da topbar. */
 #root.view-solve.night > .topbar .nav svg,
@@ -1590,10 +1631,11 @@
 /* Número selecionado/atual do gabarito sem borda. */
 #root.view-solve .answer-key-number.active { border: 0 !important; }
 
-/* Contraste noturno no índice: textos em slate-400, feedbacks iluminados. */
-#root.view-solve.night .index-title, #root.view-solve.night .index-count { color: #94A3B8 !important; }
+/* Contraste noturno no índice: textos em zinc-300, feedbacks iluminados. */
+#root.view-solve.night .index-title, #root.view-solve.night .index-count,
+#root.view-solve.night .answer-title { color: #d4d4d8 !important; }
 #root.view-solve.night .answer-key-number { color: #A8B0BA !important; }
-#root.view-solve.night .marked-flag { color: #C7C9D1 !important; }
+#root.view-solve.night .marked-flag { color: #d4d4d8 !important; }
 #root.view-solve.night .correct-flag { color: #B9E2C3 !important; }
 
 /* Letras-base do gabarito noturno sólidas e legíveis (sem transparent). */

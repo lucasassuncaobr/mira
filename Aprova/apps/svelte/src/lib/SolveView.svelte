@@ -322,6 +322,8 @@
             <h3 class="answer-title">ESCOLHA UMA RESPOSTA</h3>
           {/if}
           <div id="options-host">
+            {#key currentIdx}
+            <div class="options-stagger">
             {#each question.alternatives as alt (alt.label)}
               {@const isMarked = selected === alt.label}
               {@const isCorrect = !!feedback && !feedback.unknown && feedback.correctAnswer === alt.label}
@@ -334,8 +336,13 @@
                 {/if}
               <div class={optionClass(alt.label)} class:eliminated={!feedback && isEliminated(question.id, alt.label)} data-label={alt.label} onclick={() => selectAnswer(alt.label)}>
                 {#if !feedback}
-                  <button class="scissor-btn" class:on={isEliminated(question.id, alt.label)} class:scissor-hidden={selected === alt.label} title="Riscar alternativa" aria-label={'Riscar alternativa ' + alt.label} aria-pressed={isEliminated(question.id, alt.label)} onclick={(e) => toggleEliminate(e, question.id, alt.label, question.alternatives.length)}>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 8.5 20 20M8.5 15.5 20 4"/></svg>
+                  {@const elim = isEliminated(question.id, alt.label)}
+                  <button class="scissor-btn" class:on={elim} class:scissor-hidden={selected === alt.label} title={elim ? 'Restaurar alternativa' : 'Riscar alternativa'} aria-label={(elim ? 'Restaurar alternativa ' : 'Riscar alternativa ') + alt.label} aria-pressed={elim} onclick={(e) => toggleEliminate(e, question.id, alt.label, question.alternatives.length)}>
+                    {#if elim}
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                    {:else}
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 8.5 20 20M8.5 15.5 20 4"/></svg>
+                    {/if}
                   </button>
                 {/if}
                 <div class="option-letter">
@@ -347,6 +354,8 @@
               </div>
               {/if}
             {/each}
+            </div>
+            {/key}
           </div>
         </div>
         <div class="bottom-nav" class:feedback-active={!!feedback}>

@@ -96,10 +96,10 @@
 }
 
 .pdf-modal-controls button {
-  border: 1px solid rgba(255, 255, 255, .14);
+  border: 1px solid transparent;
   background: rgba(0, 0, 0, .55);
   backdrop-filter: blur(6px);
-  color: #fff;
+  color: rgba(255, 255, 255, .85);
   width: 34px;
   height: 34px;
   border-radius: 3px;
@@ -112,7 +112,7 @@
 .pdf-modal-controls button:hover:not(:disabled) {
   background: rgba(0, 0, 0, .72);
   color: #fff;
-  border-color: rgba(255, 255, 255, .22);
+  border-color: transparent;
 }
 
 .pdf-modal-controls button:disabled {
@@ -130,22 +130,23 @@
 
 .pdf-modal-close {
   background: rgba(0, 0, 0, .55) !important;
-  border-color: rgba(255, 255, 255, .14) !important;
-  color: #fff !important;
+  border-color: transparent !important;
+  color: rgba(255, 255, 255, .85) !important;
 }
 
 .pdf-modal-close:hover {
   background: rgba(0, 0, 0, .72) !important;
+  color: #fff !important;
 }
 
 @media (prefers-color-scheme: dark) {
   .pdf-modal-toolbar { background: #38383d; }
   .pdf-modal-title, .pdf-modal-title strong { color: #fff; }
   .pdf-modal-title span { color: rgba(255, 255, 255, .7); }
-  .pdf-modal-controls button { background: rgba(255, 255, 255, .14); color: #fff; }
-  .pdf-modal-controls button:hover:not(:disabled) { background: rgba(255, 255, 255, .24); color: #fff; }
-  .pdf-modal-close { background: rgba(255, 255, 255, .14) !important; color: #fff !important; }
-  .pdf-modal-close:hover { background: rgba(255, 255, 255, .24) !important; }
+  .pdf-modal-controls button { background: rgba(0, 0, 0, .55); color: rgba(255, 255, 255, .85); }
+  .pdf-modal-controls button:hover:not(:disabled) { background: rgba(0, 0, 0, .72); color: #fff; }
+  .pdf-modal-close { background: rgba(0, 0, 0, .55) !important; color: rgba(255, 255, 255, .85) !important; }
+  .pdf-modal-close:hover { background: rgba(0, 0, 0, .72) !important; color: #fff !important; }
 }
 
 .pdf-modal-body {

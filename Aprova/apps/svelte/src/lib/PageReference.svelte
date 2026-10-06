@@ -253,14 +253,14 @@
         style:--pdf-zoom-percent="{zoom * 100}%"
         style:--pdf-zoom-width="{Math.round(960 * zoom)}px"
       >
-        <img
-          draggable="false"
-          loading="lazy"
-          decoding="async"
-          src={src}
-          alt="Página {page} do PDF original"
-          onload={() => requestAnimationFrame(() => aplicarFoco())}
-        />
+          <img
+            draggable="false"
+            loading="lazy"
+            decoding="async"
+            src={src}
+            alt="Página {page} do PDF original"
+            onload={() => requestAnimationFrame(() => aplicarFoco())}
+          />
         <div bind:this={faixaEl} class="faixa-questao" aria-hidden="true"></div>
       </div>
     </div>
